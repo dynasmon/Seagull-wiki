@@ -1,0 +1,10 @@
+node_modules
+build
+.docusaurus
+sources
+static/reference
+docs/reference/generated
+docs/architecture/decisions
+package-lock.json
+playwright-report
+test-results
