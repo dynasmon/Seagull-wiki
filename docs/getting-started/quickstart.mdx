@@ -1,0 +1,55 @@
+---
+title: 'Run the development platform'
+description: 'Bring up the actual backend development stack and verify authenticated ingestion, hunting, and inventory.'
+---
+
+This walkthrough exercises the current backend with its development probe. It does not install a complete production platform or turn the unfinished V2 agent into a telemetry collector.
+
+## Requirements
+
+Use Docker Engine with the Compose plugin, GNU Make, and the Go toolchain selected by the backend module. The inspected backend declares Go 1.25.0 with toolchain `go1.25.13`. Private module access may require `GOPRIVATE=github.com/dynasmon/*` and your own Git credentials. Never put those credentials in a documentation command or image.
+
+Run all commands from a clean `Seagull-backend-v2` checkout. Existing services use TLS ports 8443–8446 in the development topology. See [networking](/docs/deployment/topology) for overrides.
+
+## Start
+
+```bash
+make dev-pki
+make up
+docker compose -f deploy/compose.yaml ps -a
+```
+
+`make up` also runs the PKI prerequisite and passes your user/group identity so private development keys remain owner-readable. The stack starts Redpanda, ClickHouse, PostgreSQL, migrators, and backend processes. Wait for migrations to exit successfully and long-running dependencies to become ready.
+
+## Validate telemetry
+
+```bash
+go run ./tools/devprobe -endpoint https://127.0.0.1:8443
+go run ./tools/devprobe -hunt https://127.0.0.1:8444
+```
+
+The probe first registers the development agent in the `default` tenant using the development caller. Successful submission demonstrates durable admission; the hunt demonstrates downstream storage visibility. They are separate checks. The shipped ruleset can produce detection evidence from the probe's authentication observations.
+
+## Validate inventory
+
+```bash
+go run ./tools/devprobe -inventory
+```
+
+This sends sample distribution, package, and service inventory through the independent inventory path. It does not activate an endpoint collector. Follow [inventory semantics](/docs/inventory/overview) before using real scan data.
+
+## Stop while preserving state
+
+```bash
+docker compose -f deploy/compose.yaml stop
+```
+
+:::warning Destructive development target
+The backend's `make down` runs Compose with `--volumes`. It removes persisted development data. Use it only when intentionally resetting the stack.
+:::
+
+If a step fails, use [symptom-based troubleshooting](/docs/troubleshooting/overview), not insecure TLS flags. Next, trace the [event lifecycle](/docs/architecture/event-lifecycle) and read the [implementation status](/docs/roadmap/status).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/README.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/README.md) · [Seagull-backend-v2/Makefile](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/Makefile) · [Seagull-backend-v2/go.mod](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/go.mod) · [Seagull-backend-v2/tools/devprobe/main.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tools/devprobe/main.go).

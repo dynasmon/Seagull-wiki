@@ -1,0 +1,26 @@
+---
+title: 'Why V2 exists'
+description: 'The evolution from the legacy platform to explicit durability, ownership, and independent lifecycles.'
+---
+
+The legacy implementation is a source of product requirements and operational lessons. V2 retains those lessons while replacing the architecture that connected them. Compatibility is intentional, not implied by a shared product name.
+
+## Durability becomes an admission boundary
+
+ADR 1 records a legacy ingest path that acknowledged a Redis enqueue before the downstream workers completed their writes. V2 instead makes the broker publication durable before replying. An upstream producer can therefore distinguish “the platform owns this batch” from “a process accepted some work.” Detection and database writes still happen later.
+
+## Identity becomes explicit
+
+ADR 2 records the move from proxy-forwarded identity headers to certificate verification in the gateway. ADR 26 subsequently moves tenant assignment to the registered agent's admission record. Historical statements in an older ADR must be read with these amendments.
+
+## Capabilities gain separate owners
+
+Events, detections, alerts, and incidents represent different facts. Analytical evidence belongs in the data plane; mutable triage belongs in the control plane. V2 makes this distinction in contracts, stores, processes, and architecture tests. Scaling ingestion no longer requires putting every product responsibility in the same request path.
+
+## Migration limits
+
+This workspace does not supply a general V1 database migration or an automatic fleet migration. Do not point a legacy agent at V2 merely because both use TLS. Compare the wire contracts and recorded compatibility exchanges first. Bring up a separate V2 environment, verify the [development probe](/docs/getting-started/quickstart), and treat production migration as a deployment-specific project until a supported migration procedure exists.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/docs/decisions/0001-durable-before-acknowledged.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0001-durable-before-acknowledged.md) · [Seagull-backend-v2/docs/decisions/0002-identity-comes-from-the-certificate.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0002-identity-comes-from-the-certificate.md) · [Seagull-backend-v2/docs/decisions/0011-a-detection-is-not-an-alert.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0011-a-detection-is-not-an-alert.md) · [Seagull-backend-v2/docs/decisions/0026-an-agent-sends-into-the-tenant-it-was-registered-in.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0026-an-agent-sends-into-the-tenant-it-was-registered-in.md) · `Seagull-backend-v2/notes/v1-lessons.md` (local planning evidence).
