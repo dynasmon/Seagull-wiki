@@ -1,0 +1,44 @@
+---
+sidebar_position: 1
+title: 'Implementation status'
+description: 'The reviewed implementation matrix for Seagull V2, with explicit gaps and evidence.'
+---
+
+This status describes the source baseline reviewed on **20 September 2026**. It is not a release announcement, deployment certification, or assertion that every locally implemented change has been published as a release.
+
+| Capability                              | Status                        | Evidence and limit                                                          |
+| --------------------------------------- | ----------------------------- | --------------------------------------------------------------------------- |
+| Authenticated event/inventory admission | Implemented                   | Gateway mTLS, roster tenancy, bounds, broker-before-ACK                     |
+| Independent event/detection writers     | Implemented                   | Analytical projection, commit-after-delivery, quarantine                    |
+| Stateless authentication detection      | Implemented                   | Typed fields and three shipped SSH rules                                    |
+| Count and ordered-sequence detection    | Implemented                   | Bounded event-time state; partition-affinity restrictions                   |
+| Ruleset publication/activation          | Implemented                   | Content identity and compacted log; per-engine refusal possible             |
+| Alerts and incidents                    | Implemented                   | Separate records, operator lifecycle, trails; no incident-to-alert grouping |
+| Query API                               | Implemented                   | Protobuf hunting; tenant scope from certificate, not control policy         |
+| Control sessions/policy                 | Implemented with limits       | Process-local sessions; restart/replica limitations                         |
+| Agent registry and backend PKI          | Implemented                   | Operator-mediated initial issuance; agent-authenticated renewal listener    |
+| Automatic bootstrap enrollment          | Planned                       | No one-time token redemption service                                        |
+| Inventory projection                    | Implemented                   | Full scans/deltas; no scan chunk-assembly protocol                          |
+| Vulnerability intelligence              | Implemented                   | OSV distribution imports, provenance, versioned persistence                 |
+| Asset vulnerability matching            | Planned                       | No findings produced from advisory/inventory join yet                       |
+| Agent local foundation                  | Implemented                   | Runtime/configuration/identity/key provider/diagnostics                     |
+| Agent module supervisor                 | Implemented                   | No real collector composed                                                  |
+| Agent collection, spool, mTLS delivery  | Planned                       | Reserved configuration is not a working pipeline                            |
+| Agent signed policy, updates, response  | Planned                       | Updates disabled; no command execution channel                              |
+| Agent native packages / Windows / macOS | Planned                       | Current supported foundation is Linux source build                          |
+| V2 frontend                             | Planned                       | Repository placeholder                                                      |
+| Production HA / automated recovery      | In progress / deployment work | No complete supplied HA and restore topology                                |
+
+## How status is decided
+
+Source and tests outrank README summaries and old development cards. Current composition roots decide whether a package actually runs. ADRs retain historical context and may contain superseded statements; amendment notices and later decisions matter.
+
+Examples found in this review: older notes discuss missing aggregate gateway capacity although the current gateway enforces it; early PKI prose calls the agent empty although it now has substantial foundations; a contracts README demonstrates an older release than both consumers currently pin. These discrepancies are resolved in the guides rather than copied as present behavior.
+
+## Next architectural milestones
+
+The agent plan prioritizes foundation, a core authentication-to-detection path, and then inventory. Backend notes identify vulnerability matching and broker/security hardening as outstanding work. No delivery dates are promised. See [agent milestones](/docs/roadmap/agent), [production readiness](/docs/deployment/production), and [source baseline](/docs/reference/source-baseline).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/README.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/README.md) · [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go) · [Seagull-frontend-v2/README.md](https://github.com/dynasmon/Seagull-frontend-v2/blob/307351e8d7f9a696786a9b05d50ac0b783db4163/README.md) · `Seagull-backend-v2/notes/backlog-status.md` (local planning evidence).
