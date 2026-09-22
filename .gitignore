@@ -15,3 +15,6 @@ Thumbs.db
 *.tmp
 *.pem
 *.key
+sources/workspace/
+sources/Seagull-backend-v2/notes/*
+!sources/Seagull-backend-v2/notes/performance-baseline.md
