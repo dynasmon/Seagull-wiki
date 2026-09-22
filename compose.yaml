@@ -1,0 +1,24 @@
+name: seagull-wiki
+services:
+  docs:
+    build:
+      context: .
+      target: development
+    init: true
+    ports:
+      - '127.0.0.1:${DOCS_PORT:-3000}:3000'
+    environment:
+      DOCS_URL: ${DOCS_URL:-https://docs.example.com}
+      DOCS_BASE_URL: ${DOCS_BASE_URL:-/}
+      WATCH_POLL: ${WATCH_POLL:-false}
+      # Kept off the bind mount so host builds and one-off runs cannot overwrite it.
+      DOCUSAURUS_GENERATED_FILES_DIR_NAME: /tmp/docusaurus
+    volumes:
+      - .:/app
+      - dependencies:/app/node_modules
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  dependencies:

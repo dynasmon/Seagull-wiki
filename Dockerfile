@@ -4,7 +4,13 @@ WORKDIR /app
 RUN chown node:node /app
 USER node
 COPY --chown=node:node package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund && sha256sum package-lock.json | cut -d ' ' -f 1 > node_modules/.lock-hash
+
+FROM dependencies AS development
+COPY --chmod=755 docker/develop.sh /usr/local/bin/develop
+EXPOSE 3000
+ENTRYPOINT ["develop"]
+CMD ["npm", "start", "--", "--port", "3000"]
 
 FROM dependencies AS build
 ARG DOCS_URL=https://docs.example.com
