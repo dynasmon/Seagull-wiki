@@ -1,0 +1,166 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+	"os"
+
+	"github.com/dynasmon/Seagull-backend-v2/internal/broker"
+	"github.com/dynasmon/Seagull-backend-v2/internal/ingest"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/config"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/ratelimit"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/run"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/service"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/tlsx"
+)
+
+func main() {
+	ctx, stop := run.SignalContext(context.Background())
+	defer stop()
+
+	if err := gateway(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "ingest-gateway: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+func gateway(ctx context.Context) error {
+	settings, err := load(config.FromEnvironment())
+	if err != nil {
+		return err
+	}
+
+	platform, err := service.New(settings.service)
+	if err != nil {
+		return err
+	}
+
+	material, err := tlsx.NewMaterial(settings.certificateFile, settings.keyFile, settings.agentCAFile)
+	if err != nil {
+		return err
+	}
+	mutual, err := material.MutualServerConfig()
+	if err != nil {
+		return err
+	}
+
+	publisher, err := broker.NewPublisher(broker.Config{
+		Brokers:  settings.brokers,
+		Topic:    settings.topology.Events.Name,
+		ClientID: settings.admissionRules.Gateway,
+		Security: settings.security,
+	})
+	if err != nil {
+		return err
+	}
+	defer publisher.Close()
+
+	assets, err := broker.NewInventory(broker.Config{
+		Brokers:  settings.brokers,
+		Topic:    settings.topology.Inventory.Name,
+		ClientID: settings.inventoryRules.Gateway,
+		Security: settings.security,
+	})
+	if err != nil {
+		return err
+	}
+	defer assets.Close()
+
+	// The topology is applied by backbone-migrator, never here. This only refuses
+	// to serve agents when a topic it would publish to is missing or reshaped.
+	topologyCtx, cancel := context.WithTimeout(ctx, settings.publishTimeout)
+	defer cancel()
+	drift, err := publisher.VerifyTopics(topologyCtx, settings.topology.Events, settings.topology.Inventory)
+	if err != nil {
+		return err
+	}
+	for _, entry := range drift {
+		platform.Logger().Warn("backbone_topology_drift", slog.String("drift", entry))
+	}
+
+	admitted, err := admissible(ctx, settings, platform)
+	if err != nil {
+		return err
+	}
+	defer admitted.close()
+
+	instruments := ingest.NewMetrics(platform.Metrics())
+	admitter, err := ingest.NewAdmitter(publisher, settings.admissionRules, instruments)
+	if err != nil {
+		return err
+	}
+
+	inventoryInstruments := ingest.NewInventoryMetrics(platform.Metrics())
+	inventoryAdmitter, err := ingest.NewInventoryAdmitter(assets, settings.inventoryRules, inventoryInstruments)
+	if err != nil {
+		return err
+	}
+
+	capacity, err := ingest.NewCapacity(settings.maxInflightBytes, settings.maxInflightRequests)
+	if err != nil {
+		return err
+	}
+	ingest.ObserveCapacity(platform.Metrics(), capacity)
+
+	// One limiter and one capacity across both routes: what an agent may spend
+	// and what the process may hold are bounded per agent and per process, not
+	// per kind of record, or a collector would buy a second budget by sending an
+	// inventory batch.
+	limiter := ratelimit.NewLimiter(settings.ratePerSecond, settings.rateBurst, settings.trackedAgents)
+
+	handler, err := ingest.NewHandler(ingest.HandlerOptions{
+		Admitter:       admitter,
+		Roster:         admitted.held,
+		Limiter:        limiter,
+		Capacity:       capacity,
+		Metrics:        instruments,
+		MaxBodyBytes:   settings.maxBodyBytes,
+		PublishTimeout: settings.publishTimeout,
+	})
+	if err != nil {
+		return err
+	}
+
+	inventoryHandler, err := ingest.NewInventoryHandler(ingest.InventoryHandlerOptions{
+		Admitter:       inventoryAdmitter,
+		Roster:         admitted.held,
+		Limiter:        limiter,
+		Capacity:       capacity,
+		Metrics:        inventoryInstruments,
+		MaxBodyBytes:   settings.maxBodyBytes,
+		PublishTimeout: settings.publishTimeout,
+	})
+	if err != nil {
+		return err
+	}
+
+	listener, err := ingest.NewServer(ingest.ServerOptions{
+		Address:         settings.address,
+		TLS:             mutual,
+		Handler:         handler,
+		Inventory:       inventoryHandler,
+		Instrumentation: platform.HTTP(),
+		Logger:          platform.Logger(),
+		ReadTimeout:     settings.readTimeout,
+		WriteTimeout:    settings.writeTimeout,
+		IdleTimeout:     settings.idleTimeout,
+		ShutdownTimeout: platform.ShutdownTimeout(),
+	})
+	if err != nil {
+		return err
+	}
+
+	platform.Logger().Info("agent_roster_read",
+		slog.String("agents_topic", settings.topology.Agents.Name),
+		slog.Int("agents_known", admitted.held.Known()),
+		slog.Int("agents_refused", admitted.held.Refused()),
+	)
+
+	platform.Health().Register("backbone", publisher.Ping)
+	platform.Health().Register("inventory-backbone", assets.Ping)
+	platform.Add(admitted.follower(platform.Logger()))
+	platform.Add(listener)
+
+	return platform.Run(ctx)
+}

@@ -1,0 +1,487 @@
+# Seagull v2
+
+[![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
+[![Backend](https://img.shields.io/badge/backend-Go%201.25-00ADD8.svg)](go.mod)
+[![Backbone](https://img.shields.io/badge/backbone-Redpanda-E7407A.svg)](deploy/compose.yaml)
+[![Store](https://img.shields.io/badge/store-ClickHouse-FFCC01.svg)](internal/clickhouse)
+[![Contracts](https://img.shields.io/badge/contracts-Seagull--contracts-00A6A6.svg)](https://github.com/dynasmon/Seagull-contracts)
+
+Seagull v2 is the backend of an open security operations platform, rebuilt as a
+set of small processes around a durable event backbone. Telemetry becomes
+durable before anything else happens to it; every capability downstream is a
+consumer of that stream rather than a step inside the request that admitted it.
+
+It is a re-architecture of [Seagull v1](https://github.com/dynasmon/Seagull), not
+a port of it. v1 is the functional reference — its detection content, security
+invariants and operational lessons carry over — while the layering, the queues,
+the ORM-shaped domain and the synchronous telemetry path do not. Where the two
+disagree, v2 wins unless there is evidence the v2 decision is wrong.
+
+Endpoint collection is performed by an agent released independently, and the
+messages the two exchange live in
+[Seagull-contracts](https://github.com/dynasmon/Seagull-contracts) so that
+neither repository depends on the other.
+
+## What the backend does
+
+### Durable telemetry ingestion
+
+The gateway terminates mutual TLS, takes the agent's identity from the verified
+certificate rather than from anything the producer sent, admits or refuses the
+batch against explicit size and rate ceilings, and answers only once the
+backbone owns it. An agent may drop its local copy of a batch on that answer and
+on nothing else, so a gateway that crashes mid-batch costs a retry rather than
+telemetry.
+
+### Detection engineering
+
+A rule names the class of event it reads and matches with a typed expression
+over the fields of the event contract — there is no dictionary between the two,
+so a rule naming a field the contract does not declare is refused where it is
+written, with the line and the part that is wrong. Rules carry severity, ATT&CK
+technique, false-positive guidance and provenance, and each one travels with the
+cases it was written for, which the same evaluator checks.
+
+### Sigma import
+
+A supported Sigma rule is translated into a Seagull rule and goes through the
+same validator and compiler as a rule somebody wrote here; the domain does not
+know Sigma exists. What can be translated is decided by the canonical form: a
+field it folds can carry Sigma's case-insensitive comparison, and a field whose
+case it keeps on purpose cannot, so the comparison is refused and the remedy is
+named. Everything the rule language cannot state — a pattern, a network range,
+a keyword search, a distinct count, a threshold counting down — is refused with
+the line it was written on rather than imported as something that runs and finds
+less. A translated rule arrives as a draft carrying no cases, so two independent
+gates keep it out of an estate until a person has written down what it should
+find.
+
+```bash
+go run ./tools/sigmaimport -input path/to/sigma -output deploy/rules/imported.yml -strict
+```
+
+### Incidents and correlation output
+
+Event, detection, alert and incident are four records with four owners, not four
+names for one row. A detection states that a rule matched; an alert is one
+detection somebody owns; an incident is what a correlation becomes when a person
+has to answer for it, named by the detection that told the story and carrying one
+event per stage, so it can be traced back to what it was made of. It has a
+lifecycle of its own and nothing an operator does to it writes to the events or
+the detection behind it. How far the platform vouches for the order a story rests
+on is measured from the clocks that timed it rather than declared by the rule.
+
+### Ruleset management
+
+Rulesets are administered through the control plane and published to a compacted
+topic, never by reaching into a running engine. A ruleset is named by its own
+content, so publishing the same rules twice is one version; publishing and
+activating are separate acts, so a rollout can be rolled back to a version that
+cannot have changed underneath it. Nothing that fails to compile, or whose own
+cases do not hold, is ever written.
+
+### Event hunting
+
+The query plane holds the only read connection to the store, consumes no topic
+and writes nothing. A query is a scope, a window and a question, and only the
+last comes from the caller: the tenants a caller may read are derived rather
+than requested, so a question cannot widen its own answer.
+
+### Access control
+
+The control plane authenticates by certificate, exchanges a completed handshake
+for a short-lived session bound to that certificate, and decides every request
+against a policy of typed permissions resolved per request. A token carries
+identity and no authority. Every route declares what it requires and a route
+that declares nothing cannot be registered, so deny-by-default is structural.
+
+### Agent registry and admission
+
+The platform records what it decided about every machine it takes telemetry
+from: which tenant it belongs to, what it says it is, the certificate identity
+bound to it, and where it stands. Registering an agent creates it `pending`;
+binding the certificate it will present makes it `active`; disabling, revoking
+and decommissioning are three different endings, and the last two are final
+because an identifier that came back would re-admit the certificate that was
+revoked. Every change carries an actor and a reason, and the trail is
+append-only.
+
+The gateway keeps authenticating from the certificate and reads no store. What
+the control plane decided crosses `security.agents`, a compacted topic keyed by
+the agent: the gateway replays it before it serves, follows it afterwards, and
+refuses a batch from an agent the platform stopped honouring with a map lookup
+and no round trip. A decision the backbone did not take stays outstanding in the
+registry and is published again until it lands. See
+[ADR 24](docs/decisions/0024-an-agent-is-registered-by-the-control-plane-and-refused-by-the-gateway.md).
+
+The tenant an agent's telemetry belongs to travels on the same record. It is the
+one the agent was registered in by an operator holding that tenant, and the
+gateway stamps it on every event in place of whatever the agent wrote; no
+gateway-wide tenant exists. An agent the registry never named is refused rather
+than placed somewhere, so one gateway serves every tenant and a routing mistake
+cannot move an estate's telemetry into another's. See
+[ADR 26](docs/decisions/0026-an-agent-sends-into-the-tenant-it-was-registered-in.md).
+
+### Asset inventory
+
+What an asset has is a record kind of its own, on a contract, a topic, a store
+and a process of its own, because it is not an event: an event is one observation
+and a scan is a set, and an estate reports orders of magnitude more package
+observations than logins. The platform derives an item's identity rather than
+reading one off the wire, so two collectors that spell a package differently
+cannot leave an asset holding it twice, and an upgrade replaces the row instead
+of adding one. **What an asset currently has is what its newest full scan
+named**: an item that scan stopped naming is no longer current and keeps the
+`last_seen` saying when it was last there, so nothing is deleted, nothing is
+tombstoned, and how stale the answer is falls out of the same line. A delta
+refreshes what it names and never moves that line, because it says nothing about
+what it omits — and an empty scan does move it, which is how a collector says the
+asset has none of that kind left. A record that reaches the store out of order
+loses to the newer one it arrived behind.
+[ADR 27](docs/decisions/0027-inventory-is-a-record-kind-of-its-own.md).
+
+### Vulnerability intelligence
+
+What is known to be wrong with software is read from its source — OSV's export
+of the distributions' own advisories — by the one process that reaches the
+internet, which holds no store and names no asset: what a feed says reaches the
+platform as a validated advisory on the backbone and by no other way, so a feed
+that fails or lies can stop nothing but that process. Every advisory says which
+feed it came from, the version of that feed, the URL, when it was fetched and the
+SHA-256 of the bytes, and the platform writes all of that itself. Ecosystems are
+named with their release — `Debian:12`, `Ubuntu:22.04:LTS`, `Alpine:v3.19` — and an
+advisory entry and an installed package are keyed by the same function, the
+source package where the distribution's advisories name one, so a match is a
+lookup rather than a guess; an asset the platform cannot assess says why instead
+of reading as clean. **Nothing is concluded from what a feed did not say**: an
+attempt that failed changes nothing and says how old the platform's copy is, an
+advisory a feed stops listing is kept, and one is withdrawn only when its source
+withdraws it. Every version is kept, so what was concluded from one stays
+explicable. Debian, Ubuntu, Alpine, Rocky Linux and AlmaLinux are read; matching
+is not built yet.
+[ADR 28](docs/decisions/0028-vulnerability-intelligence-is-read-from-its-source.md).
+
+### Storage and failure semantics
+
+Storage is owned per workload: ClickHouse holds telemetry and detections in
+tables shaped for the questions asked of each, the current state of every
+asset in two more, and every version of every advisory the platform has read in
+three more. A consumer advances its position
+only after the work it did is durable, so a crash replays rather than skips. A
+record that can never be stored is quarantined with the reason and its position,
+so one poison record cannot hold up a partition.
+
+### State, restarts and replicas
+
+A rule that counts or orders remembers a bounded window of events, held by the
+process that decided them. That state does not move with a partition, so
+whenever the group hands the engine a partition — at startup and at every
+rebalance — the engine is put back to the first record inside the window its
+rules need and reads forward. The window is rebuilt from the stream rather than
+from a checkpoint, because an observation names the event it came from and every
+window is measured in event time: replaying decides the same detections, under
+the same names, and counts nothing twice.
+
+Which rules an engine may run follows from that. `security.events.raw` is keyed
+by the agent, so a rule grouping by anything that includes the agent is exact at
+any number of replicas, and one grouping across agents is only exact where a
+single reader holds the whole stream. A deployment may declare that it does, and
+the declaration is checked against what the group actually assigned it: a claim
+that stops being true stops the engine rather than halving what such a rule
+reports. A ruleset carrying a rule this deployment cannot answer — a window
+wider than the store keeps, a threshold no key could reach, a group the stream
+splits — is refused whole, and the last ruleset the process could answer keeps
+running. Active means executable. See
+[ADR 23](docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md).
+
+## Architecture
+
+```text
+Seagull Agent
+      │  mutual TLS · protobuf
+      ▼
+ ingest-gateway ─────▶ Redpanda  security.events.raw
+                           │  (durable before the acknowledgement)
+             ┌─────────────┴─────────────┐
+             ▼                           ▼
+       event-writer                analysis-engine
+             │                     route · normalise · detect
+             ▼                           │
+  ClickHouse security_events      security.detections
+             │                           │
+             ▼                 ┌─────────┴─────────┐
+ security.events.quarantine    ▼                   ▼
+                        detection-writer      alert-writer
+                               │            above a severity floor: a finding
+                               ▼            becomes an alert, a story an incident
+                  ClickHouse security_detections   │
+                                                   ▼
+                     PostgreSQL alerts · incidents · trails · occurrences
+                                                    ▲
+ control-api ───────────────────────────────────────┘
+   │   open · acknowledged · in investigation · resolved / false positive
+   │
+   └───▶ Redpanda security.rulesets ──▶ analysis-engine
+         compiles, tests and publishes   compacted: every version,
+         a ruleset; activates one        one pointer at the one to run
+
+ query-api ──▶ security_events · security_detections, read only, within a scope
+```
+
+What an asset has travels beside that stream and never in it, because a
+fleet-wide package scan is orders of magnitude more records than the telemetry it
+arrives with, and neither may delay the other:
+
+```text
+Seagull Agent
+      │  mutual TLS · protobuf · POST /v1/inventory
+      ▼
+ ingest-gateway ─────▶ Redpanda  security.inventory.raw
+                           │  keyed by the asset, so one asset's scans stay ordered
+                           ▼
+                   inventory-projector
+                           │                    └──▶ security.inventory.quarantine
+                           ▼
+     ClickHouse asset_inventory · asset_inventory_scans
+                 one row per item      when that kind was last enumerated in full
+```
+
+What is known to be wrong with software comes from outside, through the one
+process allowed to reach it:
+
+```text
+ OSV export (https) ──▶ advisory-importer ──▶ Redpanda  security.advisories
+   index · records        translate · stamp        compacted: the newest version of
+                          provenance · publish     every advisory, and each feed's freshness
+                                                           │
+                                                           ▼
+                                                    advisory-writer ──▶ security.advisories.quarantine
+                                                           │
+                                                           ▼
+            ClickHouse vulnerability_advisories · vulnerability_affected · vulnerability_feed_syncs
+                        every version            by release and package      how fresh each feed is
+```
+
+Processes are declared in [`deploy/compose.yaml`](deploy/compose.yaml):
+
+| Process | Role |
+|---|---|
+| `ingest-gateway` | The only durable entry point for telemetry: identity, admission, validation, rate limiting. |
+| `analysis-engine` | Reads the event stream under its own group, routes and normalises, and decides events against the ruleset it is pinned to. |
+| `event-writer` | Makes admitted telemetry queryable, quarantining what it cannot store. |
+| `detection-writer` | Makes a detection queryable, on the same terms and as a consumer of its own. |
+| `alert-writer` | Opens the work a detection at or above a severity floor becomes: an alert for a finding about one event, folded on a declared key, or an incident for a story several events told. It inserts and never updates. |
+| `inventory-projector` | Folds what a collector saw into what an asset currently has, under a group and a quarantine of its own. An item the newest full scan stops naming is no longer current, and nothing is deleted to say so. |
+| `advisory-importer` | Follows the vulnerability feeds a deployment names, translates each changed record into an advisory carrying its provenance, and publishes it with the freshness of the feed. The one process that reaches the internet; it holds no store and names no asset. |
+| `advisory-writer` | Keeps every version of every advisory and every attempt to follow a feed, under a group and a quarantine of its own. |
+| `control-api` | The administrative surface: sessions, authorisation, ruleset validation, publication and rollback, the alert and incident lifecycles, the agent registry, and the authority that signs an agent's certificate. It is the one process terminating both trust domains — operators on its own port, and agents renewing their certificates on a second one. |
+| `query-api` | The read plane, and the only reader of the analytical store. |
+| `backbone-migrator`, `store-migrator`, `control-migrator` | Apply the topic topology, the analytical schema and the relational schema, then exit. Nothing migrates on the way to serving traffic. |
+
+Dependencies point one way — `cmd` → capability → domain, with adapters plugged
+in at the edges and `internal/platform` never learning about the product. That
+is not a convention: [`tests/architecture`](tests/architecture) enforces it, so a
+violation fails the build rather than a review.
+
+Two capabilities never reach each other through Go. They meet on the backbone,
+which is what keeps the shape of an alert table out of the thing that decides
+what an alert is about.
+
+An alert is named by the detection that raised it, so a replayed batch finds the
+alert it already opened rather than opening a second one — and the process that
+opens alerts never updates one, so nothing a reprocessed batch does can reach
+somebody's triage. [ADR 16](docs/decisions/0016-an-alert-is-a-detection-somebody-owns.md).
+
+Noise is removed from the alert plane and never from the detection stream:
+detections that are the same piece of work fold into one alert with a count,
+the estate can declare which never become work at all, and both are counted so
+what was reduced is readable. The detection keeps its full evidence for 730 days
+whatever happens, and an alert names every detection it is made of.
+[ADR 17](docs/decisions/0017-noise-is-removed-from-the-alert-and-never-from-the-detection.md).
+
+What a rule remembers between events is a bounded window of the backbone, keyed
+by tenant, rule, revision and group, and measured in event time. State is a pure
+function of the events inside its window, so a replayed batch counts once and a
+restart rebuilds it by reading the window again rather than by recovering
+anything. Every ceiling is declared, and a store at its limit refuses a new key
+instead of evicting one: a flood of invented group values must not get to choose
+which real counts an estate forgets.
+[ADR 18](docs/decisions/0018-detection-state-is-a-bounded-window.md).
+
+A rule may count what it matches: twenty failed passwords from one address
+against one agent inside a minute is a different security statement from one
+failed password, made of the same match. The count is part of the rule rather
+than a second kind of rule, every window is event time, and the detection
+carries what was counted — how many, against which threshold, over what window,
+and what the events shared — so a threshold finding is not mistaken for a single
+event. Nothing resets when a rule fires: past its threshold a rule decides once
+per event and never more, and `deploy/alerting.yml` is where those become one
+piece of work.
+[ADR 19](docs/decisions/0019-a-rule-that-counts-decides-on-a-window.md).
+
+A rule may instead order what it matches: a failed SSH password from an address,
+then one from the same address that was accepted, inside five minutes, is a guess
+that worked — where either event alone is unremarkable. The stages are what such
+a rule matches with, so it carries a sequence or a match and never both, and the
+match of each stage stays a pure function of one event while the order is read
+out of the same bounded window a count is. Ordering is event time, which means
+the story does not depend on the backbone delivering it in order: an event that
+arrives after a later stage lands where it happened and is what completes the
+story. The detection names the event that satisfied each stage, so an incident
+can be traced back to the events it was made of, and it carries how far apart the
+clocks that timed them stood — because ordering rests on the producer's clock,
+and a story whose clocks disagree by more than it lasted is one the data does not
+order.
+[ADR 20](docs/decisions/0020-a-sequence-is-decided-by-the-window-that-holds-it.md).
+
+A story that several events tell is a different piece of work from a finding
+about one of them, so a detection carrying a correlation opens an incident and
+never an alert. It is named by that detection the way an alert is named by the
+one that raised it, so a replay finds the story it already opened; it carries one
+event per stage and the group that made them one story, so the trace to its
+component events and detection is on the record rather than in a join; and it has
+a lifecycle of its own, granted separately, whose moves never touch what the
+analysis engine wrote. How far the order can be trusted is a measurement rather
+than a number somebody tuned: the spread of the clocks that timed the story,
+against its own span and against the window the rule looked through.
+[ADR 21](docs/decisions/0021-an-incident-is-a-correlation-somebody-owns.md).
+
+Sigma is a language this platform reads and never becomes. A Sigma document is
+translated into a `detection.Rule` by an adapter and compiled by the same door
+every rule file goes through, so an imported rule cannot be a second way into the
+engine. What survives translation is bounded by the canonical form rather than by
+a table of aliases: Sigma compares without case and the rule language compares
+with it, so a comparison translates only where normalisation already removed the
+difference, and where it deliberately did not — an account name, because case is
+meaning on a Unix host — the comparison is refused and Sigma's own `|cased`
+modifier is the way to ask for what the platform can actually answer. v1 answered
+the same question by rewriting what it could not read into an inert placeholder,
+so an unsupported rule imported cleanly, compiled and quietly found nothing.
+[ADR 22](docs/decisions/0022-sigma-is-translated-and-never-adopted.md).
+
+## Getting started
+
+Requires Docker with the Compose plugin and Go 1.25.
+
+```bash
+make dev-pki    # mint a development CA, server, agent and caller certificates
+make up         # build the images and start the backbone, the store and every process
+make verify     # the full gate: lint, module graph, tests, race detector
+```
+
+`make up` writes nothing outside the repository and reads nothing that is not in
+it; the development material lands in `.local/pki`, which Git ignores.
+
+Send a batch through the running gateway, then ask the query plane what became
+of it. The probe first registers the development agent in the `default` tenant as
+`dev-admin`, because the gateway admits only an agent the registry placed in a
+tenant; `-register ""` skips that step:
+
+```bash
+go run ./tools/devprobe -endpoint https://127.0.0.1:8443
+go run ./tools/devprobe -hunt https://127.0.0.1:8444
+```
+
+Send what an asset has — a distribution, a package list and a service — and watch
+it become the current state of that asset:
+
+```bash
+go run ./tools/devprobe -inventory
+```
+
+The development stack follows Debian's advisories; another distribution is one
+variable away, `SEAGULL_ADVISORY_FEEDS=Alpine make up`. How fresh the platform's
+copy of each feed is, read from the store:
+
+```bash
+docker compose -f deploy/compose.yaml exec clickhouse clickhouse-client --user seagull -d seagull -q \
+  "SELECT feed, argMax(outcome, checked_at), argMax(synced_at, checked_at), argMax(held, checked_at)
+   FROM vulnerability_feed_syncs GROUP BY feed"
+```
+
+Register an agent, have the platform sign the certificate it will present, watch
+it renew that certificate itself, and revoke it:
+
+```bash
+go run ./tools/devprobe -agents https://127.0.0.1:8445 -renewals https://127.0.0.1:8446
+```
+
+Stop everything and drop its state with `make down`. If a port is taken, publish
+elsewhere with `SEAGULL_GATEWAY_PUBLISH`, `SEAGULL_QUERY_API_PUBLISH`,
+`SEAGULL_CONTROL_API_PUBLISH` or `SEAGULL_CONTROL_API_RENEWAL_PUBLISH`.
+
+## Configuration
+
+Every setting is an environment variable, typed, validated at startup, and
+reported all at once when something is wrong. Any variable can be read from a
+file instead by adding the `_FILE` suffix, which is how secrets reach a
+container without going through the environment. The settings that matter most:
+
+| Variable | Purpose |
+|---|---|
+| `SEAGULL_BACKBONE_BROKERS` | The event backbone every process depends on. |
+| `SEAGULL_GATEWAY_TLS_CERT`, `SEAGULL_GATEWAY_TLS_KEY`, `SEAGULL_GATEWAY_AGENT_CA` | The gateway's mutual TLS material; there is no plaintext mode. |
+| `SEAGULL_DETECTION_RULES` | The rule tree the engine starts on and falls back to. |
+| `SEAGULL_DETECTION_STATE_WINDOW`, `SEAGULL_DETECTION_STATE_OBSERVATIONS`, `SEAGULL_DETECTION_STATE_KEYS` | What a counting or ordering rule may remember: the longest window, the events one key holds, and how many keys at once. The window is also what a restart re-reads. |
+| `SEAGULL_DETECTION_STATE_SOLE_READER` | Declares that this engine reads the whole stream, which is what makes a rule counting across agents answerable. Verified against the assignment; a broken claim stops the engine. |
+| `SEAGULL_GATEWAY_MAX_INFLIGHT_BYTES`, `SEAGULL_GATEWAY_MAX_INFLIGHT_REQUESTS` | What the gateway holds at once across every caller. Past it a batch is refused with `503` and `Retry-After`, never queued. |
+| `SEAGULL_BACKBONE_TLS`, `SEAGULL_BACKBONE_TLS_CA`, `SEAGULL_BACKBONE_SASL_MECHANISM`, `SEAGULL_BACKBONE_SASL_USER`, `SEAGULL_BACKBONE_SASL_PASSWORD` | How every process reaches the backbone. Off is a development posture stated rather than inherited; authenticating without TLS is refused. |
+| `SEAGULL_BACKBONE_REPLICAS`, `SEAGULL_BACKBONE_MIN_INSYNC_REPLICAS` | How many copies of a record the backbone keeps and how many must be in sync to acknowledge one. Acknowledging on every in-sync replica means nothing when one replica is in sync. |
+| `SEAGULL_EVENT_STORE_TLS`, `SEAGULL_EVENT_STORE_TLS_CA` | Encryption to the telemetry store. There is no option to skip verification. |
+| `SEAGULL_CONTROL_API_POLICY` | The policy document the control plane is pinned to. |
+| `SEAGULL_CONTROL_API_AGENT_AUTHORITY_CERT`, `SEAGULL_CONTROL_API_AGENT_AUTHORITY_KEY` | The authority the control plane signs agent certificates with. Read once at startup; a plane that cannot read it does not serve. |
+| `SEAGULL_CONTROL_API_AGENT_TRUST_BUNDLE` | Every authority an agent is told to trust, read at each issuance and sent with the certificate. Widening it is how a certificate authority is rotated without visiting a machine; an authority that signs and is not in it is refused. |
+| `SEAGULL_CONTROL_API_AGENT_CERT_LIFETIME` | How long an issued agent certificate is valid. Short is the answer to a stolen key nobody has revoked, and renewal is what makes short affordable. |
+| `SEAGULL_CONTROL_API_RENEWAL_ADDRESS`, `SEAGULL_CONTROL_API_RENEWAL_TLS_CERT`, `SEAGULL_CONTROL_API_RENEWAL_TLS_KEY`, `SEAGULL_CONTROL_API_AGENT_CA` | The agent-facing listener an agent renews on, in the agent trust domain rather than the operator one. |
+| `SEAGULL_BACKBONE_AGENTS_TOPIC` | Where the control plane says what it decided about an agent and the gateway reads it. Compacted, keyed by the agent. |
+| `SEAGULL_CONTROL_TELEMETRY_STORE_ADDRESS` | Where the control plane reads when an agent was last heard from. It writes nothing there. |
+| `SEAGULL_CONTROL_API_SESSION_KEY` | Key sessions are signed with; drawn at random when unset. |
+| `SEAGULL_EVENT_STORE_ADDRESS`, `SEAGULL_EVENT_STORE_PASSWORD` | The telemetry store and its credentials. |
+| `SEAGULL_ADVISORY_FEEDS` | The distributions whose advisories the platform reads — any of `Debian`, `Ubuntu`, `Alpine`, `Rocky Linux`, `AlmaLinux`. Required, because the first read of a feed is its whole index; the development stack names `Debian`. |
+| `SEAGULL_ADVISORY_OSV_EXPORT`, `SEAGULL_ADVISORY_OSV_CA` | Where the advisories are read from — OSV's public export, or a mirror laid out the same way — and the authority a mirror is signed by. https only; there is no plaintext mode. |
+
+[`docs/configuration.md`](docs/configuration.md) lists every setting each
+process reads, along with the acknowledgement contract, the topic topology and
+the shape of the store.
+
+## Tests
+
+```bash
+make test              # unit, architecture and end-to-end suites
+make test-race         # the same suites under the race detector
+make test-integration  # the data plane against a live Redpanda and ClickHouse
+make test-load         # the ingest load scenarios against a live Redpanda
+make bench             # the hot path, one core, no infrastructure
+```
+
+The integration suite includes the failure scenarios the guarantees rest on: a
+restart in the middle of an active window, the same restart without the read
+back so the assertion cannot pass for another reason, a partition moving to a
+second replica while three agents are being counted, and a reader losing the
+whole stream it claimed. The end-to-end suite mints its own certificate
+authority and drives the real listeners over real mutual TLS, so it depends on no fixture files and no
+property of the machine it runs on. The integration suite ends with the whole
+slice — admission, backbone, writer, store — against real infrastructure, which
+is what the rest of it is a decomposition of. The load suite fails a run when
+the gateway allocates more than 8 KB per admitted event, when a slow backbone
+produces an acknowledgement the backbone never received, or when a shutdown
+drops a batch it had already answered for.
+
+## Further reading
+
+| Document | Topic |
+|---|---|
+| [Architecture decisions](docs/decisions) | Why the foundation looks like this, one record per decision. |
+| [Configuration reference](docs/configuration.md) | Every setting, the acknowledgement contract, the topology, the store. |
+| [Seagull-contracts](https://github.com/dynasmon/Seagull-contracts) | The messages agents, the platform and the portal exchange. |
+
+Vulnerability matching and response actions are not implemented — advisories are
+read and kept, and nothing compares them with an asset yet — no collector sends
+inventory yet — `tools/devprobe -inventory` is the only producer — and
+Sigma import covers one class of event. Detection is stateless unless a rule asks
+otherwise: a rule that counts or orders its events reads a bounded window of the
+backbone in event time, which is what keeps both replayable.
+
+## License
+
+Seagull is licensed under the [GNU General Public License v3.0](LICENSE).

@@ -1,0 +1,209 @@
+package control
+
+import (
+	"crypto/tls"
+	"errors"
+	"fmt"
+	"log/slog"
+	"net/http"
+	"slices"
+	"time"
+
+	"google.golang.org/protobuf/proto"
+
+	"github.com/dynasmon/Seagull-backend-v2/internal/pki"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/httpx"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/ratelimit"
+	"github.com/dynasmon/Seagull-backend-v2/internal/protocol"
+)
+
+const DescriptorPath = "/v1/descriptor"
+
+type ServerOptions struct {
+	Address         string
+	TLS             *tls.Config
+	Guard           *Guard
+	Sessions        *Sessions
+	Registry        *Registry
+	Rulesets        Rulesets
+	Alerts          Alerts
+	Incidents       Incidents
+	Agents          Agents
+	Admissions      Admissions
+	Liveness        Liveness
+	Authority       *pki.Authority
+	TrustBundle     func() ([]byte, error)
+	CertificateLife time.Duration
+	RenewalAddress  string
+	RenewalTLS      *tls.Config
+	RenewalLimiter  *ratelimit.Limiter
+	Metrics         *Metrics
+	Instrumentation *httpx.Instrumentation
+	Logger          *slog.Logger
+	Now             func() time.Time
+	ReadTimeout     time.Duration
+	WriteTimeout    time.Duration
+	IdleTimeout     time.Duration
+	ShutdownTimeout time.Duration
+}
+
+type Server struct {
+	sessions   *Sessions
+	registry   *Registry
+	rulesets   Rulesets
+	alerts     Alerts
+	incidents  Incidents
+	agents     Agents
+	admissions Admissions
+	liveness   Liveness
+	metrics    *Metrics
+	logger     *slog.Logger
+	now        func() time.Time
+
+	authority       *pki.Authority
+	trustBundle     func() ([]byte, error)
+	certificateLife time.Duration
+	renewals        *ratelimit.Limiter
+}
+
+type route struct {
+	method      string
+	path        string
+	name        string
+	requirement Requirement
+	handler     http.Handler
+}
+
+func NewServer(options ServerOptions) (*httpx.Server, error) {
+	if options.TLS == nil {
+		return nil, errors.New("the control listener authenticates a caller by certificate and cannot serve without one")
+	}
+	handler, err := NewHandler(options)
+	if err != nil {
+		return nil, err
+	}
+
+	return httpx.NewServer(httpx.ServerOptions{
+		Name:              "control-api",
+		Address:           options.Address,
+		Handler:           handler,
+		TLS:               options.TLS,
+		Logger:            options.Logger,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       options.ReadTimeout,
+		WriteTimeout:      options.WriteTimeout,
+		IdleTimeout:       options.IdleTimeout,
+		ShutdownTimeout:   options.ShutdownTimeout,
+		MaxHeaderBytes:    16 << 10,
+	})
+}
+
+// What both listeners need, whichever trust domain they terminate: the registry,
+// the authority that signs for it, and the bundle an agent is told to trust.
+func newServer(options ServerOptions) (*Server, error) {
+	switch {
+	case options.Agents == nil:
+		return nil, errors.New("the control listener administers agents and needs a registry to keep them in")
+	case options.Authority == nil:
+		return nil, errors.New("the control listener issues the identities it binds and needs an authority to sign with")
+	case options.CertificateLife <= 0:
+		return nil, errors.New("the control listener needs to know how long an agent certificate is valid for")
+	case options.Logger == nil:
+		return nil, errors.New("the control listener needs a logger")
+	case options.Metrics == nil:
+		return nil, errors.New("the control listener needs metrics")
+	case options.Instrumentation == nil:
+		return nil, errors.New("the control listener shares the process http instrumentation")
+	}
+	if options.TrustBundle == nil {
+		return nil, errors.New("the control listener tells an agent what to trust and needs a bundle to read")
+	}
+	bundle, err := options.TrustBundle()
+	if err != nil {
+		return nil, err
+	}
+	if err := pki.Trusts(bundle, options.Authority); err != nil {
+		return nil, err
+	}
+	if options.Now == nil {
+		options.Now = time.Now
+	}
+
+	return &Server{
+		sessions:   options.Sessions,
+		registry:   options.Registry,
+		rulesets:   options.Rulesets,
+		alerts:     options.Alerts,
+		incidents:  options.Incidents,
+		agents:     options.Agents,
+		admissions: options.Admissions,
+		liveness:   options.Liveness,
+		metrics:    options.Metrics,
+		logger:     options.Logger,
+		now:        options.Now,
+
+		authority:       options.Authority,
+		trustBundle:     options.TrustBundle,
+		certificateLife: options.CertificateLife,
+		renewals:        options.RenewalLimiter,
+	}, nil
+}
+
+func NewHandler(options ServerOptions) (http.Handler, error) {
+	switch {
+	case options.Guard == nil:
+		return nil, errors.New("the control listener serves nothing without a guard")
+	case options.Sessions == nil:
+		return nil, errors.New("the control listener needs a session store")
+	case options.Registry == nil:
+		return nil, errors.New("the control listener needs a policy")
+	case options.Rulesets == nil:
+		return nil, errors.New("the control listener administers rulesets and needs somewhere to keep them")
+	case options.Alerts == nil:
+		return nil, errors.New("the control listener works alerts and needs somewhere to read and move them")
+	case options.Incidents == nil:
+		return nil, errors.New("the control listener works incidents and needs somewhere to read and move them")
+	case options.Admissions == nil:
+		return nil, errors.New("the control listener decides what a gateway admits and needs somewhere to say so")
+	}
+
+	server, err := newServer(options)
+	if err != nil {
+		return nil, err
+	}
+
+	mux := http.NewServeMux()
+	for _, entry := range server.routes() {
+		if !entry.requirement.valid() {
+			return nil, fmt.Errorf("route %s %s does not say what it requires", entry.method, entry.path)
+		}
+		guarded := options.Guard.Handle(entry.name, entry.requirement, entry.handler)
+		mux.Handle(entry.method+" "+entry.path, options.Instrumentation.Handle(entry.name, guarded))
+	}
+	return mux, nil
+}
+
+// Every route names what it requires here, and NewServer refuses one that does
+// not: an endpoint nobody decided about cannot reach the mux.
+func (s *Server) routes() []route {
+	return append([]route{
+		{http.MethodGet, DescriptorPath, "descriptor", Certificate(), s.descriptor()},
+		{http.MethodPost, SessionPath, "session_open", Certificate(), s.openSession()},
+		{http.MethodGet, SessionPath, "session_describe", Session(), s.describeSession()},
+		{http.MethodDelete, SessionPath, "session_revoke", Session(), s.revokeSession()},
+		{http.MethodGet, SessionsPath, "session_list", Session(), s.listSessions()},
+	}, slices.Concat(rulesetRoutes(s), alertRoutes(s), incidentRoutes(s), agentRoutes(s), certificateRoutes(s))...)
+}
+
+func (s *Server) descriptor() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		encoded, err := proto.Marshal(protocol.Descriptor(s.now()))
+		if err != nil {
+			Refuse(w, http.StatusInternalServerError, "response_encoding_failed", "the answer could not be encoded")
+			return
+		}
+		w.Header().Set("Content-Type", ContentType)
+		w.Header().Set("Cache-Control", "no-store")
+		_, _ = w.Write(encoded)
+	})
+}

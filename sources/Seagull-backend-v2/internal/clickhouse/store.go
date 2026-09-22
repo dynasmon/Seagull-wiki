@@ -1,0 +1,363 @@
+package clickhouse
+
+import (
+	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"errors"
+	"fmt"
+	"os"
+	"slices"
+	"strings"
+	"time"
+
+	"github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+
+	"github.com/dynasmon/Seagull-backend-v2/internal/eventstore"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/buildinfo"
+	"github.com/dynasmon/Seagull-backend-v2/internal/platform/config"
+)
+
+const table = "security_events"
+
+// The writer and the final migrated schema must name columns in the same order.
+var storedColumns = []string{
+	"event_id",
+	"schema_version",
+	"event_class",
+	"event_time",
+	"observed_time",
+	"ingest_time",
+
+	"tenant_id",
+	"agent_id",
+	"host_hostname",
+	"host_ip",
+	"host_os",
+	"host_architecture",
+
+	"collector",
+	"source",
+	"sequence",
+
+	"gateway",
+	"batch_id",
+
+	"auth_activity",
+	"auth_outcome",
+	"auth_outcome_reason",
+	"auth_method",
+	"auth_user_name",
+	"auth_user_domain",
+	"auth_user_uid",
+	"auth_service_name",
+	"auth_service_protocol",
+	"auth_source_ip",
+	"auth_source_port",
+	"auth_destination_ip",
+	"auth_destination_port",
+	"auth_transport",
+	"auth_raw_record",
+}
+
+func values(row eventstore.Row) []any {
+	return []any{
+		row.EventID,
+		row.SchemaVersion,
+		row.EventClass,
+		row.EventTime,
+		row.ObservedTime,
+		row.IngestTime,
+
+		row.TenantID,
+		row.AgentID,
+		row.HostHostname,
+		row.HostIP,
+		row.HostOS,
+		row.HostArchitecture,
+
+		row.Collector,
+		row.Source,
+		row.Sequence,
+
+		row.Gateway,
+		row.BatchID,
+
+		row.AuthActivity,
+		row.AuthOutcome,
+		row.AuthOutcomeReason,
+		row.AuthMethod,
+		row.AuthUserName,
+		row.AuthUserDomain,
+		row.AuthUserUID,
+		row.AuthServiceName,
+		row.AuthServiceProtocol,
+		row.AuthSourceIP,
+		row.AuthSourcePort,
+		row.AuthDestinationIP,
+		row.AuthDestinationPort,
+		row.AuthTransport,
+		row.AuthRawRecord,
+	}
+}
+
+// The same columns in the same order, to read a row back out. A page of a hunt
+// is scanned through these, so a column added to `values` without being added
+// here fails `agreesWithSchema` rather than shifting every field of an answer.
+func eventPointers(row *eventstore.Row) []any {
+	return []any{
+		&row.EventID,
+		&row.SchemaVersion,
+		&row.EventClass,
+		&row.EventTime,
+		&row.ObservedTime,
+		&row.IngestTime,
+
+		&row.TenantID,
+		&row.AgentID,
+		&row.HostHostname,
+		&row.HostIP,
+		&row.HostOS,
+		&row.HostArchitecture,
+
+		&row.Collector,
+		&row.Source,
+		&row.Sequence,
+
+		&row.Gateway,
+		&row.BatchID,
+
+		&row.AuthActivity,
+		&row.AuthOutcome,
+		&row.AuthOutcomeReason,
+		&row.AuthMethod,
+		&row.AuthUserName,
+		&row.AuthUserDomain,
+		&row.AuthUserUID,
+		&row.AuthServiceName,
+		&row.AuthServiceProtocol,
+		&row.AuthSourceIP,
+		&row.AuthSourcePort,
+		&row.AuthDestinationIP,
+		&row.AuthDestinationPort,
+		&row.AuthTransport,
+		&row.AuthRawRecord,
+	}
+}
+
+type Config struct {
+	Address  string
+	Database string
+	User     string
+	Password config.Secret
+	Timeout  time.Duration
+
+	// There is no option to skip verification: a deployment that cannot verify
+	// the store names the authority that signs it.
+	TLS        bool
+	CAFile     string
+	ServerName string
+}
+
+func LoadConfig(prefix string, parser *config.Parser) Config {
+	return Config{
+		Address:    parser.RequiredString(prefix + "_ADDRESS"),
+		Database:   parser.String(prefix+"_DATABASE", "seagull"),
+		User:       parser.String(prefix+"_USER", "seagull"),
+		Password:   parser.Secret(prefix + "_PASSWORD"),
+		Timeout:    parser.Duration(prefix+"_TIMEOUT", 30*time.Second, time.Second, 5*time.Minute),
+		TLS:        parser.Bool(prefix+"_TLS", false),
+		CAFile:     parser.FilePath(prefix+"_TLS_CA", ""),
+		ServerName: parser.String(prefix+"_TLS_SERVER_NAME", ""),
+	}
+}
+
+func (c Config) tls() (*tls.Config, error) {
+	if !c.TLS {
+		if c.CAFile != "" {
+			return nil, errors.New("event store tls material was given and tls is off")
+		}
+		return nil, nil
+	}
+
+	configured := &tls.Config{MinVersion: tls.VersionTLS12, ServerName: c.ServerName}
+	if c.CAFile == "" {
+		return configured, nil
+	}
+	authority, err := os.ReadFile(c.CAFile)
+	if err != nil {
+		return nil, fmt.Errorf("read the event store authority: %w", err)
+	}
+	pool := x509.NewCertPool()
+	if !pool.AppendCertsFromPEM(authority) {
+		return nil, fmt.Errorf("%s carries no certificate", c.CAFile)
+	}
+	configured.RootCAs = pool
+	return configured, nil
+}
+
+type Store struct {
+	connection driver.Conn
+	database   string
+	insert     string
+}
+
+func NewStore(configuration Config) (*Store, error) {
+	if err := agreesWithSchema(); err != nil {
+		return nil, err
+	}
+
+	connection, err := connect(configuration)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Store{
+		connection: connection,
+		database:   configuration.Database,
+		insert:     fmt.Sprintf("INSERT INTO %s (%s)", table, strings.Join(storedColumns, ", ")),
+	}, nil
+}
+
+func (s *Store) Store(ctx context.Context, rows []eventstore.Row) error {
+	if len(rows) == 0 {
+		return nil
+	}
+
+	batch, err := s.connection.PrepareBatch(ctx, s.insert)
+	if err != nil {
+		return fmt.Errorf("open a batch on %s: %w", table, err)
+	}
+	for _, row := range rows {
+		if err := batch.Append(values(row)...); err != nil {
+			_ = batch.Abort()
+			return fmt.Errorf("add event %s to the batch: %w", row.EventID, err)
+		}
+	}
+	if err := batch.Send(); err != nil {
+		return fmt.Errorf("write %d events to %s: %w", len(rows), table, err)
+	}
+	return nil
+}
+
+func (s *Store) Ping(ctx context.Context) error {
+	if err := s.connection.Ping(ctx); err != nil {
+		return fmt.Errorf("reach the event store: %w", err)
+	}
+	return nil
+}
+
+// Refuse writers whose database is behind their embedded schema.
+func (s *Store) VerifySchema(ctx context.Context) error {
+	outstanding, err := pending(ctx, s.connection)
+	if err != nil {
+		return err
+	}
+	if len(outstanding) > 0 {
+		names := make([]string, 0, len(outstanding))
+		for _, entry := range outstanding {
+			names = append(names, entry.String())
+		}
+		return fmt.Errorf("the event store is missing %d migration(s): %s — run store-migrator",
+			len(outstanding), strings.Join(names, ", "))
+	}
+	return columnsPresent(ctx, s.connection, s.database, table, storedColumns)
+}
+
+// Verify the schema that migrations actually produced. Shared by both stores in
+// this database, because a table and the adapter writing it drift apart the same
+// way whichever table it is.
+func columnsPresent(ctx context.Context, connection driver.Conn, database, table string, wanted []string) error {
+	rows, err := connection.Query(ctx,
+		"SELECT name FROM system.columns WHERE database = ? AND table = ?", database, table)
+	if err != nil {
+		return fmt.Errorf("read the columns of %s: %w", table, err)
+	}
+	defer func() { _ = rows.Close() }()
+
+	present := map[string]struct{}{}
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return fmt.Errorf("read the columns of %s: %w", table, err)
+		}
+		present[name] = struct{}{}
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("read the columns of %s: %w", table, err)
+	}
+
+	var missing []string
+	for _, column := range wanted {
+		if _, ok := present[column]; !ok {
+			missing = append(missing, column)
+		}
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("%s.%s does not hold %s", database, table, strings.Join(missing, ", "))
+	}
+	return nil
+}
+
+func (s *Store) Close() error { return s.connection.Close() }
+
+func agreesWithSchema() error {
+	declared, err := declaredColumns(table)
+	if err != nil {
+		return err
+	}
+	if !slices.Equal(declared, storedColumns) {
+		return fmt.Errorf("the store writes %d columns and the migrated schema defines %d: %s versus %s",
+			len(storedColumns), len(declared),
+			strings.Join(storedColumns, ", "), strings.Join(declared, ", "))
+	}
+	if length := len(values(eventstore.Row{})); length != len(storedColumns) {
+		return fmt.Errorf("the store names %d columns and supplies %d values", len(storedColumns), length)
+	}
+	if length := len(eventPointers(&eventstore.Row{})); length != len(storedColumns) {
+		return fmt.Errorf("the store names %d columns and reads %d of them back", len(storedColumns), length)
+	}
+	return nil
+}
+
+// Internal ClickHouse traffic matches the clear-text broker leg.
+func connect(configuration Config) (driver.Conn, error) {
+	switch {
+	case configuration.Address == "":
+		return nil, errors.New("the event store needs an address")
+	case configuration.Database == "":
+		return nil, errors.New("the event store needs a database")
+	case configuration.Timeout <= 0:
+		return nil, errors.New("the event store needs a positive timeout")
+	}
+
+	secured, err := configuration.tls()
+	if err != nil {
+		return nil, err
+	}
+
+	connection, err := clickhouse.Open(&clickhouse.Options{
+		TLS:  secured,
+		Addr: []string{configuration.Address},
+		Auth: clickhouse.Auth{
+			Database: configuration.Database,
+			Username: configuration.User,
+			Password: configuration.Password.Reveal(),
+		},
+		ClientInfo: clickhouse.ClientInfo{
+			Products: []struct {
+				Name    string
+				Version string
+			}{{Name: "seagull", Version: buildinfo.Read().Version}},
+		},
+		Compression:  &clickhouse.Compression{Method: clickhouse.CompressionZSTD},
+		DialTimeout:  configuration.Timeout,
+		MaxOpenConns: 2,
+		MaxIdleConns: 1,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("create the event store client: %w", err)
+	}
+	return connection, nil
+}

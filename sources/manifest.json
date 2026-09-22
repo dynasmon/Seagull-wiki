@@ -1,0 +1,2877 @@
+{
+  "reviewed": "2026-09-20",
+  "repositories": {
+    "Seagull-backend-v2": {
+      "revision": "fa3bf69023db0168832346c50bd353ca4188b87a",
+      "url": "https://github.com/dynasmon/Seagull-backend-v2",
+      "trackedFiles": 444
+    },
+    "Seagull-agent-v2": {
+      "revision": "36efb578b40a058d3a92637f9cf08d9026431289",
+      "url": "https://github.com/dynasmon/Seagull-agent-v2",
+      "trackedFiles": 77
+    },
+    "Seagull-contracts": {
+      "revision": "d2090c560f54ee80990d1188c0d8fd0408a1e1d5",
+      "url": "https://github.com/dynasmon/Seagull-contracts",
+      "trackedFiles": 35
+    },
+    "Seagull-frontend-v2": {
+      "revision": "307351e8d7f9a696786a9b05d50ac0b783db4163",
+      "url": "https://github.com/dynasmon/Seagull-frontend-v2",
+      "trackedFiles": 2
+    }
+  },
+  "files": [
+    {
+      "repository": "Seagull-backend-v2",
+      "path": ".dockerignore",
+      "sha256": "05465a337ddaf8d2462c3912b7d864c395317dc42cddb4e017d5746b4975dcd2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "fe3823531f65e301322d3756a4e3215e9f735d03870321c79365f5b74a38bff3"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": ".gitignore",
+      "sha256": "3feaebc10272dd5166dcc5dfc4cc552a916c05f9d0a30685783579e69e5ae70b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "Makefile",
+      "sha256": "434a6c6579bd110db5601133704abffcafe34a37239c4c6863b2a8583d780070"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "README.md",
+      "sha256": "5d95d87da7470106300216d8bc5c088ec2fc57c4c6b72f687395337213aaceea"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/advisory-importer/backbone.go",
+      "sha256": "899b9d9eb6f6308a867107d6521514afe35286c74c52cd948074fecaffd0b5bc"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/advisory-importer/config.go",
+      "sha256": "fa4ba88813e58a312af62d2349f8abb0c16ffa64810281fd07ca2382928052e6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/advisory-importer/main.go",
+      "sha256": "ca2b728ffd3bc504ce3f7c865a2d7d40fae6a61322350afb23c0210f559d8779"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/advisory-writer/backbone.go",
+      "sha256": "4e7215a4e3f0d6ea7d57b62d33de87a2bd00deb59853ff5775180828ad9141b3"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/advisory-writer/config.go",
+      "sha256": "5d7aa2ec36df51acd6578a4de3979b1ca67190be5f1367d4362d721e1bfe9417"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/advisory-writer/main.go",
+      "sha256": "3af50b95eeca10e37cd8d37c45e23e2c1d2b0e0e3ed75f37ac116082570639f2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/alert-writer/alerting_test.go",
+      "sha256": "a6170cbb28626fdfb969722fae09d9b5612d3446aa904fad19a3946ebbcc52c2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/alert-writer/backbone.go",
+      "sha256": "de251ab59f211fdd318dba07979d987f66c2a062d882fbda566488f1007bb87b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/alert-writer/config.go",
+      "sha256": "72d24c16d6f176c8bc793b01f5e58f83ffe0cc751163248e9a3fc4a93688d824"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/alert-writer/main.go",
+      "sha256": "dbcc92b677d6ee5a33ad0a88c2e3b5ede5bfa36cd50e89f011a82fdb8e064135"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/analysis-engine/backbone.go",
+      "sha256": "e22a4a0789cca84cea6666e49e49672a66dca67c725246121bce89cc61df8850"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/analysis-engine/backbone_test.go",
+      "sha256": "b646ea125979772a02f79321b765b00d0f2c99cd3562a356d13d16451c53c6a3"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/analysis-engine/config.go",
+      "sha256": "a6afbae1e2593f554de45f40a92515858f4089987ce288bbb862eba853b6a61e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/analysis-engine/main.go",
+      "sha256": "36270efe60d1808ea34b2ced92d6f5fd0f779d71bbb14e00f5c355609da9a6a5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/analysis-engine/rules.go",
+      "sha256": "58034517a44fb9728f209570c5641bfc52a2686e41eac3d8550f50fe4a594621"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/analysis-engine/rules_test.go",
+      "sha256": "dbd8450dba4d7f3907e8f6ae7682dfb9608366cbdd859fc7e9cefe11442572c8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/analysis-engine/state.go",
+      "sha256": "149115edf4c2096bd36c877b5e2ebfcee756d2414f41fb0a0ee5186650e5139d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/analysis-engine/state_test.go",
+      "sha256": "7af08cbadc841e16ee1248ca3ef4d8c7447c2c33fe45421e34e5482c2751e9d2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/backbone-migrator/config.go",
+      "sha256": "d05bbb720e68e690ccfde1c693536fca560552136c814934b52a59174ae3b0a7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/backbone-migrator/main.go",
+      "sha256": "65fd4feac0c48115b8ca265f6420ff574e1ee09d9b9f088d07f3f8e64373130c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/control-api/config.go",
+      "sha256": "f95dde15148438fdfd59831802e329e0cee41b5e1f2b63aec0474ef05d464be9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/control-api/main.go",
+      "sha256": "433f222f2518ea5bafd9da595720d7442478285d9200333946b354f6fbccf56d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/control-api/policy_test.go",
+      "sha256": "735174aea5798889ba36123bf7459360018915cd59f1f7a6b0411df9ead1b169"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/control-api/rulesets.go",
+      "sha256": "265458e2931cfb2ac1322f7fd591f8ebbdf8413c9f96d822531fe0de75665494"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/control-api/rulesets_test.go",
+      "sha256": "fb93172a24a2f6682416ebb4aaf584178cb7fa0b02531e0799eb2e2ac2e1211e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/control-migrator/config.go",
+      "sha256": "77a78f26d55f492975d9ff8e7c81da085e7597257c01b3bca1fe364797dc130b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/control-migrator/main.go",
+      "sha256": "d8c86b34b395ea6cdb7f0cae8034ba73df6b7aaebcf24f6e93d348bc5077617e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/detection-writer/backbone.go",
+      "sha256": "7bff5366667e7a35e2ae8a4e2d15d865bcd3dc4f2e93d06054441c89f8fff4ed"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/detection-writer/config.go",
+      "sha256": "a053cc848aa79fcdcb631cae8572ee3752b39940f1d60e435421f3598a3b3701"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/detection-writer/main.go",
+      "sha256": "347857923a488098d18e88e5ad1f43af5f43447f5239e9dace21ea80d6435165"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/event-writer/backbone.go",
+      "sha256": "49eedce7ebd6574cc812671d47ee2964f57e3adfd68a7e6cbcbfcf62bf27f9fe"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/event-writer/backbone_test.go",
+      "sha256": "5f981de2ab0e252027fcaaeb528e68482820f3b5215d44c7313b44465eeab356"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/event-writer/config.go",
+      "sha256": "eeceb329acb142cc6f8268355d0d03e2350f433b62fccbd8d79966b97a8444d5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/event-writer/main.go",
+      "sha256": "1073589c0bcd394ddddefe4fe79a780c8d00eaae6b01ddd015e51a27134633c4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/ingest-gateway/config.go",
+      "sha256": "42de13b1b66a5cf125a3ec6afacc5d577fd32db8e49cd1baab5bdf5016d59703"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/ingest-gateway/main.go",
+      "sha256": "0852efedcf43020edaf90b5c85a4cbffe9707f0945c72238e367343c975f75cb"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/ingest-gateway/roster.go",
+      "sha256": "ced5359f883b8606db5acb79372ef70c1eaef479c8b94db16ddae6a2a5a4fc8d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/ingest-gateway/roster_test.go",
+      "sha256": "7d3fbdf0cc40841c339d4fa57a38e267d60ebf9adb6b7a81b1d1b6b616adea4b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/inventory-projector/backbone.go",
+      "sha256": "2eff6ab1a8017bfc02feeebb63d969527d1f2592bedefd24169e5a84c541bd63"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/inventory-projector/config.go",
+      "sha256": "5cbf2e46d9446cdd24ceff12fc7577621d1c4cbce2d89ed57bb02ec15265d01f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/inventory-projector/main.go",
+      "sha256": "a9d2acd7a79d24bc4893b0c68ab951b175f52bbe3516f388d03224066bf476c4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/query-api/config.go",
+      "sha256": "ccea004d3bd7040bc0f5f97707ae5641e7064bb846b8dc5a58a1b09e8dfa871a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/query-api/main.go",
+      "sha256": "fae9dc980fe34b6c4a0c4e5daa5efc138f2972e36a54b1247ba06bf69d774cfa"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/store-migrator/config.go",
+      "sha256": "ec3f6f50c40d31bb002ed5aaad0b05a7084d4740a27663d13b6d605d9906510c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "cmd/store-migrator/main.go",
+      "sha256": "24739fe5b57337803bf8f4bc6479e41fddf7788f077f422137a6bda1b5558bf6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "deploy/Dockerfile",
+      "sha256": "b664039ba4b560830ae5d477c2c9eef560d9f1ee6e64b90649ef83f6ec39d2b7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "deploy/alerting.yml",
+      "sha256": "80eb8eac274ac5b2d8765e003e60803cac54eabf53ea22b86d0aeba84281ca50"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "deploy/compose.test.yaml",
+      "sha256": "fd5ca602a4f3d203644b9b80832c0360ad0620ae2c9085953ead5580b32eee2a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "deploy/compose.yaml",
+      "sha256": "8bbffbe9f8e6c0a82425b39b305e7947db9bf2782560c4048b44118fa0732cde"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "deploy/policy.yml",
+      "sha256": "81b95a07072bf0798bdc99a32cee8e2e3034224d52d976a4c69ead2d7af7bcd1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "deploy/rules/authentication.yml",
+      "sha256": "e58b1c01569125baa9abc79a227fa1f80d61fb13a3d708d326b35075c1d2641c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/configuration.md",
+      "sha256": "b8a1ef343b85ed9d7bb31a9c411a93115f253de8fdb8f3b236f80a50eef3b69c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0001-durable-before-acknowledged.md",
+      "sha256": "deff282fa7cc2b4062b176caa3d4f31c80f65bb1efb130216be53b647944571a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0002-identity-comes-from-the-certificate.md",
+      "sha256": "80c746fdea56775c172434f18d83edef246161b42c61ead0d02608309bd45a67"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0003-the-contract-is-the-event-model.md",
+      "sha256": "07e728a32d27d338baa73661c798416972cfc5866a45c87fddebe9f2b2f65ef3"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0004-one-process-skeleton.md",
+      "sha256": "e4c1d4c4410988acba9ba1d66f1d4aaf8345f8149b04494b75c277c1c0b299c4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0005-the-canonical-form-is-for-analysis.md",
+      "sha256": "2741fe7f49df84d123aa862a77e26482d716ace2dcd889602fece3dd8137cade"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0006-a-rule-addresses-the-contract.md",
+      "sha256": "392d1ff18c1f32ff17462bf8c4b70a5a460d50706edd3b653f41badc2a841ce2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0007-a-rule-file-is-not-the-rule.md",
+      "sha256": "8f485d417cdd21a85d58e43d967b16b8eb62f76da4d4cc63a5abcf7bc5802922"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0008-a-ruleset-is-named-by-what-is-in-it.md",
+      "sha256": "4bffe2c71403483c4426dba6cb8fe2f8167654a228a38cc582a43cf594272bce"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0009-an-absent-field-answers-no-question.md",
+      "sha256": "0026923060c8c0f8fadef17ddd227deffbe7dd678980740a76d46be6d10aa4ac"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0010-a-rule-carries-the-cases-it-was-written-for.md",
+      "sha256": "95364faab5f144471eb240608eea25f26d117c869b1a398559f799b58215a881"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0011-a-detection-is-not-an-alert.md",
+      "sha256": "e07c2f9c94e9353d8988177274d408aad709eb68fe441e68daf01783c4708ae9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0012-storage-is-owned-per-workload.md",
+      "sha256": "1c08cd39ec402bf02fe4f27b39325816783d9a49f38db136a7328e03b572bc5d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0013-a-query-is-a-scope-a-window-and-a-question.md",
+      "sha256": "6b01176da564867ae9488f78ab2d68eb6d89a401f0b3ab304075e19e78084a78"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0014-a-token-says-who-and-the-policy-says-what.md",
+      "sha256": "786f382104177aeeda62206140e3684f837470a54c7a82d27a549d110713bbb4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0015-a-ruleset-is-published-to-a-log.md",
+      "sha256": "f4881f15f2d04e33e41cf923d6f31b2eb798ce9219dd7678a556772a0d030f18"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0016-an-alert-is-a-detection-somebody-owns.md",
+      "sha256": "5a0a02c41679e8d80df7f5263d91b38a1f8058c6f9ece524f5633b9a744f2116"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0017-noise-is-removed-from-the-alert-and-never-from-the-detection.md",
+      "sha256": "55d397fad1d159a57d244debb15c536c4ae6179c7d69cabdb9323f73994d0191"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0018-detection-state-is-a-bounded-window.md",
+      "sha256": "a38628ff8da81fddb6a73888c88e2aa03a3d5cb8088cb9f1d08df5129572edf2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0019-a-rule-that-counts-decides-on-a-window.md",
+      "sha256": "0854cf806b740b9338e6c9f3d79dd73cfdbb194fa6057fb4935c5d0590d56433"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0020-a-sequence-is-decided-by-the-window-that-holds-it.md",
+      "sha256": "406aee24f173eed635f149667e9150ec40e3f398af473b836a3fa145f17f6bfd"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0021-an-incident-is-a-correlation-somebody-owns.md",
+      "sha256": "06fbf9de63fc092677c7d820557b6093ee7b98f65cde458ea92956cbb92116d1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0022-sigma-is-translated-and-never-adopted.md",
+      "sha256": "75e7cec9459ebd15456912f71f8850f75a9796eb34874b9edaf4ed2e3fee9281"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md",
+      "sha256": "639eecb26214a6b85c213381938401665ea8ea36e983a3e4f20982263d2c112a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0024-an-agent-is-registered-by-the-control-plane-and-refused-by-the-gateway.md",
+      "sha256": "ba44bb79869fadf51121b2bf4e85ea4cf85f150988b8c267d46a08529fd6db14"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0025-the-platform-signs-the-identity-it-binds.md",
+      "sha256": "c7676612398f874b9aeca0977a4343f75e1004ab6998b1cdb89683574d56c1fc"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0026-an-agent-sends-into-the-tenant-it-was-registered-in.md",
+      "sha256": "957b6972b463e891b5ff9d162afa909c18a78c5d0fc1debb931d57a403c7158a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0027-inventory-is-a-record-kind-of-its-own.md",
+      "sha256": "7418e30e92d39249a8af6ff430be1696f346ee1c3880a8f199765f056f3e1b20"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/0028-vulnerability-intelligence-is-read-from-its-source.md",
+      "sha256": "510d2c593071fa2334253fd330ec22d59afd0c9f3e354b35266e7e7a36ffd136"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "docs/decisions/README.md",
+      "sha256": "86f010732da0b0a33ab8b7c4c11972f4cec22a36784638f763eb8076bf3c7bd6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "go.mod",
+      "sha256": "af59e881de26cedfe1c3642d8b97013372e57777b6bae7c0c82669f2edf32161"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "go.sum",
+      "sha256": "9c99632580f23307d6cd0e17fbd0466f385fa1b9f91e80d8ecb9bc8c23ce14f4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisoryfeed/importer.go",
+      "sha256": "9ff5682311df553fd8367fef25f824f54cf32b11425bc1d43f918c2dfb39c58c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisoryfeed/importer_test.go",
+      "sha256": "354cd132c301117869c7ef218ccf836fe4ad1952ca6248cd44de5e2d4fee8dfb"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisoryfeed/metrics.go",
+      "sha256": "a873216fe0cb0000627018e38cdebbce3382182c21910070ed460d099cad411a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisoryfeed/ports.go",
+      "sha256": "3e0d8e835cd148e98475d950f8dda28adf07bb2e783eb32ecfdcec6956074eba"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisorystore/metrics.go",
+      "sha256": "fbc19c342f9f4c61486b54789026c2748b7af8de1a0c6c22f9680fabac45feb8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisorystore/ports.go",
+      "sha256": "a18e16ca32a0323d6a182455f9780ae07f3d158a47841e20194fade3e06caa36"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisorystore/row.go",
+      "sha256": "7dc5f5789f529cb01b96d3ebc30259fe0873b1ace38697fe0c6aa0366b97c970"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisorystore/row_test.go",
+      "sha256": "2b720e4f82fee7c6489a9cb91a2822fac68454db6a9d16349e21a44a4e39c5b2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisorystore/writer.go",
+      "sha256": "ce65ae797b9bf39404b3ba0c5f3a71df5069e1b46131a89530827b43cb44ab4f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/advisorystore/writer_test.go",
+      "sha256": "f3a26577bd0e60f809117eb32b06d676e607bc2aaa7db6bffe90ea3f59372a60"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/certificate.go",
+      "sha256": "7409aa88aab662be3dd5da446f183666f9bd1ab9ffd3eaf24075e8ba52fba824"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/identity.go",
+      "sha256": "233b14ffd5edb75ac34802ec831ff8a4e1533d906ba54df1130ad916709e0748"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/identity_test.go",
+      "sha256": "5f2d0e5d192724ff89ab6fed844afdf8b008aa3bd81cafd605bb6dbb5c8860e5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/move.go",
+      "sha256": "e0cad91cff54750ca5b903d603b3f7e16e273e35bbf075d815c24b26216169da"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/move_test.go",
+      "sha256": "2a68f49296d121587e9fbd3daaee4c07457b91fffb8467d7fd8ddbd7162aa563"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/register.go",
+      "sha256": "b1f90b87717cbb5b22b52d1d99119ae58513c244f8e94477b28a066bee19210f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/register_test.go",
+      "sha256": "a2db593972bcbc8c931fa1f25bc83409f2c2466aacabb5e054afead1e616677c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/roster.go",
+      "sha256": "47af8ce785e74093762a22f3f9281cc5090680f1cceedee99159025685563b46"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/roster_test.go",
+      "sha256": "58454c3f9ad1a082a9b5837e48cb29fe7261068daffcc1918375d5db786b235e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/state.go",
+      "sha256": "6f5a4a553709223aca82f92ffb12dba678d647f7e6690f9a33af8e07db60fd0a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agent/state_test.go",
+      "sha256": "c9c656de13f224205d8b09d1d5e8a997075273c2f70d792ea0133754dac51e92"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agentidentity/identity.go",
+      "sha256": "679e1554444afd06c25876f73be0d00e0b410b9ed3e921215c826f1bb6fe3e3b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/agentidentity/identity_test.go",
+      "sha256": "2f26e4d569c771c8e18854fbe8bdc8e95e7fccf17e32a7ebe4de3107519e3d79"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/fold.go",
+      "sha256": "9217800d7a0c803b9e69a7de92f0bf98112769d084d0ac7d600444931ca347cc"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/key.go",
+      "sha256": "7119fb58954274dd181a0fa22f9604d4359c182a3073fa363847cc31b71829d5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/move.go",
+      "sha256": "f98eb94e6ab61845013f625ee1dc3ab216f8f7dafb1809f047fd273bf43f338c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/move_test.go",
+      "sha256": "63fc2263ce655af311af2e3142ad36ab005a5aa90e81c51d886640e9d0fb7621"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/raise.go",
+      "sha256": "ee8bcfb99fe09aac6f213a4e59ddbb56ca15e36c1b890d1ab3cc0a10d51b6171"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/raise_test.go",
+      "sha256": "a98f6229f1fa043352dd1eb239e06a3e2b5207e734abbfee75afb60cae0096ec"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/state.go",
+      "sha256": "270d2867706a8df2314b35ade38822d098807a442b81af1009e0c892c45fea61"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/state_test.go",
+      "sha256": "cb0bac6c914d3723bc5f0c8a4b4aeaa75c3ebf053e0a1145f78374da7c071f6f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/tuning.go",
+      "sha256": "e5320d2b4dc35cbb6a2c8a26e46ef26580497f73f3dbd7cdb7e7811d4527396d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alert/tuning_test.go",
+      "sha256": "ba63dc050fa1b7ff4708f06784db1f33bccd4cd923af5c40bc8b8dba2769979e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alertfile/document.go",
+      "sha256": "41d852703f9271437d4173555fdb2afc824399f7fa1759c79fa036e586172157"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alertfile/read.go",
+      "sha256": "d00e64b33fdb0525dcee5e97034f64f083a9d7d012bf780a921c63f8e46cc199"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alertfile/read_test.go",
+      "sha256": "325d1f31a17cf07feba6a9a9d42167518ba082c2fd86b71f8ea0eb7221e5db49"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alertstore/metrics.go",
+      "sha256": "1257c677950abc435693ecc48ada5c60988bb14f04d171459313ca5ca2ea0060"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alertstore/writer.go",
+      "sha256": "7ee98cbe5a97e85c4cefe2aacd514d794b41a0734a990d5b5e8af7735de6b324"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/alertstore/writer_test.go",
+      "sha256": "0a87214748f32ae2836c1c91a92c1b59b86d1045c4b2a9918b1da1cb2997a2b7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/count.go",
+      "sha256": "abe18494095551637350c99158a380e8e02d25168e9cbb4ee10c190219521424"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/count_test.go",
+      "sha256": "ba87c22a26ddd727c13a1c36a7aeef374409fc3aa20f1fbfe9d88c88cc767341"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/detect.go",
+      "sha256": "54ac492837d1f9f7ea92ea3365f3461fe16e0b0f08bdcff4728256c48398f0a4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/engine.go",
+      "sha256": "97d47475f3bb0eeae3c3c8bc7b6b1f18951e202435885fcfa1f439b8b2bdc27d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/engine_test.go",
+      "sha256": "1d615671dc3191ff55499b6fc3f12fcdb2fd23334ea8ec215a6e91fe70bc79e0"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/metrics.go",
+      "sha256": "c0fb9d851559fb5cddceef5fb013a8ecdf15c24bc15a218ba99483034c6806a4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/normalize.go",
+      "sha256": "0a96ddd58a5596543f77cc2f8b64e1dd0949bc33beba5c6794b4b3a709b60404"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/normalize_test.go",
+      "sha256": "d7d1c9b6c43665e07d6bd47112a4049d7b1a4a3bf8702feb7238fb7421d9504d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/recovery_test.go",
+      "sha256": "c0b6e025cc61f4d073e7ca75c658c8a78ad7bbb814aef46860b0ace16dea4217"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/route.go",
+      "sha256": "3bdc11273434810f29aa6317f3a390b2e9eb8f7098ce6264534f3dbc0a202db9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/route_test.go",
+      "sha256": "95002fbd858c60a5a6545087806572bc700f456c29b0b4e179953a0600cfd888"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/sequence.go",
+      "sha256": "2944d291b5283e9c6a03a0876990a98915fff53bde85201414ac55ef5c4332c5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/analysis/sequence_test.go",
+      "sha256": "9db7e6227cfbd457a15885f2fd920bbd1b15440a4a7687f8218ff1dd1c7d149c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/grant.go",
+      "sha256": "1c1119c33055361a7c0e6f6b5fe4d9fe90014f585bc36ff019684a91187a6071"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/grant_test.go",
+      "sha256": "89b16924ee0709507a6e24e89430f08d08640742f767381c26550eec5f3962a8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/permission.go",
+      "sha256": "a682b21b5f9cbcf37cf63fdff179e26437b9f8f9e6021002fc98faa6855e19b6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/permission_test.go",
+      "sha256": "3bd6bb08a322ce00243f7f1fa518bf44a1995f7007cb8b73a8c1187eacc7758a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/policy.go",
+      "sha256": "c514ab35d6a13eb03615a835f9bad7d732daeadfc22a6381fea78dcd78d90b45"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/policy_test.go",
+      "sha256": "04ba13b84a939c2ba53128dd18573a05f0162bc8a249cbcc0663a101013ef2aa"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/role.go",
+      "sha256": "8f403f5136fec8c2718c68b02f2d59627204211e9e08f0ca6425b8ab9cda39b8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/session.go",
+      "sha256": "99f67dc322e1b88aa9a9ba8b34e9a7c2ad2d3d88246ea4793168dbfa25b39807"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/authz/session_test.go",
+      "sha256": "494232eef9089a2b28b95ee2833b0fb37082d1e6dd6a9f7cbd33fd9853b5c9b8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/advisories.go",
+      "sha256": "ce4300a35b0a903c0cb583f9ec1476cc6a9f919ce495c7a9fd48c8677a64b354"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/advisories_test.go",
+      "sha256": "fe2d1556d539c28d814b43d1be11be6e2215c5fef3db3d882144b856c9689843"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/agents.go",
+      "sha256": "98164e942a85493d2efc4ec0ea23c03e2481fe48b0792f83ccbd186de625ec00"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/consumer.go",
+      "sha256": "8dfa0c2a373e9efb8bc0031c3532754483dc57c3e5fce606381455ba3f674373"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/detections.go",
+      "sha256": "dd02ae85d2a034f55bde5a45ad6330f0ce156c3e457f169735867ff01ffc31ef"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/inventory.go",
+      "sha256": "1316afe895673410488523d77a3c2a19445e70df05090ac137ce4eb929ab838a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/metrics.go",
+      "sha256": "c9cd3e1a40089918879b3325145cd1ff47096f612ea7773c48283f5f1eecf8c5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/metrics_test.go",
+      "sha256": "6bc921307da31c25f159f7af579da95695461752f34138315733cbc0657a73aa"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/partitioning.go",
+      "sha256": "cd14ff8c97bdbea8b286590211a7aa8036303e793c7bd6303b5b29a1f1e43db0"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/partitioning_test.go",
+      "sha256": "779c5c684cb1ac7b02d9e0670a892e60f1b3f330db112c89edc60dd2ac20b5ec"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/publisher.go",
+      "sha256": "1d16bcca98ae7e7fc5d45ac4534ad2d0ad9914204348c679069cf1798f59e5c5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/publisher_bench_test.go",
+      "sha256": "d84fc46ac0102738f7b6a7eacb6d081ece61c20f550420aeb51cd109cd7dd7e8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/quarantine.go",
+      "sha256": "fe55009a397c436b75dbd047bdddd17d404ac4fe7b77656756d21c63a07ea982"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/recovery.go",
+      "sha256": "24b22b0d7c9af965d1a27dd74965d1db380535b77591fc8fc3a8f2a1eefb9043"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/recovery_test.go",
+      "sha256": "b2143a1b00be343a0b4777fb70a005a5aed58a4de6f5f21216c404d4ab8ff020"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/rulesets.go",
+      "sha256": "5522ec4f91c08b34000ff5d90bc292656d0acd6342d09009bf1516cff1c61ee1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/security.go",
+      "sha256": "359aa345f0e4619995155626a78a52619e377031fc48f0448149f5c7f2af5342"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/security_test.go",
+      "sha256": "bbb874a3aa294c900cfc2bc795c63f7ce9528d08b422b9874895a040dec30c16"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/statelog.go",
+      "sha256": "f63947211fb173d4d99a0fc3dc75943c350cf70b6b670292cf1b25fe8bf50cd0"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/topics.go",
+      "sha256": "8105e241d1e691485448224527871a5a3f74a9f172894fa47a3731e48765d07c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/broker/topics_test.go",
+      "sha256": "ef437cdd32837a55768db86b4a95bfd9157ee16b7699c97852c68bd8c5ce44e6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/advisories.go",
+      "sha256": "b54385ed1bca25be9f7853f0207e39c321527463886d1b8c224b55d21d66cbfa"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/advisories_test.go",
+      "sha256": "d361680f338866f65f7aa6b89ce4ba327822ce09b9d230fc85d6229e846a481f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/detections.go",
+      "sha256": "f3440876c420f1d155d3fe564d0271be818b8ebe495c9731e0c00c132b7b3391"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/detections_test.go",
+      "sha256": "8fd8eda95ae40ded279370099e736da397b0b1b7f663033aa8ee21fcfb21307f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/hunt.go",
+      "sha256": "6033085c5010c66adaec68ca10be42ed012692ed00af386cc27ae7067f8b99da"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/hunt_test.go",
+      "sha256": "f9f2a993d3e144e78f26f75e258e7248c273b0944daf5913b76deaf661025e3a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/inventory.go",
+      "sha256": "fa7d45312cad40a8e441fadba9f4b7820f40bdd79e9b0564a1a71c88f1607b38"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/inventory_test.go",
+      "sha256": "f549a0da11460b6f8c4be069e19738170443904fa739cd526dd8927572001115"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/liveness.go",
+      "sha256": "5c4bd4953c55635881e968ef0a2a051864fbe12bf1e33754502002a16714686e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/migrate.go",
+      "sha256": "8e2527889660837768390c1ccd248c9a19bc4c73d39df7e536fa33b0c6c7acdc"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/schema.go",
+      "sha256": "1ee1b1acbed64f11db5994cd9061e1aa634f9f58080264e9f0b1f590187b2d20"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/schema/0001_security_events.sql",
+      "sha256": "593774405f7e598d8dfb0c130e665c4ee51aeb3bf801c525d88cbe5dfcd4fae6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/schema/0002_security_detections.sql",
+      "sha256": "880f0bff2b938b5906ea98311920c5edd138e4d0e0347fa04b4fb4680c068a1c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/schema/0003_detection_aggregation.sql",
+      "sha256": "09bc2d02a101bf2e6998cebbddbeaf0a80793a652076262538cb281e0f6253f8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/schema/0004_detection_correlation.sql",
+      "sha256": "640f296e170b72e84480410fe033391b333a7cf1688fa43af9bd4e7b0abd3dfd"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/schema/0005_asset_inventory.sql",
+      "sha256": "e251da3f030ee9c911d4bd5cfaef8abc1f77a58224c7559b80605262df7f6fef"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/schema/0006_vulnerability_advisories.sql",
+      "sha256": "47f2b3593c14a680e79b28bcba2429f0db27ff33a98309a1b4cf439939de2091"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/schema_test.go",
+      "sha256": "4826d64904978a902d8b6c93796fc53e9ac94e4f440239d24e8e41c051f5c026"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/clickhouse/store.go",
+      "sha256": "c675d431472386a139f9b52c99ff6398348b9ae1c4eb7de0f6e9bce5794f71ea"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/admissions.go",
+      "sha256": "560fd76e1aaf8ae85646fc318042c75e1b72c15e61f956e3ae708c75fd041b2c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/agents.go",
+      "sha256": "3278def9214a5c9145f9a4a5402c598f2034e74c70b357d54d9e3bc035eeb870"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/agents_test.go",
+      "sha256": "8b6cf812b94f37c3600f6f5bc5634c516cee62801d11e8402b22e21dfb467f2a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/alerts.go",
+      "sha256": "ac4673e60d9e4182321d813bc2240798eb8e8b563e4e39dc931b337243513de4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/alerts_test.go",
+      "sha256": "7a4470421e6620fbc6c77200eb611479cc0d5ed83d6ff63e27f7e05c6c9b185e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/certificates.go",
+      "sha256": "b271944f24f14ed770874205b64e83e1134372edf192a74c163757b4daeab750"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/certificates_test.go",
+      "sha256": "faecdd4d9666bb2e8cd7de78e1d44b4b1bcd3e9ed8402a9f91034d3d669f559f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/filters.go",
+      "sha256": "1fc0c6ac291b32dd21eb48f4822c0f9ff7d65d82c5601e7592f8dda20746d280"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/filters_test.go",
+      "sha256": "71d7247ddc77de4096a8ad0486d7ea6b3d0f1410829a7901af1aa6654006ac28"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/grant_internal_test.go",
+      "sha256": "66bc6881b53049fe4d4451ec1cb41499284b48c65479d425d50f84a73ccbe921"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/guard.go",
+      "sha256": "c63e342d5bca14769181388220b8e92c6a72791e9ca3e736fde2b6da30b7c9e8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/guard_test.go",
+      "sha256": "50ddbac7b198e9ce70e148fbb4ad739fceaa44596d451e7f0b53f25971d1118f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/http.go",
+      "sha256": "20663c200dedd0791ec2f693432c7d5e6466fa3782bc04b4caaa2c32e1d41bc4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/incidents.go",
+      "sha256": "115f34ce9f185bd85966c6d597414f3368f96f5272e7fe1480b1768efb699b78"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/incidents_test.go",
+      "sha256": "f14528fc0d2c63abe085366a6f8f97050dec71b35055ba343cef66e9661954e8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/liveness.go",
+      "sha256": "4ddefbbafeb11ccccd96f489fb5458a1ea7810fa6ee603bea66bdf83a004f44b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/metrics.go",
+      "sha256": "270e1c993cc88a98e2075d56713d2938cf952b8844183d5c07ff4945cd72c236"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/registry.go",
+      "sha256": "51eadf3c29d7f369004fd08b7d28de4f417669985aa9c57401723252df5feefe"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/renewal.go",
+      "sha256": "760856a5154877c249b16687adfb3db38367a0be54a86abfd9672edd06b39d1a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/renewal_test.go",
+      "sha256": "761e701f0711068e54b9c288be5ba1d796f33f5037dcb290b8312d295ec41a0c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/routes_test.go",
+      "sha256": "b94fb8abdd959442bbfc578b0d9876393c8c21e347403e6307bb4fe881fb23b7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/rulesets.go",
+      "sha256": "70c9d9c1c759e72855261e32b3fca824f6e6fa033b13f598aec4b5fcaa2ed37d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/rulesets_test.go",
+      "sha256": "ded417dd13ce06e4cff20f2f72d93d271e3d6491fb77bb1cdec899ec00ae7d8c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/server.go",
+      "sha256": "543a6f69c1e2ab9deba36c4489d1564de7cf43a4880bdc5e6a8c3c41a9c87b6b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/sessions.go",
+      "sha256": "7534f77421dae4c9600ac938fc5d2afe3060250cadcea8a17894159b7e284b08"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/control/sessions_test.go",
+      "sha256": "c26a25344b3e6cb0d74a79fc882bee32aec8a376f2dbdfa020fd3ebc878acde7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/check.go",
+      "sha256": "eda5497bfbe943e49c38e44fb91a1460cf5b7f48fd07e642a4f2492db4b925cf"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/check_test.go",
+      "sha256": "ecee9c07f151579964fb359d9a2b9b02e462bc66c8c9154a261592aa78a04410"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/class.go",
+      "sha256": "cf62887cb5022bab2b038c9ab4528d666d73c2dcc6cdc1ac19f81478b624f01d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/compile.go",
+      "sha256": "cc01d1cf7bdba7a15744660959bbe7518d53f9b4a729c7e91bb23df4f5b3b633"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/compile_test.go",
+      "sha256": "71ce0c82708ccae51d150f7e2f9d53541c13c788b3ac24eb692adc76d5b56754"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/contradiction.go",
+      "sha256": "ff989dc12a4c7392562bc6b5911b1f2cf7cf7165935887f2e77982c29726994c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/contradiction_test.go",
+      "sha256": "1a2b4a8a0adefe9247a3bda200fc0488e80b57f154c789cb0a2dbbc6455052d1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/count.go",
+      "sha256": "9f5b11929f46311c2b1d0a44e5d6fa0e5e8edc3ede5a7ccd93a92ee26a437da2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/count_test.go",
+      "sha256": "f1ee94d3dadf06448f655619fac9442a84f49dd00ea23aa7cabb5dcacf739844"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/decide.go",
+      "sha256": "26679ac67403e02736e7ceef78f11e8a063383a7a60576a542e1dd4d712f5e36"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/decide_test.go",
+      "sha256": "04ec626a353038845441440219ee9a621717b4aa35d35c28bbb1e81fc104772f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/detected.go",
+      "sha256": "edd8963d225d4ffee4d45314dae8dd69f598069a987807b4f7d6a2e26b21142a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/detected_test.go",
+      "sha256": "45c8f83779863bb5329648f00f51ab9a8de0fe0406649ad5446c176956206a4e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/expression.go",
+      "sha256": "fab8313bf14691700cc68909688c80f2780454a243d0a0195b4df06c193955be"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/field.go",
+      "sha256": "0b26182012c788e8004324ef804a7bf6ba276f987a375e701012e16c09163ba1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/field_test.go",
+      "sha256": "b7380d28075a6ca8c1154f57052d130231c18562880d6c75060833d8d9261db8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/rule.go",
+      "sha256": "2cb36bac423fdce83e7af0b782aecdea5e99c520fd63666c9334ccf4f3ccd398"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/sequence.go",
+      "sha256": "357d16fa2fb6126361d1fee31232eca5d376ec772840d272cf53e5ed999ff77d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/sequence_test.go",
+      "sha256": "0d5c1caa63531505b943fca4d1564786b24a7330e9b46c7226ebf4b50fb448f3"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/validate.go",
+      "sha256": "2e3fed47dc557c9602990ac3493c16ac07da2d440f74a37c1d5d4f95849226cc"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detection/validate_test.go",
+      "sha256": "6bdd40257f21728f2e4ddb45abdc95999569adb4b8f1d563d85c100d673f5d83"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/bounds.go",
+      "sha256": "9348f7802b56de25c66399055c0578e2ccec9c6b6e17c94f4e7a8d9a1bb3b525"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/bounds_test.go",
+      "sha256": "9beb8d8a2932435825caa5b69debff3438e6046815bf0e8e22d30b344e08490c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/keeper.go",
+      "sha256": "a63071320259e8a61f9e10b8d5b83384d05f401ce2954770b6687550162e56d8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/keeper_test.go",
+      "sha256": "eded27f144fe6aedec0060105e3f27d995b3a8d2d31c23e367b4dca5e0fb8420"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/key.go",
+      "sha256": "89b674bd67a1da7044c95cd5b698a17aea9ecf40357149639fba762908cd879d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/key_test.go",
+      "sha256": "686e03c82bd8e17be30a0cc2f2fe5e9003fffa70a88d8e6873e50e99e6b4f044"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/observation.go",
+      "sha256": "45e83bee7a23c8b597a606642f4351c35577a8e7fef05e80c7f4757a1488a398"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/observation_test.go",
+      "sha256": "ffd6a88f996ca94ae689dd58f6ef434c3d6719ca04fa5fb9573f1d0b04532865"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/partitioning.go",
+      "sha256": "51d22ef152f1fb9b7057011bacf198b77197fefcce0d8530df7302026d4825d0"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/partitioning_test.go",
+      "sha256": "643ab6555d9d50125c208a39ed770e77ad282dcb55e025188ed1af6dd8ff2dd1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/state.go",
+      "sha256": "0b2cab2cc4ab208014399f233cff12a8fedf391f20eb387dec84dc156fe1529f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstate/store.go",
+      "sha256": "b7a7b8bea6bacf20eaa6090252d7f8129705e8a339dbe3cd10667366439f8fe7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstore/metrics.go",
+      "sha256": "3c4f1f95545d0ed524f79d3b4a2a44d94c810535e98c9208151997c86d9907a1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstore/restore.go",
+      "sha256": "c1f9558ba8f12e59d2ccceb4fb0c690e3d3ab2d19ee127cfd41027b5994654be"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstore/restore_test.go",
+      "sha256": "4a6dd5c100cfb0de728cc4aaae337188f86379467c9cbff087b45c577aec5ccf"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstore/row.go",
+      "sha256": "c23c330face9b472c80726a9a8158b2cdceda70cfd33b1f4d0b4b45c6e814199"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstore/row_test.go",
+      "sha256": "79ffd1369ea88deb9e10b0c18d7f8a839136ab5f691ce8f8fb1564991cb6287c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstore/writer.go",
+      "sha256": "ca63a4829ca388c083fb6a8915715e501c3d3d5a2b0177ce08b5e69e1dcfe2d6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/detectionstore/writer_test.go",
+      "sha256": "cc2762909aea11e541bc12c05119e4b95a58832b2cbe96e1ec6ee517ecfc52ac"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/devpki/authority.go",
+      "sha256": "e56089f390e73c60d7d41a0cfdaa1c44bc02c2d5d6a19cfc7a8a29228caa7296"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/devpki/files.go",
+      "sha256": "f2736f4e21dfa8f95b2410c45d09e7d3dfa1d23025928243221e0152d6740e1d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/event/limits.go",
+      "sha256": "ebfdc6866bd6476c090551856ee2c7b903543cc428c1b4955ea7848deca4e067"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/event/validate.go",
+      "sha256": "d146e111cfe531068de25018f8f6456757445030ca8313a3328e88d30ab86702"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/event/validate_bench_test.go",
+      "sha256": "14f930797512d85e3719b2c752dadb62af84ad57e109b72648a1053291a602c2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/event/validate_test.go",
+      "sha256": "ce213c6e8161fdd01a873468a64e625ce2b6c10f1ecf59b22d4b5942418f8e00"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/eventstore/metrics.go",
+      "sha256": "ff44bca83814b5c09b645fb5e99da0ae7dd973e488f0324c537e2fff042a11bb"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/eventstore/restore.go",
+      "sha256": "707e3ab67c2dba02ca3097d07e9504d00bbc92690111d2e8295141cfa3ee30e7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/eventstore/restore_test.go",
+      "sha256": "c46256170e0318b513c4b2dc25bbbfbfd36a4d14ec36e7dbad7384043262ff04"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/eventstore/row.go",
+      "sha256": "a9051e3cfba03196917a0db07a371278821b88efdd1e96809e28dec6dd24f2ba"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/eventstore/row_bench_test.go",
+      "sha256": "08e047360ac7ba9e3f46fbf29d1c54caf0b00f8f9cf9ba46de92bfeca66a4edf"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/eventstore/row_test.go",
+      "sha256": "9c568d2cfc21d9d676f39be40b96b1fbe654510025fc3fabc5238177af70568d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/eventstore/writer.go",
+      "sha256": "6878c40308d0fb496aa34959c937ac290c0eabc7af3a5ed17c68195d1cf089c7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/eventstore/writer_test.go",
+      "sha256": "caa1acfe076768b40b0ed59e293f4a689fddcc46e3da80eb8bbc6c11bd4a6647"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/capacity.go",
+      "sha256": "f3b642890c049e6fe6751212ad0991954541a8e27f977873ed29b84cf2654185"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/cursor.go",
+      "sha256": "ad210fb3e1c07cfff8f5d8daa999ba4eaea8ca95da15e275394589ec60cc8da2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/expression.go",
+      "sha256": "b792343dfb28480e939f9256dbca299fcffd29ee0dcff36f291c32d44ac3d0ff"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/field.go",
+      "sha256": "922d93d8c060d5f1aed91773e0eedee5deaae46d4d24a4b9db052e3cd826561c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/field_test.go",
+      "sha256": "1ee0fa62b7f0c10b76c6907c3883ef5e17bd2f9e30d507731898ea6e2c1fdb4a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/http.go",
+      "sha256": "31b4caff37122483932041b46638cc98a92a61f5ad5696570aec6922599c61a6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/http_test.go",
+      "sha256": "55ef01f1b35889c23fd62754f2c8ebb31fac2264310de684ceca4c925c506929"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/hunt.go",
+      "sha256": "aeed5b1d0b07f904175f9c2518777235b6cba7dc9f789cc80a1132991dcc1d6d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/hunt_test.go",
+      "sha256": "0fbefaa02d02a3b6e3be277e0c32ded44f09f4044bc3955689d3591a26b315cf"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/metrics.go",
+      "sha256": "9112a4b3ec34906dc11b05427efb0b73b2e318f1cbf01782f88b2b374fa387d7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/query.go",
+      "sha256": "614f41a9e750c2f820564b3a69abf8b3bdc10ceb36c3c99a911ebee5d696a9d8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/query_test.go",
+      "sha256": "c2ea6b021405045b8ec0afe1e001d2f40baacc4e0a3e1272577f80cd521e62af"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/scope.go",
+      "sha256": "fdd983319703156e30c21aded7fb5c21595f21f2b2ef577fe3846d891d7bac68"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/scope_test.go",
+      "sha256": "c9e92a9962c1e4c2531741c080c5351fd29478aab98070adea7bfcf51f05674f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/hunt/server.go",
+      "sha256": "a92d301d9fbf7db5f54d9bbada58146a522817e60439d1c62102d9dad5c2f8f9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/incident/confidence.go",
+      "sha256": "30d821f12ba1c66817361044cab31006d028690f4b2029c0f7f2eee6082cd0c9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/incident/confidence_test.go",
+      "sha256": "d0630ed6f5556ec942afd6e358be16b475dc100839fd3e10f5228293c8994f27"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/incident/move.go",
+      "sha256": "cac727165723b179a1fa83ef6470452d9e80b7994b79c49fca62614acd82ce31"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/incident/move_test.go",
+      "sha256": "52cec506519ef747678f9e8c96db8dc15543466f1ca75facb967c93c785bbd24"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/incident/raise.go",
+      "sha256": "88c35ed3dbd47543717f769a0d48a94f1227b129a68fc0977dfdf0248cebba85"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/incident/raise_test.go",
+      "sha256": "64565792666f3f55e20647e5ca4f2a9392b13d814d87e1d7fb341cf0cd4ea7a8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/incident/state.go",
+      "sha256": "f08e6b6480d3cd2b82fd638d0f893ce11eaff67fb9fd8ac49a955bd2cdd47a84"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/incident/state_test.go",
+      "sha256": "cb4e43603ebfea629ad8a8e3082c7fd3d40efefa7ff496088142a4b8404c8cb0"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/admission.go",
+      "sha256": "749c9532e4ea35f585d8e6ec020e0f29d22a960fd1e525ec3da6dfa5f69b77ec"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/admission_bench_test.go",
+      "sha256": "db0a15da25121929aefa1424da832080387d39232b707bc7909ad92c10a99355"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/admission_test.go",
+      "sha256": "7079f88024a1d7ee60bab95e991b3785ed3210cafd9394faa4c45416f9dc6bb1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/capacity.go",
+      "sha256": "927418878d1ea2af0931daadab3df587b1c46314505057182ca0dea30d6fc69d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/capacity_test.go",
+      "sha256": "d8dbc1f7d3c8d27849e2dd4565ee815cb08c66240d28598a240f70a92c596a6f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/http.go",
+      "sha256": "f1fffd39d2d40f2b4d19682cef2c5079c838ff3dc54f111639be70b74d1098c0"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/inventory.go",
+      "sha256": "1c29a852cce931dc375a3cb8080f8665bbd06de48a386bcb7b9c3eaaf6ee05b9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/inventory_metrics.go",
+      "sha256": "a249a9cba12a68bb812bf02736d377ba653aed08f2c62dfc40e79e0aacaba763"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/inventory_test.go",
+      "sha256": "101fea50fe48ce314bcc55244fd648a20f3aaa311dd96e015a0aadd8dd50e6f7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/metrics.go",
+      "sha256": "417759528f982e8207f115524eedc9cdae16493a2f1bc2586afa82b47bb57fad"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/server.go",
+      "sha256": "ee651d5baafbd59cad390bbd3e1ef55fab3cad6d20a18fdd53af49d9dd94edb7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ingest/streams.go",
+      "sha256": "475b607e538f918ddab995329d87c9da4380934a841c1b8ab194d16ae2474def"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventory/identity.go",
+      "sha256": "c32f017cbb242272f23e86fa1b811bc766211413356ce2c9119760b0dffc58a2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventory/identity_test.go",
+      "sha256": "c6a57d02c4e6d4ed0d6099bc75cb286184c46527d6263849ac5e679c83b09136"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventory/limits.go",
+      "sha256": "441d2900ef7d766ec8a2ba4cba2d11727fc639ac8f8248e06628b4bb28c77159"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventory/validate.go",
+      "sha256": "79101d7b1143a6e163d6a28c76794a13420a535849b751dd2f49d12c46c29914"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventory/validate_test.go",
+      "sha256": "6f8e8b48dbced83f4146a8c512f2f2e39d7eba4ffe0f10ab253ed43ffacc306e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventorystore/metrics.go",
+      "sha256": "a0968c09cc56ba464452bfd4f83a08ccce12e02f13221e9f8f4e785b9a2c3e44"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventorystore/ports.go",
+      "sha256": "e93f1d65ed71f9bda212a9d66487e40261104de290f982ad14b900aa53591261"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventorystore/projector.go",
+      "sha256": "d8a9eee704d693812edb6e7475e35e7043fe9aea45d053046d1162385549b8a2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventorystore/projector_test.go",
+      "sha256": "2df2531aa467d85423a7c5bf2a5049303a14e376b17f9ea590d394abb435903e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventorystore/row.go",
+      "sha256": "c0c5322290d0b153e1a310f9ac5d326fafc97845e957b8947d46fa0f20411db6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/inventorystore/row_test.go",
+      "sha256": "e4a95cb035ea24d093625e42e5465fddab159d5a9f2d061cfeaa44c7a3541cd9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/osv/export.go",
+      "sha256": "1f48a97cddd6a5df5acb83032c16d5da42ac3fb2adeb3def828fbb3a779d71d8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/osv/export_test.go",
+      "sha256": "1092d7b993425ec7f521c4923098f28078085593ed3e9bfd0f329af9b9cf7796"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/osv/translate.go",
+      "sha256": "a1b09822eb1b4487930bddeae9bc3505c3188cbed38a5f9e687ca62efb55cb39"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/osv/translate_test.go",
+      "sha256": "d1cc1cc122753ae2f8dfb0c3830fde38d369d5ebdef123e1883cd32d0dfa9d2e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/pki/authority.go",
+      "sha256": "34e6185392fe6b4f81dbde212a6ec849a8800bfc662ed2dd720508dd6dbe4b25"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/pki/authority_test.go",
+      "sha256": "037c5f96a595c6283cf50797a330a0a6affa926438b014631dc1eea33459a30a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/pki/bundle.go",
+      "sha256": "86534e0787c7f5e2268bf7568b3903fb3fbbe067ce08058076168e543e6f71c4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/pki/bundle_test.go",
+      "sha256": "cd6c2db5de58453e61ae4843bc99667f9ec78ee5286f5685d244717c4f95902d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/pki/request.go",
+      "sha256": "cad065a1be816930f56621eb8d454dad01e8ac184f7a83b2aceeef30db34c875"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/pki/request_test.go",
+      "sha256": "20ebf85ea376047437a3736391863e65a98c64d711e902814a5887dde0827cb1"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/buildinfo/buildinfo.go",
+      "sha256": "0e113699da283bca4fdd7f266b264a289f9902bc300d5ff924b66b6b9bc171a3"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/config/parser.go",
+      "sha256": "730dea53dc6f06facc75e8ceb65591ac3fe83a662e9fb7d89d8ab2092678bb97"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/config/parser_test.go",
+      "sha256": "a6fa02919f3f44c54cb8a01006bf6456c56900d6927c0bb7cee8e2456fb80273"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/config/secret.go",
+      "sha256": "47323aa608572bd6e362451df67ba22cdd865ee2a56f1b438e70d6bebd70c35a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/health/health.go",
+      "sha256": "435fa23d16ecceaf9c28d98d164c1dfff038c947243bf811ef6b55332fbfa025"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/health/health_test.go",
+      "sha256": "4683c82df8f4ccafb1bb676148e1986ad08e1d56ed3ac661b8f39079843d69df"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/httpx/middleware.go",
+      "sha256": "614bb8c0e3f2c6bdf6e1b959fc689ed85ad5006c464be326a4ff24c297fc2f05"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/httpx/server.go",
+      "sha256": "133d5cccb5f0bd027343ea5e7fca65d84259bda399bc3a1f36fdf8145b6689fe"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/httpx/server_test.go",
+      "sha256": "8dbe94d34baec98d0f66e5ab51a6c01f963d096bd00496dd5d4573e5db3f26cd"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/log/log.go",
+      "sha256": "00ef07cbd48103204aaed56bde7a6757e7a8066ec160aa23dec75c197ffd5d12"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/log/log_test.go",
+      "sha256": "f93b428f5576af1808fdabe716d88afec9a507b9b9d5e787f2f6604b378757c5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/metrics/metrics.go",
+      "sha256": "d10bb9b049bf75442ddd561d68d7c717ddbea8e8bf02a4e775abbb62c88e4980"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/metrics/metrics_test.go",
+      "sha256": "384665152b43ece33ef5cc61998fb6ef561cd76d249663df26eb14296f994ea9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/ops/server.go",
+      "sha256": "ef02935914f883183b3a3106eb26735bcf8ad95a34726389078032f79f2ec211"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/ratelimit/limiter.go",
+      "sha256": "b4aff3488841c70c09a96ec7a513407dcfb15254a76319f773b38772c9813410"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/ratelimit/limiter_test.go",
+      "sha256": "0397f6ab4d61bd9ef8258363d2ca582f38aa06b8587bc83f922bfc06a51429c7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/run/group.go",
+      "sha256": "5e18d76e2eeb53312d8076fc6f81b638c037eceb4e4c730308fc5890ede77c21"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/run/group_test.go",
+      "sha256": "01b6df29e7a03e969d6870f06f333b666765627bcea49606e46adb13b03c429b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/service/service.go",
+      "sha256": "90eb31764329e5d6a5978891e3126bfb72c583caf8cf9feb19d8c9adc69f0e95"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/tlsx/material.go",
+      "sha256": "6b7725ff30923df383b8894ddcada615f0d5dade5100847b1badedf8ab6b55d6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/platform/tlsx/material_test.go",
+      "sha256": "b7709f6d6ae444653090564d75988dbf9bf56efd2096a472fb35d241dabcd7d6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/policyfile/document.go",
+      "sha256": "ba17922188076f3bc28bcb69f56e94e51dfa316624545848f8004834d7d3326c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/policyfile/read.go",
+      "sha256": "631e08b089b42320f2b1e0c88f3f70d704da3ce2b51c013f0c6d9005bb63ca39"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/policyfile/read_test.go",
+      "sha256": "7d52338748f626cc99151a452cd935a7366a9badd48c7b077bcb33d5fd57df16"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/agents.go",
+      "sha256": "6b86c2db952cdb01c68cfd6159e269c4bd5f71195ede6f35d39a3c2b2d74ba8c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/alerts.go",
+      "sha256": "4c1c2f07897fb1ed623ce415a78b4c6c8053540726638e6fa537fe1363d9d1ea"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/certificates.go",
+      "sha256": "a8d4bb5d02c80d5a01cf015cffbefa620d7144b284b0778b355c29f7e737e354"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/fold.go",
+      "sha256": "e82b031857ebc16332ee1d66a6145142fa89db9dcc001976c75e19deb6803d63"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/incidents.go",
+      "sha256": "554f79955d9ad06a154c2f917f6296d3d225d9932d35824066898798ef1948fd"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/migrate.go",
+      "sha256": "43ef37e02617751ef3c371f35ae926a7d7513b2a8eb6c9d309c3dead297e3bee"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/schema.go",
+      "sha256": "e778524a3b242fc5db23b6da08c28b8ae96e23fe0e85bce879ac0ffb0049d627"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/schema/0001_alerts.sql",
+      "sha256": "6761ff0a6603fb18861b31be000bbdcdec2a6f3390c6ee0b9212f82a0517dc53"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/schema/0002_alert_correlation.sql",
+      "sha256": "f2bf7d25d51e494e41e53a68e4882a5743cd2ab6c76464d567345fa578565b55"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/schema/0003_incidents.sql",
+      "sha256": "53a58d0324574798cd022b3d5701ead07636fed4e8b719449eeb68e6273dba07"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/schema/0004_agents.sql",
+      "sha256": "b1410d405a5852225b147828013aa24dbbc2ae104b21c24bf60c6adc6543ecda"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/schema/0005_agent_certificates.sql",
+      "sha256": "dcea391569a25ac5e4449a1ac5c954af950129137a741868a13838e9260abf64"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/postgres/store.go",
+      "sha256": "c67dec1258eff193ddfd8da3f2e8dbf3f766f5c93447359568bb8133d103b2bb"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/protocol/protocol.go",
+      "sha256": "d757fbd6025cc7143dcdc20b38b39ba44a3672d319ae164f81f53e9b18cbe276"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/case.go",
+      "sha256": "9434c7e2fd53f25115c1ff755f7d648f20b26c5110fd7d2836c66437bd0d3297"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/case_test.go",
+      "sha256": "d937c2ecbb8b62e4fa29f4851f4311c761c5ab426bcd1b2cc7766df2a13e5ab8"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/check.go",
+      "sha256": "fcdad759dcdc5719ee954bf614f9cfcc392ad86fc6fd76227f1ad3c42232b8ad"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/count.go",
+      "sha256": "df38212b6399f05bd11dd2e6762be33bdcf4df2d03ad52527a546549ddd1756a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/count_test.go",
+      "sha256": "a3b595dd842362ab9b29b46912261ce1674c9d66184af96a86f62dbb84617d7b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/document.go",
+      "sha256": "b971ecf7b79c4625f77af8673dab946e4af96aaaf21a145f710cdce93cc273e6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/expression.go",
+      "sha256": "87af17fe3370675b07052b98188725bb784177c8c6017178f47186d9d4335a9c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/parse_test.go",
+      "sha256": "e9f3c634e1aced5129dc6ad0d09b1476a18c2267256ffc266c4e165a33481567"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/read.go",
+      "sha256": "b79693b79b574e84a09d39170b1c0fe4c69fbfb7d5d77beb9d1b6ddd52666f16"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/read_test.go",
+      "sha256": "c4836d7594a175fd738dd7244384374443c03c700c5871bc8bcd83036db2320d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/rule.go",
+      "sha256": "8d1ea382c8d05e8956a48750a90edf2096aee601399e06d0a94348e0399590ed"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/sequence.go",
+      "sha256": "64d56317e3bb7f18af5638400a6dd1583b854748814645efdd3b55b5ec262590"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/sequence_test.go",
+      "sha256": "1ab3cc8408532a0dfe493bbe60b069de489aaafa51bf5a9c28093a799c418701"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/write.go",
+      "sha256": "59ae18c624f999ed469d37a92747911e63f5f8896c240f8336c806d2062574c3"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/rulefile/write_test.go",
+      "sha256": "3d103a4b2500c9a07faa506762c7262c19edd9893877265242156cffa5a03fee"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/catalogue.go",
+      "sha256": "98a239e2632d0978b0981d4c604f730fa8a2e4a9636cdcf1c12fa450ef57bfa4"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/catalogue_test.go",
+      "sha256": "6466c00f0040744178661a0e542a87f901f6886d0cb9eeef654874a62acd28df"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/metrics.go",
+      "sha256": "f7e510f4ffa3edc840fc92538bb144930f92813222a992f76ef130c3b6e91c95"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/registry.go",
+      "sha256": "10292223b498488550fd72f7fd048c5665966a89722f7351c21a635a557b68b2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/registry_test.go",
+      "sha256": "781a95e7a3be2d379694161682de456505677de42994f4adf57e7757976a1246"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/rule.go",
+      "sha256": "d4ea670ccae25294fef85ac83fa85d33693fce503facfd212367907d717b725d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/snapshot.go",
+      "sha256": "a57939ef9cd48c28389adad49e6b4f62d0aeca3cf6cfe66505793df62609c3e5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/snapshot_test.go",
+      "sha256": "385662d0707e645274a155411ca51a9f5fbde6c0ea4985bef88a1e7f2b744b0a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/version.go",
+      "sha256": "8514836937a31c1d437ad4313ea61f9a7603cd0087316f197758c47d3b8117c3"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/ruleset/version_test.go",
+      "sha256": "ae122c8679930cd062816cb9dc9d7110a1462bcb8ca62482acbe29f9db104730"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/condition.go",
+      "sha256": "6a2d065e30cda05505da49b57ced9953d345c6f204695ec8992da6a6337e5511"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/document.go",
+      "sha256": "2cc67d5991bd73a199005ac48e3d3b56ee90bf10bedbefc4976d9deb4683c501"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/fault.go",
+      "sha256": "ab942534848847d87deb6f8cb7cb643bd8805753e44e2526d36b5daa6acc019e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/refuse_test.go",
+      "sha256": "bf6198fb3cd1dc205e333534c822a9a0900baf63cf385a622b6399f5f0469a37"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/selection.go",
+      "sha256": "bbc68bfddb5be942df4eafcaec7241fe4f8feacaca87535b513dccba17bb2866"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/taxonomy.go",
+      "sha256": "735711fd3e7e85b5bd92c2018e34d26b9a594bf7fbdb8f471c84749d583e0865"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/taxonomy_test.go",
+      "sha256": "0aec4c49ab6e21f84b1e6ba2d2cddfc788211b16efd3d1693675c906a35441d2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/translate.go",
+      "sha256": "4d1d0cc172111f2d05253ee3d389c66d99a7bc5722fbaef8ff904fc55175ee83"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/translate_test.go",
+      "sha256": "ede414080913587f69bc8463ff3cca5a6e07822ca5a29316c579a42d15c83e13"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/value.go",
+      "sha256": "d044db3f6d352e1789a702b71931965265de10584383017f0295583cfa715284"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/sigma/value_test.go",
+      "sha256": "7e21260bcc29fe2ed529514e17c39b7430f613d3ed120c174f0e4d4cade467f0"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/vulnerability/ecosystem.go",
+      "sha256": "28cd4ca9def5823d139c3aa6dd54716e073cce87b4a34b23c119bceded3a7854"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/vulnerability/ecosystem_test.go",
+      "sha256": "46bb9440b336351709dd06f2dde1858f04ad63711181cd728a240b7f91ce4a5d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/vulnerability/limits.go",
+      "sha256": "ea8767250a4fd9bd54f6ab4a4155f13ebc6fcdca2547b1f8e304d1d81c26da18"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/vulnerability/validate.go",
+      "sha256": "3d64f61f32d1d72fa02d7cc31681cb7a8361d318b91820cc41f378806566ad3d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "internal/vulnerability/validate_test.go",
+      "sha256": "c6701bd4ebad05529f999a424524b74663c212bc85713595d366c896bd59a91d"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/architecture/dependencies_test.go",
+      "sha256": "f5e83c85a53ec300ae5b2333df422172966276a4c0aded15675b6b19bf995aea"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/agents_test.go",
+      "sha256": "4319a903e9e0b2e47765d8130a5353be47ceed17929cf0171b91017bcc16c147"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/alerts_test.go",
+      "sha256": "5c6bf440cc20b28c9d8fb452b2950a76772f420d2496d144a940765b5348c6b5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/certificates_test.go",
+      "sha256": "12bb910da592aecd4c9346e6f768e838fc74567412b286c6a6101a60261d5c94"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/control_test.go",
+      "sha256": "cda96bbe8ac9cdecd7ce317e299ddf15e803b2e37e926678d4cda7113edd99ff"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/harness_test.go",
+      "sha256": "933fe8e1d5c4c89cb261102667876131f7a896cfd56bc18653e1f6fff1587c4f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/hunt_test.go",
+      "sha256": "e3b90063df396ed623201812ddb2061f1fffae2ca34e4ff62a28673bc5ab84b6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/incidents_test.go",
+      "sha256": "9a08c3ad06fe2ec2bff6af419aaddb419d12f8987e67a5c76425a2b7f3e74387"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/ingest_test.go",
+      "sha256": "ade5422d6588ffcf5d7f98b1ec582d4cb7aebc4482c8caf4f91a2589e09187bb"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/main_test.go",
+      "sha256": "c7c6c620bc6bc326d5e98aceb59f2435a36872f9911a4a3be9f969edbc9b83e6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/operational_test.go",
+      "sha256": "4a697f5969177f24d4ee0e1a851a8dc75d1b328b8b60dc532fcf499121b1088a"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/e2e/shutdown_test.go",
+      "sha256": "f0bd7711a28773a493f9052165f28a114355fe8c550f1e91a513a82553169c72"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/fixtures/events.go",
+      "sha256": "77797a01a7663d55c599a7d8e03bbe95d5db81273a66dd3f880526c641e381c2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/fixtures/inventory.go",
+      "sha256": "0f8fef6e382e0f02a6c297c9197f0060ee5b10906271a6d42807b7eca24e8be6"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/advisoryfeed_test.go",
+      "sha256": "ab187417b6ee4b82aa7d5eb9e90d84f1597f3ed5a878e1b7909bed16611dc7e9"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/advisorystore_test.go",
+      "sha256": "3dbe63ada9c38ceaa4c3d1084f329a29f1e782924fba9f0f41ca41d48aea5625"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/agentcertificates_test.go",
+      "sha256": "12a87aa145298b07497fd0046d7c9cc4a8718521ac1f39f6cec8f9dbbaf60d99"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/agentlog_test.go",
+      "sha256": "fa0bbacaeb44a69572fb290b9c2dfb2f6907c0b4d5fd0e52f7b51cebd53cb874"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/agentregistry_test.go",
+      "sha256": "60807aeee4123d78f60678eb9265a2e5462251a3d41b16685ec75be978ef0477"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/alertstore_test.go",
+      "sha256": "29cf65c14aaaea8f96e1f6c0adb1c2256134e3f40dd03f543310fc2ddacb304c"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/analysis_test.go",
+      "sha256": "49a25335892c1cfb4cc45e06651ccaeb4941a551150feb39c4d0713404e3e17b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/backbone_test.go",
+      "sha256": "5fa06239c7793fe8f53ff743b0714a84f47cec639c54297bc89f3c030efc92c7"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/detectionstore_test.go",
+      "sha256": "856ac2edf6b3806b60a4d0da9529d63cd922d8ca7ae595eb5badf05c5d033a14"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/eventstore_test.go",
+      "sha256": "839b2c13c7fb5913a6e75a3aa7e28d823e99950e51d3ad41968ebb4e70a1458f"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/hunt_test.go",
+      "sha256": "3356ffbc834400d504218779928a1fcd43c7941963eb4c399cc2e465ec5ae15e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/incidentstore_test.go",
+      "sha256": "356c455ef83024a0d852cbba03c7f388463eb138236b421997dd38b1a29bda92"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/inventorystore_test.go",
+      "sha256": "11efe01bb213904490b60e16a26f657a14ea5b10d93c490a96603d1b0ab563ed"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/liveness_test.go",
+      "sha256": "6e4702e98f09dedb6f189836ab0c5a3952685ca3954c28a1f117b1f437bcfe25"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/pipeline_test.go",
+      "sha256": "cc1c6607394f4721eb7fb092434ca20af169fcba0e020819bc7783190003eb13"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/recovery_test.go",
+      "sha256": "001681905b70def581f3f6f641b5bdc1552179afc9d8387159670f086408cba5"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/ruleset_test.go",
+      "sha256": "272cb4c987b9d4df5b18edc37da031a82c6ef9c2bd991608b3cfa9723312f065"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/integration/topology_test.go",
+      "sha256": "4043d0f3c473420d1ceb0d4f3ad66f3246e0e5f298979df9f4ae6d3f8b460584"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/load/harness_test.go",
+      "sha256": "1c2860d3e0c35235b00dc27dbbecc014f13d8e2d27b576d0154847454c1c186b"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tests/load/ingest_test.go",
+      "sha256": "93c5beb79cadc4a3bcdce9afe3abf967a32d71e6f5b4c3a24dcc9133e20032bc"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tools/devpki/main.go",
+      "sha256": "394d6ecb8b2245b4510d0c05ee79732f0ad72c01fdebde854429bc8b5748a570"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tools/devpki/main_test.go",
+      "sha256": "fd83917558b00b6787147c37753fb7f11337ed2e985b0119b8be0a95c15e69f2"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tools/devprobe/main.go",
+      "sha256": "331b4695b0e21687fbdfe36b8665ff011e8783b48cf898f4fc0acf696e3d15bd"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tools/sigmaimport/main.go",
+      "sha256": "53ffca239b56967d108a42e71f5a4052ee32c901a774005d0d7572a3b5f6531e"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "tools/sigmaimport/main_test.go",
+      "sha256": "317b96182e3a70c4c3f0991f383caf7f73231b35e3fece9c33d32919ecf9e713"
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "notes/Seagull-backend-v2-advisories-threat-model.md",
+      "sha256": "cf344a1dfb1bc4e67a054fa62b4cd432473ce5c4d20abf8f31638d1a409aa66d",
+      "local": true
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "notes/Seagull-backend-v2-threat-model.md",
+      "sha256": "135588aeb1870160789ff32e0874a521f25bc40c9a239a9db5e3f8b2e5d8ee57",
+      "local": true
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "notes/backlog-status.md",
+      "sha256": "4847fa1d147ea12affbb8e90120706c73b80df7bc254ad3b21024b128c7cf1b7",
+      "local": true
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "notes/be-034-handoff.md",
+      "sha256": "f038426db57ce7139ecb03328f0cfbe6f416cbf910af46d6b04ac471e4b3b2dd",
+      "local": true
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "notes/be-035-handoff.md",
+      "sha256": "a040d80de1024171eb0526203635430870a4a648722a032375873d41641171c8",
+      "local": true
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "notes/next-steps.md",
+      "sha256": "022ab86cc55864f44e36013253a0465ff92666705668f2a8c63116481948ddf7",
+      "local": true
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "notes/performance-baseline.md",
+      "sha256": "ef99d711154e1c83b62dd0bfb9c5194313ce5f5be8caba1df9df56a33b07f206",
+      "local": true
+    },
+    {
+      "repository": "Seagull-backend-v2",
+      "path": "notes/v1-lessons.md",
+      "sha256": "63dc5d69c5deeeb99e0a3012b6766a7ce31f5956cb97404ddc1298b7080f91a1",
+      "local": true
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": ".gitattributes",
+      "sha256": "a93a393ff30e04cb20c2272c1c7f05d79a4cbcf427103266c9ef05eccecb72fc"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "52def6f4d9fb3619a7327b33942b89bc910600fb5fbe146998995aa3ddc6b90b"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": ".gitignore",
+      "sha256": "795106aa22bf2b4d601be39b5c076fa98a48d515871c77c8618c74b8a6f4f8e3"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "Makefile",
+      "sha256": "8afebdb8a1518dda9f52097c1f0dee37521b1511d71687ea4157e5c28bc74dc5"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "README.md",
+      "sha256": "fc781329bbc48871c774a76ba6a78ef9552d7c787f751392173b1b4c2fc09b39"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "cmd/seagull-agent/main.go",
+      "sha256": "dcb5d6f3523cc6b679389ced4563720b53cecca91f8457cdb4b955d7536a01ca"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "cmd/seagull-agent/main_test.go",
+      "sha256": "c166929f7eb74ca39ad79e52ea291727d553473325cff23cad2d6bdaf6b3ca66"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "go.mod",
+      "sha256": "1a4296a0828bc92e9042ad25630c3b18d6d5ff1d25c3eef4c8d6bab12884a1f3"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "go.sum",
+      "sha256": "07f6706b56b36f0eed08d537bf9537ed3034edead437cae392d8a18a9f393968"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/config/active.go",
+      "sha256": "a3196d625a4a53693a72e57d56be8aefa6ec1fed7233fa44bcb957c0b9c94d8e"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/config/active_test.go",
+      "sha256": "1349ef2afee8c0b9125953c05529bbdadb5b8f6b0beb4930666b4ceeb29da281"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/config/config.go",
+      "sha256": "395dbf4ed173cc100ed00cc6026e03abf88cd81370a9c6d33765ecfe4b6b5f45"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/config/config_test.go",
+      "sha256": "7a429d1765588306c6a0436929e3da43a307d257453b5c909e3338879d49a89a"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/identity/identity.go",
+      "sha256": "16c6ab4b5474697ef4f4d80d14a06a374724c854dcfadc34132f2b62b261b865"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/identity/identity_test.go",
+      "sha256": "50d2c29a14dcc6305dd073cfaca72404fea08a3d6967d6600f40f77be966463c"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/modules/modules.go",
+      "sha256": "33a24b7bb3459bb1693f6059bf16f20a8fb3517d0fcb6d8565479acee8759c4e"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/modules/modules_test.go",
+      "sha256": "85fcf279a4efb4955da9ba3a76fbfbf7388507244a20757f951b2873cb163bd8"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/pki/keyfiles.go",
+      "sha256": "122946f23215cb8f04c288d62812b08849ab6cb4de3e1b0f7062d8b20f27dd39"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/pki/keyfiles_test.go",
+      "sha256": "3a641991a6075e3be7569c3b1e735c57847acfa394f0c79c54a923d30e3df861"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/pki/keys.go",
+      "sha256": "246ff69edaecacd91dc19a88ff0c957efe96b740140d47836bd8999c16a36ee9"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/pki/keys_test.go",
+      "sha256": "67c5b095b2b4b1a0db5ae805daa6b74c7cebbebd5525a8eb3483722d928d38ca"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/dumps/dumps.go",
+      "sha256": "921c270c411ff89688ad2294c756bfd9440a7b50f6cf62ceba3b778f8981af93"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/dumps/dumps_linux.go",
+      "sha256": "089ff204a8082070e53aed7909f886c5d3fac410ddee9b41b95f97c0c6b41baf"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/dumps/dumps_linux_test.go",
+      "sha256": "026c33a15d09eb6597a5a96c858114518d64545930756338bbaef9745dfd20b3"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/dumps/dumps_other.go",
+      "sha256": "630dfc13ec583962b425a3bea1edac9e549ed5dd9405e409f069a6690c9aea3c"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/dumps/dumps_other_test.go",
+      "sha256": "3cc9ae1ea114f4c7a466a20beec742e2e78be25e4a97dde7afa5d1472d9866a9"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/files/files.go",
+      "sha256": "81f1bbe9cd771a500ad9ceeec928354ddd5ff6cde02494ac84f5544ba88704bc"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/files/files_other.go",
+      "sha256": "98e2499a5ff88e3c98b0511ac25524bc72b4844aefa033e278be18d3925e569f"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/files/files_unix.go",
+      "sha256": "6e508019b3b839def908e24e1d07040df8a3140fea9228ee84d29b75b5d8fc58"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/files/files_unix_test.go",
+      "sha256": "7f1f0a6d05cf3600ba50592a2db1f5478a6c3f36da552e77543af71d5eb3ed16"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/privileges/privileges.go",
+      "sha256": "5d72533ba9bc7bb6d34520caae02583e7a95f952bfec8a3b9394b04ea08516cc"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/privileges/privileges_linux.go",
+      "sha256": "9351a68dc4b7201350a81f763f9b62e6597172e192e507442a74f9d70b51a497"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/privileges/privileges_linux_test.go",
+      "sha256": "f3041cfc022e49035c65b9a7a4b5952eac741f27338a6ca42cbcceedfab1f408"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/privileges/privileges_other.go",
+      "sha256": "de217604a08848cebf6bd201e21bd30de55b083882fa30ee8ddcd8f69b3bf566"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/platform/privileges/privileges_test.go",
+      "sha256": "c0a7e3b2d5fc0a2021993c889b184be5ad943f9d4184d5371a37e76b4b454cb3"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/protocol/protocol.go",
+      "sha256": "cf7a7a70fecb506ea0c04fd333eb4a8f144cf647732a19b79d727a355f5324ae"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/protocol/protocol_test.go",
+      "sha256": "2752167ab1d69fa88f657755e4b6b29e55f04f401a51b29663b4a6bb3f1865c9"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/runtime/runtime.go",
+      "sha256": "4353621ed7d7352ab0186a742669b967cc70a41cfa89d0a5b2e311a733fae578"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/runtime/runtime_test.go",
+      "sha256": "860a4cd77afbdef7f2cd4fe8d9c88a60a2f733cfd899ca0e9b9a4969ba0d383c"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/secrets/secrets.go",
+      "sha256": "1148f2697d1701596d879ea40a292b374d47fa1cc0c6644e0273e5d74b98520a"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "internal/secrets/secrets_test.go",
+      "sha256": "6ddf265938f62f9a8968a4fc47e62cd6f4879bac2a6ff09217d1b1fb19cc4e2c"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/architecture/boundaries_test.go",
+      "sha256": "0a2e3a19a711a5a8a9f5707ea52457cf870000b7b93157ffbcb8b5dccaaf36ba"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/architecture/exposure_test.go",
+      "sha256": "b1dde6807c32756d908ce752b6e5984a993af4dff815f87fc465d91af7fca00a"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/architecture/ignore_test.go",
+      "sha256": "ae1292ef6accbdfef8b5789bd6d0bdbb74131ca6b6c5ee0b93b55e8f4d80b725"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/architecture/ownership_test.go",
+      "sha256": "a107829ffedfee9907e9327ba26d0cfd22dadbbe9722cbc512c9599e06692854"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/architecture/panics_test.go",
+      "sha256": "47b2fdb8c3b46c05f2fd669b3c808ef7032191eff1c7aba651181867331a1722"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/architecture/wire_test.go",
+      "sha256": "41affddbee4fd5cfdce4626dc1e830ae65add03d45b6af19748c76cf163d3394"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/gateway_test.go",
+      "sha256": "fdf2211b60afe31aeb5a654c6369927562a0ad5383ae011fc5136a52110ddc28"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/ingest_test.go",
+      "sha256": "0e1d27852f1a9cf4b10d8dd62b416623bb7afb0b26d281237364bedb62d2f6e4"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-accepted.reply.pb",
+      "sha256": "a4d3320b314a78c20d4abe44fc78c56892a975cf179500d19d860f825f041948"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-accepted.request.pb",
+      "sha256": "7a42bbe1395b3ec5d4d40ba42c9503ba64a8ba6884e5d30f5ecd6ab00e66176e"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-invalid-record.reply.pb",
+      "sha256": "d88b7ceb0f2af8225dbe7f19cd0a09f690b896a90af32d007566abcdeda54538"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-invalid-record.request.pb",
+      "sha256": "ba5e2e9225d1900e7d77a85366e304475b970b32c1cf50db07e8f389a3b184f9"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-protocol-2.reply.pb",
+      "sha256": "9a9897d69b88dfce4bd725d3f22174009a89816022970ecb1579e5964cbc9bcd"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-protocol-2.request.pb",
+      "sha256": "87762598bb57e29b4fa1ceb2f1bad7049b332601cd009e0d40c976c9f5e4a796"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-schema-2.reply.pb",
+      "sha256": "82428f2d7e0f7e7a726009272215afe95b8a68f267cc4610910b6c9c93a92db4"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-schema-2.request.pb",
+      "sha256": "7d7953271a8613253266e9223bb8ab7a0f0f15a4fbbe583b11aecd4aa24fb445"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-unknown-class.reply.pb",
+      "sha256": "c174aec6512aa0f53055e1d0b37a114078a275a9fa11ad2757b4cd9cb84962b2"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-unknown-class.request.pb",
+      "sha256": "1f7381b26e39c38aec63c0f6d2a234a2b63d85e28ba412d887f8c1e61087459c"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-unknown-transport.reply.pb",
+      "sha256": "704bbdd244051d3e7941454a75765d3c451a7119a2fe2dafec9397ab8afa15ba"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/events-unknown-transport.request.pb",
+      "sha256": "e41e456e2c40ea586b0ec2fe4ff0f16793a85a45ea75d3b71d4068951c3f224f"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/exchanges.json",
+      "sha256": "4f69b346089389392acb135434b7df354d9a8ab5a8fa013a66f2d75a3cf25dd5"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-accepted.reply.pb",
+      "sha256": "a4d3320b314a78c20d4abe44fc78c56892a975cf179500d19d860f825f041948"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-accepted.request.pb",
+      "sha256": "e459c8d38876b71dfe9bc987e7314573b109216c75e4379b5e850ca96ac2f76d"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-invalid-record.reply.pb",
+      "sha256": "39897f68b78772f004bb4c2bb482117e769262a5ffd87ef6a166c4abd3099fb0"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-invalid-record.request.pb",
+      "sha256": "3f5ba69c4a28e97b3382aea451e6d1e49ecbc119c50275be64db96103b584c74"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-protocol-2.reply.pb",
+      "sha256": "9a9897d69b88dfce4bd725d3f22174009a89816022970ecb1579e5964cbc9bcd"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-protocol-2.request.pb",
+      "sha256": "e3136d3d92ee0e631244dbbb9f4e4996cc4627680685fadc0af5b618ae8c3fa8"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-schema-2.reply.pb",
+      "sha256": "bb686c2e1fdc9f3543fb5d0757f7baa5f3300fba5b26b0efd74538826ad89700"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-schema-2.request.pb",
+      "sha256": "cca33d098284d6577c9215573a2ba77e6c9b659cafe41f6da920f1c0b36d0cff"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-unknown-kind.reply.pb",
+      "sha256": "ce960440d1a60738297360e06e0030b826b98d1b26a5a70c5fc3af9eadedefa8"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-unknown-kind.request.pb",
+      "sha256": "bfa7963086be906fadfcad2b53d4dbefe338d2d3277693a4cbd5b2a2aa98fcf4"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-unknown-mode.reply.pb",
+      "sha256": "83f3d9534d0a3f72cb4e4f1bc528ab8fb4d52bc8e69800846661d220021b5793"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-unknown-mode.request.pb",
+      "sha256": "b8043ab978ac5b882f3ed1578a0bccf55241dda3c72706cd7ccdcaa07bc225c1"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-unknown-service-state.reply.pb",
+      "sha256": "f628b19064536ff5301f0901dcb68f26a4ada1e7aa0f43e9d86874ea86d8404a"
+    },
+    {
+      "repository": "Seagull-agent-v2",
+      "path": "tests/compatibility/testdata/backend-6fae345/inventory-unknown-service-state.request.pb",
+      "sha256": "81f0e8bea81d2fc50452d952d7e868e25373c6f8de88328dffef73bc828d613f"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "f2f35bdd4d8f322fd59a1cfabe9a8606057ff4b83e025e030e26518641939d8d"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": ".gitignore",
+      "sha256": "e93e9566783f37eed86850aa466911204a5df01255486e06d323af12a3f27c4f"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "Makefile",
+      "sha256": "58b1abcd5e20d35cb334dab338ede7b58a03a70c7fe944ba3288c7949a9ab25a"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "README.md",
+      "sha256": "2322f1b7fbfde4f4ee46eaf70aa3c0f97bc40f13145769ae8854008f21328386"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "buf.gen.yaml",
+      "sha256": "ddc0519242955d61ab176c79d20e39a79909a38373a700c2c6c631c7e5916454"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "buf.yaml",
+      "sha256": "bda68586bbdf808b33c348d4c11029efaedf23a94b5e078208337606e24cd1ce"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/agent/v1/agent.pb.go",
+      "sha256": "5d2fc90a035b98afa182c38db10bb79ad0b3d7b6537a1e65c61c29c3c350e667"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/alert/v1/alert.pb.go",
+      "sha256": "5e56010d2a6dda8fdbe87a22525b8fd4775d25e22dfb829fc6401599cef0db8b"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/control/v1/access.pb.go",
+      "sha256": "f65ee269c2853edacc9256e3b5e4014ddfd39af6645516d3bc1a48e568d7430d"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/detection/v1/detection.pb.go",
+      "sha256": "b6dc4c56c7421f1d81fa020936c3e619da884e29a3d0ea733de388d72940308c"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/event/v1/event.pb.go",
+      "sha256": "ecbba44fab7ee61a853d5bb54fb96c7a291a226d3ef3013b667cd810494dd666"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/hunt/v1/hunt.pb.go",
+      "sha256": "2c600a93be5878f489f56c2189da9e8f327ec192cf5eb5f7dd1d9e1961f185a3"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/incident/v1/incident.pb.go",
+      "sha256": "7e080456760ee8008648348700eb2c15a7e14361aaffc4370e4e708eb2d6d1a1"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/ingest/v1/ingest.pb.go",
+      "sha256": "d300c09c74530165298969dde8342ad5215cdb2d217dd442829d47dbcf3c0618"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/inventory/v1/inventory.pb.go",
+      "sha256": "031c895fa5c145394f4ef17f228cc0f57c880d0b5ee4b07e5178d8cd2c386e5d"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/platform/v1/descriptor.pb.go",
+      "sha256": "c759218361b92c2ead1c834481373ee707a7d9b7cafc10bf36f738dc55a409ab"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/ruleset/v1/ruleset.pb.go",
+      "sha256": "afc91c01a5da3a1e08515580c1c0a248e88f34a435033681a251da94f93b7c88"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "gen/go/seagull/vulnerability/v1/advisory.pb.go",
+      "sha256": "2915684747fcfec32cb90c1d52e394a11d27bf875806bc63223273ea54fc284d"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "go.mod",
+      "sha256": "968a676dac6db007b8daa31afce03f474f0f432a51482dfa12cdc29694ad086d"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "go.sum",
+      "sha256": "81a4e5aa3e2ec571565b3f27efcc35d3fde52e3bdc8ce927640ff474634daba7"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/agent/v1/agent.proto",
+      "sha256": "c1a7b9a1db3935cfa6d28ed0f88c4e0e8b967f5f37f245a2db32998a5e307510"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/alert/v1/alert.proto",
+      "sha256": "24e725f92c587b3c1a678ce3efa4e5be207e268d3aedc326839f0fe07e1d0cb4"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/control/v1/access.proto",
+      "sha256": "5dae7496a2afb6e067b550e3213ad011c42ab74f76e3773ae49f1eb2d4225f0a"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/detection/v1/detection.proto",
+      "sha256": "ea8807f7278fa2196885afcfcfc791a0c4bd5f5d785354267415971c72f6966a"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/event/v1/event.proto",
+      "sha256": "9a100117014b81ace5382bb310aa99dc9cb1dbca0fd21eb3f8d90a9662f5a07f"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/hunt/v1/hunt.proto",
+      "sha256": "1c0adb380a081b791e4fc9b9605425489971134abe959ca8551828bcd6173bb4"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/incident/v1/incident.proto",
+      "sha256": "e92253f373ae8a8ed9fe6219ef8d634f1fb7a18600d65a948517e5d635f9e66e"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/ingest/v1/ingest.proto",
+      "sha256": "e0f9fe811d893c6f1cdd51ae038eff1e16bc3438583f46f56b8d1f5ef6c5349e"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/inventory/v1/inventory.proto",
+      "sha256": "daf43f69f6a24f56aab1122eb22174ba380a1e9ba9dbe69f6b8286d4f16f41ee"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/platform/v1/descriptor.proto",
+      "sha256": "2ccb22a50a751c963ec84291de1fcdf062f81017fe671ba35d05ad98d96f9639"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/ruleset/v1/ruleset.proto",
+      "sha256": "bc2adc148b5421ad136f9397c4225ddcd52b375f125fc8e5cbc3dc7bf7f54ab1"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "proto/seagull/vulnerability/v1/advisory.proto",
+      "sha256": "3b6616be11d84ecd7a6c19762cd07f3712bb425743b9db018f1593af01972050"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "tools/buf/go.mod",
+      "sha256": "1b69cfbf54608de4e1539fe122e0ccba401888d422905ed11d3360293d58dc20"
+    },
+    {
+      "repository": "Seagull-contracts",
+      "path": "tools/buf/go.sum",
+      "sha256": "d0a4206d8f551ce186386d2b9a832de133779cb524513c1a90bd112765e1e261"
+    },
+    {
+      "repository": "Seagull-frontend-v2",
+      "path": "LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repository": "Seagull-frontend-v2",
+      "path": "README.md",
+      "sha256": "df30cc874fcad2af32ebfe7357790bb87567f77c63b85b8738543e8ac04ac145"
+    },
+    {
+      "repository": "workspace",
+      "path": "AGENTS-BACKLOG.md",
+      "sha256": "a5ea8e908d0a926918ad4c23b3d1f3da4a1886a5ffc75ad396b2376b59e32c02",
+      "local": true
+    },
+    {
+      "repository": "workspace",
+      "path": "AGENTS.md",
+      "sha256": "d6476ae53998dce80e6485faa2ca9b5a42b0538f981202dfb6dadc8bfcb0b5f5",
+      "local": true
+    }
+  ]
+}
