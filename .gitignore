@@ -1,0 +1,17 @@
+node_modules/
+build/
+.docusaurus/
+.cache/
+coverage/
+playwright-report/
+test-results/
+*.log
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.tmp
+*.pem
+*.key
