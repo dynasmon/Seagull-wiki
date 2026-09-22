@@ -1,0 +1,32 @@
+---
+title: 'Backup, recovery, and upgrades'
+description: 'Identify irreplaceable control state, replay limits, and the current absence of a turnkey production recovery procedure.'
+---
+
+## What must be protected
+
+Broker data and topology preserve retained event history, immutable rulesets, activation pointers, admission replicas, and advisory state. ClickHouse preserves long-lived analytical projections beyond shorter broker retention. PostgreSQL preserves operator lifecycle, trails, registry decisions, and certificate history. CA signing material and endpoint installation keys have separate confidentiality and recovery requirements.
+
+A backup containing endpoint keys is a credential copy. Restrict and encrypt it according to deployment policy; treat compromise as identity compromise. Do not treat a backup as an ordinary telemetry export.
+
+## What replay restores
+
+Within retained history, consumers can reconstruct projections under their implemented replay semantics. Analysis rebuilds bounded state on assignment. Replay does not recreate an operator's triage decisions, a deleted signing key, or broker records already aged out. Changing a ruleset while replaying can also change the analytical question being asked.
+
+## Current procedural limit
+
+The workspace has persistence and recovery tests, but no complete production backup scheduler, cross-store restore orchestration, HA failover runbook, or guaranteed rollback script. This documentation therefore does not invent `backup` or `restore` commands. Use supported procedures for the exact deployed store versions and rehearse a restoration into an isolated environment before relying on them.
+
+## Upgrade review
+
+Record source/image revisions, contracts versions, schema migrations, ruleset identity, trust bundles, and active configuration. Review schema changes before starting new binaries; migrations are owned by dedicated executables. Verify admission, query visibility, detections, and operational state after the change.
+
+Restore testing must confirm identities and tenant bindings as well as row counts. A “healthy” service after restoring an inconsistent registry and admission log may still make an incorrect authorization decision. Preserve or reconcile authoritative control state before reopening ingestion.
+
+## Retention planning
+
+Choose replay windows longer than the outages and recovery periods you intend to survive, then measure catch-up time and storage use. No finite retention setting proves unlimited lossless operation. Future agent disk-pressure exceptions must be accounted for separately.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml) · [Seagull-backend-v2/tests/integration/recovery_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/integration/recovery_test.go) · [Seagull-backend-v2/internal/postgres/schema/0004_agents.sql](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/postgres/schema/0004_agents.sql) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).

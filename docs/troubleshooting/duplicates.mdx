@@ -1,0 +1,30 @@
+---
+title: 'Events or detections appear duplicated'
+description: 'Symptoms, causes, diagnosis, resolution, and verification for events or detections appear duplicated.'
+---
+
+## Symptoms
+
+The same logical observation appears multiple times in broker records or physical analytical rows; repeated findings appear during recovery.
+
+## Likely causes
+
+HTTP retry after partial broker publication, consumer crash after persistence but before commit, or state-window replay. ReplacingMergeTree physical rows and query-time deduplicated semantics are distinct. A producer that changes event ID on retry creates genuinely different identities.
+
+## Diagnosis
+
+Compare stable event/detection IDs, source offsets, batch context, and restart/rebalance timestamps. Identify whether the duplicate is at transport, physical table, query result, occurrence, or operator-work level. Read the store query and deduplication behavior before counting raw physical rows.
+
+## Resolution
+
+Keep stable IDs across retries and retain consumer idempotency. Investigate unexpected duplicate logical results in the owning query/projection path. Do not drop all repeated broker messages or disable replay; that can lose required recovery work.
+
+## Verification
+
+Replaying the controlled input preserves the intended logical identity and does not reset or overwrite operator triage. Physical duplicates may remain until the store's merge behavior resolves them.
+
+Continue with [health and metrics](/docs/observability/health) and [failure semantics](/docs/architecture/failure-model).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/broker/publisher.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/publisher.go) · [Seagull-backend-v2/internal/broker/consumer.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/consumer.go) · [Seagull-backend-v2/internal/clickhouse/schema/0001_security_events.sql](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/clickhouse/schema/0001_security_events.sql) · [Seagull-backend-v2/docs/decisions/0016-an-alert-is-a-detection-somebody-owns.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0016-an-alert-is-a-detection-somebody-owns.md).

@@ -1,0 +1,28 @@
+---
+title: 'Symptoms on unimplemented paths'
+description: 'Distinguish an integration failure from a component that does not exist in the current baseline.'
+---
+
+## Agent starts but sends nothing
+
+The current agent composes configuration lifecycle, installation identity, and keys, but no collector or transport. Successful `run` is therefore not an upload test. Verify the source revision and [agent status](/docs/agent/overview) before investigating certificates. Use the backend development probe to test the implemented server path.
+
+## Agent spool is growing
+
+There is no V2 spool implementation to diagnose at this revision. If you observe a real spool, identify whether it belongs to the legacy agent, a later V2 revision, or an external integration. Do not apply a fictional queue-path or purge command from the future architecture. For upcoming V2 implementations, compare oldest record age, byte bound, transient/permanent delivery failures, and durable ACK state as specified in [the spool requirements](/docs/agent/spool).
+
+## Frontend cannot reach the API
+
+The V2 frontend repository has no application yet. A running legacy UI is not automatically a compatible client for V2 protobuf endpoints or certificate/session authorization. Identify the client revision, route, encoding, and trust boundary. Do not add permissive CORS or a JSON adapter on the assumption that they are existing V2 configuration options.
+
+## Updates, policy, heartbeat, or commands do not work
+
+These agent channels are planned and have no supported current endpoint/flag to turn on. Configuration explicitly refuses enabled updates. Backend agent liveness is read from telemetry, not from an agent heartbeat API. Refer to [fleet-control target architecture](/docs/agent/policy-updates) for the actual requirements.
+
+## Verification
+
+For a newly implemented revision, update the source baseline and confirm its composition root, contract, backend handler, and integration tests all exist before moving a feature to implemented status.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go) · [Seagull-agent-v2/internal/config/config.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/config/config.go) · [Seagull-frontend-v2/README.md](https://github.com/dynasmon/Seagull-frontend-v2/blob/307351e8d7f9a696786a9b05d50ac0b783db4163/README.md) · [Seagull-backend-v2/internal/control/liveness.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/liveness.go).

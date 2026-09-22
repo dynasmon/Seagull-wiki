@@ -1,0 +1,30 @@
+---
+title: 'API, sessions, or migrations fail'
+description: 'Symptoms, causes, diagnosis, resolution, and verification for api, sessions, or migrations fail.'
+---
+
+## Symptoms
+
+A listener is unavailable, the process refuses startup, control requests are unauthorized, or a query reads no tenants.
+
+## Likely causes
+
+Invalid typed configuration, failed schema/topology migration, unavailable dependency, wrong certificate domain, expired/process-lost session, policy denial, or certificate-derived query scope. A second control replica does not honor the first's in-memory sessions.
+
+## Diagnosis
+
+Inspect `docker compose -f deploy/compose.yaml ps -a` and the relevant migrator/API logs. Check `/readyz` through the configured operations listener. Separate transport failure, structured refusal, and empty authorized query result. Check the route's required guard and handler tenant checks.
+
+## Resolution
+
+Correct configuration and complete the owning migration. Re-establish a session on the correct process after restart. Supply an authorized query certificate scope instead of adding a user-controlled tenant parameter. Keep raw driver errors out of external clients.
+
+## Verification
+
+Migrations exit successfully, readiness reports the relevant dependencies ready, and an authorized request succeeds while the corresponding unauthorized request remains refused.
+
+Continue with [health and metrics](/docs/observability/health) and [failure semantics](/docs/architecture/failure-model).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/control/guard.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/guard.go) · [Seagull-backend-v2/internal/control/sessions.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/sessions.go) · [Seagull-backend-v2/internal/hunt/scope.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/scope.go) · [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml).

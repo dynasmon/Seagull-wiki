@@ -1,0 +1,30 @@
+---
+title: 'Enrollment or certificate validation fails'
+description: 'Symptoms, causes, diagnosis, resolution, and verification for enrollment or certificate validation fails.'
+---
+
+## Symptoms
+
+TLS fails before an HTTP response, issuance is refused, renewal cannot authenticate, or ingest returns `agent_not_registered` / `agent_not_admitted`.
+
+## Likely causes
+
+Wrong trust domain, wrong server name, expired certificate, absent private key, unregistered identity, disabled/revoked state, CSR identity mismatch, or admission revision not yet replayed. There is no current V2 agent enrollment CLI.
+
+## Diagnosis
+
+Check issuer, validity dates, identity, and server name without revealing private material. Compare the listener (operator control versus agent renewal/ingest). Inspect registry state and certificate history through authorized tooling. Check control publication and gateway roster startup logs.
+
+## Resolution
+
+Provision the correct authenticated trust bundle and credential pair. Complete operator-authorized registration/issuance. Let outstanding admission publication recover. For suspected key theft, revoke and replace the identity; do not use insecure verification or put operator credentials on the endpoint.
+
+## Verification
+
+The intended certificate authenticates on the intended listener; the gateway roster admits the correct tenant; a test batch receives a complete durable ACK. Certificate issuance alone is not proof of gateway admission.
+
+Continue with [health and metrics](/docs/observability/health) and [failure semantics](/docs/architecture/failure-model).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/agentidentity/identity.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/agentidentity/identity.go) · [Seagull-backend-v2/internal/control/certificates.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/certificates.go) · [Seagull-backend-v2/internal/control/renewal.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/renewal.go) · [Seagull-backend-v2/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md).

@@ -1,0 +1,46 @@
+---
+sidebar_position: 1
+title: 'Operate Seagull'
+description: 'A routine operator workflow for startup, health, failures, and state-preserving shutdown.'
+---
+
+Start with the supported [development deployment](/docs/getting-started/quickstart) and understand its [production limits](/docs/deployment/production). These commands run from the backend repository and target its declared Compose file.
+
+## Inspect the estate
+
+```bash
+docker compose -f deploy/compose.yaml ps -a
+docker compose -f deploy/compose.yaml logs --tail=100 ingest-gateway analysis-engine event-writer
+```
+
+Check successful one-shot migrators as well as long-running services. A completed migrator is expected to exit; a failed migrator is a dependency failure. Avoid dumping full telemetry or secret files into tickets while collecting logs.
+
+## Prove a working path
+
+Use the development probe only in a development environment: it registers test identities and sends test records. First confirm durable admission, then downstream query visibility, then detection/triage if testing those capabilities. The three checks answer different questions.
+
+Agent registry existence is not connectivity evidence. Current liveness is derived from telemetry in the analytical store; no heartbeat pipeline is implemented in the V2 agent.
+
+## Restart deliberately
+
+```bash
+docker compose -f deploy/compose.yaml restart event-writer
+```
+
+Restart one known owner when appropriate. Stateful analysis restarts can trigger broker rewind and window rebuild. Control API restart invalidates its sessions. A restarting consumer can replay a durable batch whose commit was interrupted; watch lag and duplicates with those semantics in mind.
+
+## Stop without deleting data
+
+```bash
+docker compose -f deploy/compose.yaml stop
+```
+
+The backend `make down` removes volumes and is a development reset. Preserve data by stopping or using an explicitly reviewed Compose operation without volume removal.
+
+## Next operational tasks
+
+[Health and metrics](/docs/observability/health) explains what to watch. [Certificate operations](/docs/operations/certificates) covers identity changes. [Advisory operations](/docs/operations/advisories) covers feed freshness. [Recovery](/docs/operations/recovery) explains what replay cannot reconstruct. [Troubleshooting](/docs/troubleshooting/overview) starts with symptoms.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/Makefile](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/Makefile) · [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml) · [Seagull-backend-v2/internal/control/liveness.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/liveness.go).
