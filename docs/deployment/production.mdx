@@ -1,0 +1,33 @@
+---
+title: 'Production readiness and high availability'
+description: 'Existing hardening, missing deployment guarantees, and what must be proven before production operation.'
+---
+
+The repository demonstrates backend capabilities and offers useful hardening mechanisms, but the supplied single-node Compose stack is not a production HA reference deployment. The unfinished agent and frontend further limit complete product readiness.
+
+## Implemented foundation
+
+Component images use scratch and a non-root identity. Compose applies read-only filesystems, dropped capabilities, and `no-new-privileges` to the backend application processes. Typed startup configuration, TLS listeners, migration verification, bounded work, readiness, and per-process metrics are present.
+
+## Deployment responsibilities
+
+Provision encrypted/authenticated broker and database access, effective broker ACLs, role-appropriate store credentials, managed CA material, replicated durable storage, monitored retention, off-host backups, and tested recovery. Development password and single-replica defaults do not satisfy those requirements merely because the application supports TLS.
+
+## Availability constraints
+
+- Gateway admission depends on a replayed roster and reachable durable broker publication.
+- Stateful analysis must keep each rule group on an owner and rebuild on reassignment.
+- Sole-reader declarations prohibit casually adding replicas for cross-agent rules.
+- Control sessions live in one process and are invalid after its restart.
+- An endpoint outage buffer is not available until the V2 spool/delivery implementation lands.
+- There is no supplied HA PostgreSQL/ClickHouse orchestration or general production backup/restore automation.
+
+## Readiness evidence
+
+A production assessment should prove the chosen deployment's failure behavior, not just a successful startup: broker quorum loss, writer outage, storage recovery, credential compromise/rotation, retention exhaustion, consumer rebalance, and rolling compatibility. [Testing documentation](/docs/testing/strategy) identifies existing evidence and gaps. [Performance guidance](/docs/architecture/performance) does not extrapolate local measurements to a fleet guarantee.
+
+Treat this page as an explicit boundary of the current product, and the [roadmap](/docs/roadmap/status) as a guide to remaining work.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml) · [Seagull-backend-v2/deploy/Dockerfile](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/Dockerfile) · [Seagull-backend-v2/internal/control/sessions.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/sessions.go) · `Seagull-backend-v2/notes/backlog-status.md` (local planning evidence).
