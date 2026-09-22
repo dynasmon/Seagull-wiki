@@ -1,0 +1,65 @@
+{
+  "name": "seagull-wiki",
+  "version": "2.0.0-dev",
+  "private": true,
+  "description": "Seagull V2 technical documentation",
+  "license": "GPL-3.0-only",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "scripts": {
+    "start": "docusaurus start --host 0.0.0.0",
+    "dev": "npm start",
+    "build": "docusaurus build",
+    "serve": "docusaurus serve --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . && node scripts/validate-content.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "references": "node scripts/generate-references.mjs",
+    "references:check": "node scripts/generate-references.mjs --check",
+    "sources:check": "node scripts/check-sources.mjs",
+    "check": "npm run typecheck && npm run lint && npm run references:check && npm run format:check && npm run build",
+    "test:browser": "playwright test",
+    "sources:refresh": "node scripts/refresh-sources.mjs"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.9.2",
+    "@docusaurus/preset-classic": "3.9.2",
+    "@easyops-cn/docusaurus-search-local": "0.55.3",
+    "@elastic/eui": "116.2.0",
+    "@elastic/eui-theme-borealis": "8.0.0",
+    "@elastic/datemath": "5.0.3",
+    "@emotion/react": "11.14.0",
+    "@emotion/css": "11.13.5",
+    "@mdx-js/react": "3.1.1",
+    "clsx": "2.1.1",
+    "moment": "2.30.1",
+    "prism-react-renderer": "2.4.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "3.9.2",
+    "@docusaurus/tsconfig": "3.9.2",
+    "@docusaurus/types": "3.9.2",
+    "@types/react": "18.3.28",
+    "@types/react-dom": "18.3.7",
+    "@types/node": "22.19.15",
+    "typescript": "5.9.3",
+    "eslint": "9.39.4",
+    "typescript-eslint": "8.57.1",
+    "prettier": "3.8.1",
+    "@playwright/test": "1.58.2"
+  },
+  "overrides": {
+    "webpack": "5.105.4",
+    "serialize-javascript": "7.0.5",
+    "prismjs": "1.30.0",
+    "sockjs": {
+      "uuid": "11.1.1"
+    },
+    "@docusaurus/theme-common": "3.9.2",
+    "@docusaurus/plugin-content-docs": "3.9.2"
+  }
+}
