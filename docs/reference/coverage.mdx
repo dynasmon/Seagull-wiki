@@ -1,0 +1,56 @@
+---
+title: 'Documentation coverage map'
+description: 'Package, service, schema, security, operational, and planned-capability coverage.'
+---
+
+This map covers every discovered backend top-level internal package, every executable, every agent package, and all canonical schema families at the [source baseline](/docs/reference/source-baseline). It is a maintenance inventory, not a claim that planned components are implemented.
+
+## Backend owners
+
+| Package / owner                                          | Canonical guide                                                              |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `cmd`                                                    | [backend/services](/docs/backend/services)                                   |
+| `ingest`, `agentidentity`                                | [ingestion/gateway](/docs/ingestion/gateway)                                 |
+| `broker`                                                 | [event-pipeline/streaming](/docs/event-pipeline/streaming)                   |
+| `event`, `protocol`                                      | [contracts/event-model](/docs/contracts/event-model)                         |
+| `analysis`, `detection`                                  | [detection/overview](/docs/detection/overview)                               |
+| `detectionstate`                                         | [architecture/state-correctness](/docs/architecture/state-correctness)       |
+| `rulefile`                                               | [detection/rules](/docs/detection/rules)                                     |
+| `ruleset`, `sigma`                                       | [detection/rulesets](/docs/detection/rulesets)                               |
+| `alert`, `alertfile`, `alertstore`                       | [correlation/alerts](/docs/correlation/alerts)                               |
+| `incident`                                               | [correlation/incidents](/docs/correlation/incidents)                         |
+| `inventory`, `inventorystore`                            | [inventory/overview](/docs/inventory/overview)                               |
+| `vulnerability`, `advisoryfeed`, `advisorystore`, `osv`  | [vulnerability-management/overview](/docs/vulnerability-management/overview) |
+| `clickhouse`, `postgres`, `eventstore`, `detectionstore` | [storage/ownership](/docs/storage/ownership)                                 |
+| `authz`, `policyfile`                                    | [security/authentication](/docs/security/authentication)                     |
+| `agent`, `pki`, `devpki`                                 | [security/enrollment](/docs/security/enrollment)                             |
+| `control`                                                | [api/overview](/docs/api/overview)                                           |
+| `hunt`                                                   | [api/hunting](/docs/api/hunting)                                             |
+| `platform`                                               | [observability/health](/docs/observability/health)                           |
+
+## Executables
+
+`advisory-importer`, `advisory-writer`, `alert-writer`, `analysis-engine`, `backbone-migrator`, `control-api`, `control-migrator`, `detection-writer`, `event-writer`, `ingest-gateway`, `inventory-projector`, `query-api`, `store-migrator`. Each is described in [service responsibilities](/docs/backend/services) and has a [configuration reference](/docs/reference/generated/environment).
+
+## Agent packages
+
+| Package               | Guide                                            |
+| --------------------- | ------------------------------------------------ |
+| `runtime`             | [Agent runtime](/docs/agent/runtime)             |
+| `modules`             | [Agent collectors](/docs/agent/collectors)       |
+| `config`              | [Agent configuration](/docs/agent/configuration) |
+| `identity`            | [Agent identity](/docs/agent/identity)           |
+| `pki`                 | [Agent keys](/docs/agent/keys)                   |
+| `protocol`            | [Agent compatibility](/docs/agent/compatibility) |
+| `secrets`             | [Agent diagnostics](/docs/agent/diagnostics)     |
+| `platform/files`      | [Agent identity](/docs/agent/identity)           |
+| `platform/privileges` | [Agent privileges](/docs/agent/privileges)       |
+| `platform/dumps`      | [Agent diagnostics](/docs/agent/diagnostics)     |
+
+## Remaining domains
+
+All twelve schema families appear in [contracts](/docs/contracts/overview). All 28 backend ADRs appear under Architecture → Decisions. Every SQL migration is included in the [storage reference](/docs/reference/generated/storage). Runtime metric declarations appear in [metrics](/docs/reference/generated/metrics).
+
+Installation, Docker/deployment, PKI, threat modeling, data ownership, configuration, troubleshooting, tests, CI, contribution, and status each have explicit sections. Native agent packaging, heartbeat, secure updates, SCA/FIM/process/network collectors, vulnerability matching, and V2 frontend architecture are documented as targets. No unsupported operational command is supplied to fill those gaps.
+
+The documentation implementation itself is covered by [maintenance](/docs/development/documentation) and [static deployment](/docs/deployment/documentation).

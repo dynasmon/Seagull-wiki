@@ -1,0 +1,49 @@
+---
+title: 'Glossary'
+description: 'Canonical Seagull terminology for telemetry, security decisions, ownership, trust, and recovery.'
+---
+
+| Term                | Seagull meaning                                                                                                |
+| ------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Agent               | Independently released endpoint component; distinguish executable, installation, and backend registry identity |
+| Installation ID     | Random persistent identity of one local installation; not the backend-authorized agent ID                      |
+| Agent ID            | Identity registered by the platform and derived from the verified certificate for admission                    |
+| Collector / module  | Endpoint observation owner supervised by the module runtime; no real V2 collector currently runs               |
+| Admission           | Validation and acceptance at a stated ownership boundary; gateway admission requires broker durability         |
+| Enrollment          | Establishing an authorized agent credential and its registry binding                                           |
+| Telemetry           | Observations delivered from an endpoint; events and inventory have different semantics                         |
+| Event               | Typed security observation with stable identity and three distinct timestamps                                  |
+| Canonical form      | Analysis working representation derived from the contract; not a replacement for raw evidence                  |
+| Detection / finding | Evidence-bearing analytical decision from a rule                                                               |
+| Alert               | Operator-owned work derived from a finding, with lifecycle and occurrence evidence                             |
+| Correlation         | A rule's higher-order relationship across events, currently including ordered sequences                        |
+| Story               | The ordered events satisfying sequence stages                                                                  |
+| Incident            | Operator-owned form of a correlation story                                                                     |
+| Ruleset             | Immutable, content-addressed executable rule collection; publication and activation are separate               |
+| Occurrence          | A detection linked into folded alert work, preserving evidence behind a count                                  |
+| Spool               | Planned bounded durable endpoint backlog; not an in-memory queue                                               |
+| ACK                 | A response whose accepted/durable flags and full received count permit normal delivery completion              |
+| Gateway             | `ingest-gateway`, which verifies identity and admits telemetry into the durable backbone                       |
+| Backbone            | Kafka-compatible durable broker transport supplied by Redpanda in the current deployment                       |
+| Partition affinity  | The relationship that keeps a stateful rule's grouping on one owner                                            |
+| Consumer group      | Independent progress/partition ownership for a processing workload                                             |
+| Replay              | Reading retained input again to recover or reconstruct effects; duplicates are expected                        |
+| Quarantine          | Durable preservation of a permanently refused record, position, and reason                                     |
+| Inventory snapshot  | Complete enumeration of one asset kind; omission can change currentness                                        |
+| Inventory delta     | Updates to named items; omission says nothing about missing items                                              |
+| Advisory            | Source-authored vulnerability intelligence, not an asset finding                                               |
+| Provenance          | Platform-stamped origin and digest of fetched intelligence                                                     |
+| Contract            | Versioned canonical wire schema owned outside component implementations                                        |
+| Capability          | An explicitly supported feature; a descriptor field is not proof that a client negotiates it                   |
+| Control plane       | Agent/PKI/ruleset/access/triage administration                                                                 |
+| Data plane          | High-volume admission, analysis, projection, and durable analytical output                                     |
+| Query plane         | Scoped analytical reads without topic consumption or analytical writes                                         |
+| Trust boundary      | A crossing where identity, authority, validation, or confidentiality must be established                       |
+| Readiness           | Whether a process can perform its declared work given dependency state                                         |
+| At-least-once       | Work can repeat during retry/recovery; it is not permission to silently lose records                           |
+
+Continue with [architecture](/docs/architecture/overview) and [data ownership](/docs/storage/ownership) for the relationships behind these terms.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/README.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/README.md) · [Seagull-contracts/README.md](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/README.md) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).
