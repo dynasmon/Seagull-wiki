@@ -1,0 +1,292 @@
+:root {
+  --ifm-color-primary: #036fa6;
+  --ifm-color-primary-dark: #036495;
+  --ifm-color-primary-darker: #035e8d;
+  --ifm-color-primary-darkest: #024e74;
+  --ifm-color-primary-light: #037ab7;
+  --ifm-color-primary-lighter: #0380bf;
+  --ifm-color-primary-lightest: #0490d8;
+  --ifm-background-color: #ffffff;
+  --ifm-font-color-base: #192536;
+  --ifm-font-family-base:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ifm-font-family-monospace:
+    'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.75;
+  --ifm-heading-font-weight: 650;
+  --ifm-code-font-size: 85%;
+  --ifm-global-radius: 4px;
+  --ifm-navbar-height: 64px;
+  --ifm-navbar-shadow: none;
+  --ifm-menu-color: #475569;
+  --ifm-menu-color-background-active: #edf6fc;
+  --ifm-table-stripe-background: #f8fafc;
+  --doc-sidebar-width: 285px;
+  --sg-border: #dde4ed;
+  --sg-muted: #526277;
+  --sg-surface: #f7f9fc;
+  --docusaurus-highlighted-code-line-bg: #dfeefa;
+  --sg-diagram-surface: #f8fafc;
+  --sg-diagram-divider: #e3e9f1;
+  --sg-diagram-ink: #1e293b;
+  --sg-diagram-muted: #56667b;
+  --sg-diagram-line: #66768c;
+  --sg-diagram-control: #7a4fd0;
+  --sg-diagram-ack: #0e8a7c;
+  --sg-diagram-lifeline: #cfd8e3;
+  --sg-diagram-scroll-shadow: rgba(15, 23, 42, 0.16);
+  --sg-diagram-process-fill: #eaf4fc;
+  --sg-diagram-process-stroke: #5b9ccc;
+  --sg-diagram-process-ink: #0b3a5b;
+  --sg-diagram-topic-fill: #fdf4e4;
+  --sg-diagram-topic-stroke: #d29b3c;
+  --sg-diagram-topic-ink: #5b3a07;
+  --sg-diagram-store-fill: #e8f6ee;
+  --sg-diagram-store-stroke: #57aa7e;
+  --sg-diagram-store-ink: #0f4a2c;
+  --sg-diagram-actor-fill: #ffffff;
+  --sg-diagram-actor-stroke: #9fadc0;
+  --sg-diagram-actor-ink: #243447;
+  --sg-diagram-planned-fill: #fbfcfe;
+  --sg-diagram-group-fill: rgba(100, 116, 139, 0.05);
+  --sg-diagram-group-stroke: rgba(100, 116, 139, 0.45);
+  --sg-diagram-group-ink: #56667b;
+  --sg-diagram-endpoint-fill: rgba(13, 148, 136, 0.05);
+  --sg-diagram-endpoint-stroke: rgba(13, 148, 136, 0.45);
+  --sg-diagram-endpoint-ink: #0f766e;
+  --sg-diagram-operator-fill: rgba(122, 79, 208, 0.05);
+  --sg-diagram-operator-stroke: rgba(122, 79, 208, 0.42);
+  --sg-diagram-operator-ink: #6a43bf;
+  --sg-diagram-backend-fill: rgba(3, 111, 166, 0.045);
+  --sg-diagram-backend-stroke: rgba(3, 111, 166, 0.38);
+  --sg-diagram-backend-ink: #036395;
+  --sg-diagram-number-fill: #e2e8f0;
+  --sg-diagram-number-ink: #334155;
+}
+[data-theme='dark'] {
+  --ifm-color-primary: #62c6f1;
+  --ifm-color-primary-dark: #3db8ed;
+  --ifm-color-primary-darker: #2bb1ec;
+  --ifm-color-primary-darkest: #1198d0;
+  --ifm-color-primary-light: #87d4f5;
+  --ifm-color-primary-lighter: #99dbf6;
+  --ifm-color-primary-lightest: #d0effb;
+  --ifm-background-color: #0b1220;
+  --ifm-background-surface-color: #111c2e;
+  --ifm-font-color-base: #e2e8f0;
+  --ifm-navbar-background-color: #0b1220;
+  --ifm-footer-background-color: #0b1220;
+  --ifm-menu-color: #b4c2d6;
+  --ifm-menu-color-background-active: #142b40;
+  --ifm-table-stripe-background: #111c2e;
+  --sg-border: #29384d;
+  --sg-muted: #a7b7cd;
+  --sg-surface: #111c2e;
+  --docusaurus-highlighted-code-line-bg: #25364b;
+  --ifm-toc-border-color: #29384d;
+  --ifm-hr-border-color: #29384d;
+  --sg-diagram-surface: #0f1829;
+  --sg-diagram-divider: #223149;
+  --sg-diagram-ink: #e2e8f0;
+  --sg-diagram-muted: #a3b3c8;
+  --sg-diagram-line: #8a9bb3;
+  --sg-diagram-control: #b89cf5;
+  --sg-diagram-ack: #4fd1c1;
+  --sg-diagram-lifeline: #33445c;
+  --sg-diagram-scroll-shadow: rgba(0, 0, 0, 0.55);
+  --sg-diagram-process-fill: #0f2a42;
+  --sg-diagram-process-stroke: #4b93c9;
+  --sg-diagram-process-ink: #d5ecfb;
+  --sg-diagram-topic-fill: #2b2213;
+  --sg-diagram-topic-stroke: #c0913a;
+  --sg-diagram-topic-ink: #f7e2b6;
+  --sg-diagram-store-fill: #0e2b20;
+  --sg-diagram-store-stroke: #45a276;
+  --sg-diagram-store-ink: #c9f1dc;
+  --sg-diagram-actor-fill: #152033;
+  --sg-diagram-actor-stroke: #5a6b84;
+  --sg-diagram-actor-ink: #dce5f0;
+  --sg-diagram-planned-fill: #111b2c;
+  --sg-diagram-group-fill: rgba(148, 163, 184, 0.05);
+  --sg-diagram-group-stroke: rgba(148, 163, 184, 0.4);
+  --sg-diagram-group-ink: #a3b3c8;
+  --sg-diagram-endpoint-fill: rgba(45, 212, 191, 0.05);
+  --sg-diagram-endpoint-stroke: rgba(45, 212, 191, 0.4);
+  --sg-diagram-endpoint-ink: #5eead4;
+  --sg-diagram-operator-fill: rgba(184, 156, 245, 0.06);
+  --sg-diagram-operator-stroke: rgba(184, 156, 245, 0.42);
+  --sg-diagram-operator-ink: #c4b0f7;
+  --sg-diagram-backend-fill: rgba(98, 198, 241, 0.05);
+  --sg-diagram-backend-stroke: rgba(98, 198, 241, 0.36);
+  --sg-diagram-backend-ink: #87d4f5;
+  --sg-diagram-number-fill: #25354b;
+  --sg-diagram-number-ink: #d6e0ec;
+}
+html {
+  scroll-padding-top: 85px;
+}
+.navbar {
+  border-bottom: 1px solid var(--sg-border);
+}
+.navbar__title {
+  font-size: 1.22rem;
+  letter-spacing: -0.04em;
+}
+.navbar__link {
+  font-size: 0.85rem;
+}
+.menu {
+  font-size: 0.83rem;
+  padding: 18px 12px !important;
+}
+.menu__link {
+  line-height: 1.5;
+  padding-block: 7px;
+}
+.menu__list-item-collapsible {
+  font-weight: 600;
+}
+.breadcrumbs {
+  margin-bottom: 24px;
+}
+.breadcrumbs__link {
+  font-size: 0.75rem;
+}
+.markdown h1 {
+  font-size: 2.15rem;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+.markdown h2 {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  margin-top: 2.5rem;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--sg-border);
+}
+.markdown h3 {
+  font-size: 1.15rem;
+}
+.markdown > p,
+.markdown > ul,
+.markdown > ol {
+  font-size: 0.96rem;
+}
+.markdown table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  font-size: 0.82rem;
+}
+.markdown th,
+.markdown td {
+  padding: 10px 13px;
+  border-color: var(--sg-border);
+}
+.markdown th {
+  background: var(--sg-surface);
+}
+.markdown pre {
+  font-size: 0.81rem;
+}
+.markdown a:not(.hash-link) {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.markdown blockquote {
+  color: var(--sg-muted);
+  border-left-color: var(--ifm-color-primary);
+}
+.table-of-contents {
+  font-size: 0.76rem;
+}
+.theme-admonition {
+  box-shadow: none;
+  border: 1px solid var(--sg-border);
+  border-left: 3px solid var(--ifm-color-primary);
+}
+.theme-admonition-warning,
+.theme-admonition-danger {
+  border-left-color: #c67e16;
+}
+.feature-status {
+  display: inline-block;
+  margin: 0 8px 16px 0;
+}
+.eyebrow {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.69rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--sg-muted);
+  margin: 0;
+}
+.footer {
+  border-top: 1px solid var(--sg-border);
+  padding: 25px 20px;
+}
+.footer__links {
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+}
+.footer__copyright {
+  font-size: 0.72rem;
+  color: var(--sg-muted);
+}
+.missing-page {
+  padding-top: 80px;
+  padding-bottom: 100px;
+  max-width: 720px;
+}
+.missing-page h1 {
+  margin-top: 20px;
+}
+.missing-search {
+  margin: 24px 0;
+}
+.sg-diagram {
+  margin: 1.75rem 0 2rem;
+  padding: 18px 18px 12px;
+  border: 1px solid var(--sg-border);
+  border-radius: 8px;
+  background: var(--sg-diagram-surface);
+}
+.sg-diagram__caption {
+  margin-top: 8px;
+  color: var(--sg-diagram-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+.sg-visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+:focus-visible {
+  outline: 3px solid var(--ifm-color-primary);
+  outline-offset: 3px;
+}
+@media (max-width: 650px) {
+  .markdown h1 {
+    font-size: 1.85rem;
+  }
+  .sg-diagram {
+    padding: 12px 10px 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
