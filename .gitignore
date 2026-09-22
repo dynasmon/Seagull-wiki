@@ -7,6 +7,9 @@ playwright-report/
 test-results/
 *.log
 *.tsbuildinfo
+.env
+.env.*
+!.env.example
 .DS_Store
 Thumbs.db
 .idea/
@@ -15,6 +18,8 @@ Thumbs.db
 *.tmp
 *.pem
 *.key
+.static-site/
+.nginx.conf
 sources/workspace/
 sources/Seagull-backend-v2/notes/*
 !sources/Seagull-backend-v2/notes/performance-baseline.md

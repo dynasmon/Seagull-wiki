@@ -8,3 +8,5 @@ docs/architecture/decisions
 package-lock.json
 playwright-report
 test-results
+.static-site/
+.nginx.conf
