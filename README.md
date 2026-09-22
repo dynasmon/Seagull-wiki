@@ -64,7 +64,7 @@ Source checking/refreshing requires the sibling Seagull repositories, optionally
 - `sources/`: selected versioned generation inputs and source inventory.
 - `scripts/`: deterministic reference generation and validation.
 - `docker/`: development entrypoint and static-server configuration.
-- `tests/`: browser checks.
+- `tests/`: browser checks; `.github/workflows/ci.yml`: independent CI.
 
 The V2 agent does not yet collect/upload telemetry and the V2 frontend is a placeholder. The site documents these limits explicitly. Backend, agent, and frontend builds do not depend on this repository.
 
