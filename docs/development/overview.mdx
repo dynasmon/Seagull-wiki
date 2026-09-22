@@ -12,13 +12,12 @@ Clone only the repositories you need, using the actual project GitHub remotes. P
 
 ## First working loop
 
-| Repository    | Initial gate                                 | Additional evidence                                                        |
-| ------------- | -------------------------------------------- | -------------------------------------------------------------------------- |
-| Backend       | `make verify`, `make build`                  | `make test-integration`, `make test-load`, `make vulncheck` where relevant |
-| Agent         | `make verify`                                | `make vulncheck`; compatibility/failure tests for changed behavior         |
-| Contracts     | `make verify`, `make breaking`               | Consumer compatibility against released bindings                           |
-| Documentation | `docker compose run --rm docs npm run check` | Production image and browser suite                                         |
-| V2 frontend   | No build yet                                 | Establish implementation and CI before claiming support                    |
+| Repository  | Initial gate                   | Additional evidence                                                        |
+| ----------- | ------------------------------ | -------------------------------------------------------------------------- |
+| Backend     | `make verify`, `make build`    | `make test-integration`, `make test-load`, `make vulncheck` where relevant |
+| Agent       | `make verify`                  | `make vulncheck`; compatibility/failure tests for changed behavior         |
+| Contracts   | `make verify`, `make breaking` | Consumer compatibility against released bindings                           |
+| V2 frontend | No build yet                   | Establish implementation and CI before claiming support                    |
 
 ## Read before changing behavior
 

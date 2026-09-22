@@ -3,7 +3,7 @@ title: 'Configuration guide'
 description: 'Typed backend environment settings, file-based secrets, agent JSON, and generated reference conventions.'
 ---
 
-Seagull has separate configuration owners. Backend processes read typed environment variables; the agent reads one strict JSON file; rules, alert tuning, and authorization policy use their own validated documents. The documentation website has only public build/server configuration.
+Seagull has separate configuration owners. Backend processes read typed environment variables; the agent reads one strict JSON file; rules, alert tuning, and authorization policy use their own validated documents.
 
 ## Backend settings
 
@@ -20,10 +20,6 @@ The [maintainer operational reference](/docs/reference/generated/operational) ad
 ## Agent configuration
 
 The agent uses `-config FILE` and ignores environment configuration. Unknown keys, duplicate keys, null values, oversized input, unsupported formats, and unsafe ownership are refused. See [the complete agent reference](/docs/agent/configuration), including which reserved settings do not yet have active consumers.
-
-## Documentation configuration
-
-`DOCS_URL` is the public canonical origin and `DOCS_BASE_URL` the slash-delimited deployment prefix. They are build-time public values. `DOCS_PORT` selects the development host port, and optional `WATCH_POLL=true` enables slower polling for filesystems where native notifications fail. No application secret is required by the docs.
 
 ## Source evidence
 
