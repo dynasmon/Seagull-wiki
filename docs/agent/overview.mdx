@@ -1,0 +1,37 @@
+---
+sidebar_position: 1
+title: 'Seagull Agent V2'
+description: 'Current endpoint foundations and the target reliable collection and delivery architecture.'
+---
+
+<FeatureStatus status="in-progress" />
+
+Seagull Agent V2 is an independently built Go endpoint component. Its intended job is to observe the host and deliver typed security observations durably. The executable currently establishes local foundations; it does not yet perform that complete job.
+
+## What exists today
+
+| Area                | Current evidence                                                                                    |
+| ------------------- | --------------------------------------------------------------------------------------------------- |
+| Runtime             | Essential/optional component lifecycle, cancellation, shutdown deadline                             |
+| Configuration       | Strict JSON, validation, defaults, file permission checks, SIGHUP activation                        |
+| Installation        | Persistent random installation ID, ownership/locking, explicit replacement                          |
+| Key provider        | Endpoint-local P-256 keys, signer interface, private files                                          |
+| Collector lifecycle | Module supervision implementation and tests, no real collector composed                             |
+| Protocol            | Published contracts pin, version constants, refusal classification, recorded compatibility fixtures |
+| Diagnostics         | Structured logs, bounded repeated text, privilege reporting, Linux core-dump controls               |
+
+## What is not delivered
+
+No authentication, process, FIM, network, inventory, or SCA collector is running. There is no durable telemetry spool, uploader, live capability negotiation, enrollment CLI, certificate renewal loop, heartbeat channel, signed policy application, verified updater, native package, or command executor in the current composition root.
+
+Some configuration fields reserve future transport and spool budgets. Their validation is implemented; their enforcement by missing components is not. `modules` rejects every collector name, and `updates.enabled` cannot be set to true.
+
+## How to use this section
+
+Start with [installation from source](/docs/installation/agent) and [configuration](/docs/agent/configuration). Read [identity](/docs/agent/identity) and [keys](/docs/agent/keys) for current endpoint state. Read [spool](/docs/agent/spool), [delivery](/docs/agent/delivery), and [collection roadmap](/docs/agent/telemetry) as requirements for upcoming work.
+
+Linux is the supported foundation in this baseline. OS adapter files for other targets do not establish a supported Windows or macOS product.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go) · [Seagull-agent-v2/internal/config/config.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/config/config.go) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).

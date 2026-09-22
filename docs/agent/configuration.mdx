@@ -1,0 +1,124 @@
+---
+title: 'Agent configuration'
+description: 'Current agent configuration behavior, limitations, source evidence, and operational guidance.'
+---
+
+<FeatureStatus status="implemented" />
+
+This page preserves the agent maintainers' detailed explanation at the reviewed revision, checked against the owning implementation. Read the [agent overview](/docs/agent/overview) for the boundary between implemented foundations and planned delivery.
+
+## Current behavior
+
+`-config` names one file, and everything the agent runs on is in it. The file
+is JSON: what the agent refuses has to be what an operator wrote, and JSON has
+one way to write a value, no unit or type it infers, and no dependency of its
+own in a build whose whole module graph is verified.
+
+```json
+{
+  "format": 1,
+  "identity": { "state_directory": "/var/lib/seagull-agent" },
+  "server": {
+    "ingest_url": "https://gateway.example:8443",
+    "renewal_url": "https://control.example:8446",
+    "trust_bundle": "/etc/seagull-agent/platform-ca.pem"
+  }
+}
+```
+
+That is a whole configuration: those settings are the deployment, so the agent
+has no default to offer for them, and every other setting has one it documents
+below. `seagull-agent -config FILE config print` prints what the agent would run
+on, defaults and all, and `config check` reads the file and reports what it
+refuses without starting the agent.
+
+The agent reads the file whole, or refuses it whole:
+
+- a setting it does not have, a setting written twice, a setting written as
+  null, more than one document, or a file above 64 KiB, is refused. Nothing is
+  guessed: what the file leaves out is the default below, and a file written
+  for a build with settings this one does not have is refused rather than half
+  understood;
+- a size is bytes with a binary unit, `8MiB`, and a time carries its unit,
+  `30s`. A bare number is refused, because what it counts is the reader's guess;
+- every setting the file gets wrong is reported at once, each with its name, and
+  the same file is always refused the same way, whether the agent is starting or
+  reading it again;
+- `format` is the shape of the file and not the release of the agent. This build
+  reads format 1. A newer format is refused and names the release that reads it.
+  A release that changes what a setting means raises the format and keeps
+  reading the formats it still supports; a release that only adds a setting
+  leaves the format where it is.
+
+| Setting                                | Default      | What the agent takes                                          |
+| -------------------------------------- | ------------ | ------------------------------------------------------------- |
+| `identity.state_directory`             | —            | an absolute path to the directory that holds the installation |
+| `identity.key_provider`                | `filesystem` | `filesystem`                                                  |
+| `server.ingest_url`                    | —            | an `https` URL, with no credentials and nothing to resolve    |
+| `server.renewal_url`                   | —            | an `https` URL, for the platform's renewal listener           |
+| `server.trust_bundle`                  | —            | an absolute path to PEM certificates                          |
+| `transport.connect_timeout`            | `10s`        | `1s` to `1m`                                                  |
+| `transport.request_timeout`            | `30s`        | `5s` to `10m`, never shorter than the connect timeout         |
+| `transport.max_batch_bytes`            | `4MiB`       | `64KiB` to `8MiB`, the recorded platform's request ceiling    |
+| `transport.max_response_bytes`         | `64KiB`      | `4KiB` to `1MiB`                                              |
+| `spool.max_bytes`                      | `512MiB`     | `16MiB` to `64GiB`, and at least four batches                 |
+| `spool.max_age`                        | `72h`        | `1h` to `720h`                                                |
+| `modules`                              | `{}`         | the collectors this build has, which are none                 |
+| `resources.memory_limit`               | `256MiB`     | `64MiB` to `8GiB`                                             |
+| `resources.max_concurrent_collections` | `2`          | 1 to 64                                                       |
+| `resources.max_concurrent_uploads`     | `1`          | 1 to 16                                                       |
+| `resources.shutdown_timeout`           | `10s`        | `1s` to `5m`                                                  |
+| `logging.level`                        | `info`       | `debug`, `info`, `warn` or `error`                            |
+| `logging.format`                       | `json`       | `json` or `text`                                              |
+| `updates.enabled`                      | `false`      | `false`: this build installs no update                        |
+
+The defaults are what a supported deployment reaches the recorded platform with.
+Its ingest listener reads at most 8 MiB per request, and admits events up to
+seven days old and inventory up to thirty, so a spool kept far beyond that keeps
+records the platform will not take. `resources.memory_limit` is the target the
+garbage collector works to, not a ceiling the kernel enforces: that one belongs
+to the service the agent is installed as. None of the defaults turns a check off
+or leaves a budget unlimited, and there is no setting that does either.
+
+The file is the agent's instructions, so who may write it is who decides what
+the agent does:
+
+- the file and the directory that holds it belong to the account the agent runs
+  as or to root, and neither their group nor anybody else may write them. They
+  may be read by anyone: the settings are public;
+- `server.trust_bundle` is read under the same rule, and has to hold
+  certificates the agent can parse. Whoever changes it decides which platform
+  the agent trusts, and the agent verifies against that bundle alone;
+- no setting carries a secret. A setting names where credential material is
+  kept, and the agent's own keys live in the installation, so the file can be
+  read, copied into a ticket or written by configuration management without
+  handing anything over.
+
+A running agent reads the file again when it receives SIGHUP. It reads and
+validates the whole candidate before anything changes:
+
+- a file it refuses leaves the agent on the configuration it already read,
+  logged as `configuration_not_reloaded` with the reason and a `recovery`;
+- a file it accepts replaces that configuration whole, logged as
+  `configuration_reloaded`, so nothing ever runs on half of each;
+- what the agent settled as it started is refused as a change:
+  `identity.state_directory`, `identity.key_provider`, `logging.format` and
+  `resources.shutdown_timeout` take stopping the agent and starting it again.
+
+What a setting does today follows what the agent has. `identity`, `logging` and
+`resources.memory_limit` and `resources.shutdown_timeout` are in force: they
+decide where the installation is opened, what the log says and what the agent
+spends. `server`, `transport`, `spool` and the concurrency budgets are validated
+here and take effect as the components that spend them arrive, so a deployment
+is configured once rather than as each one lands. `modules` and
+`updates.enabled` are the settings this build refuses outright: an agent that
+accepted them would be promising collection it cannot do and updates it cannot
+install.
+
+## Related guidance
+
+Continue with [agent architecture](/docs/agent/architecture), [enrollment and PKI](/docs/security/enrollment), [configuration troubleshooting](/docs/troubleshooting/agent), and [the target delivery model](/docs/agent/delivery).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md) · [Seagull-agent-v2/internal/config/config.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/config/config.go).

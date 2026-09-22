@@ -1,0 +1,73 @@
+---
+title: 'Installation identity'
+description: 'Current installation identity behavior, limitations, source evidence, and operational guidance.'
+---
+
+<FeatureStatus status="implemented" />
+
+This page preserves the agent maintainers' detailed explanation at the reviewed revision, checked against the owning implementation. Read the [agent overview](/docs/agent/overview) for the boundary between implemented foundations and planned delivery.
+
+## Current behavior
+
+An installation is one agent installed on one machine, and
+`identity.state_directory` names the directory that holds it. The first start in
+a new or empty directory draws its `installation_id`, 122 random bits written as
+a UUID; every later start reads the same one. It is never derived from the
+hostname, an address, a MAC or a machine identifier, which stay observations
+about the machine.
+
+The installation is not the agent the platform knows. The platform issues a
+certificate for an `agent_id` an operator registered, and once enrollment
+activates a credential generation, `installation.json` records it: that agent,
+the generation number, the `key_id` of its key and what the certificate says.
+It holds no key, token or other secret, and a field it does not declare, such
+as a key, makes the file damaged, so copying it or the agent's public settings
+authenticates nothing. Each generation follows the active one by exactly one
+and is issued to the same agent; enrolling as another agent takes a new
+installation.
+
+The state is the agent's alone:
+
+- the directory and its files belong to the account the agent runs as and are
+  closed to its group and to others, and the agent reads nothing that is not;
+- a running agent holds the directory locked, so a second agent or a
+  replacement on the same directory is refused, and the lock goes away however
+  the agent ends;
+- a write lands in a temporary file that is synced and renamed over
+  `installation.json` before the directory is synced, and a start discards what
+  an interrupted write left behind;
+- whatever else the installation keeps, such as its keys, lives in a private
+  directory of its own inside the state directory, which the installation holds
+  under the same lock and closes when it is closed.
+
+When the state cannot be used, the agent does not start: it logs
+`agent_not_started` with the reason and a `recovery`, and never creates a new
+identity in its place. A damaged `installation.json`, or a directory that holds
+something but no `installation.json`, is restored from a backup of this
+installation or replaced; a state written by a newer agent is read by that
+release or replaced; a state others can reach is made private again.
+
+`seagull-agent -config FILE installation replace` is that replacement, made on
+purpose while the agent is stopped. It sets everything the state directory held
+aside under `replaced/`, in a directory named after the moment of the
+replacement: `installation.json`, the keys and anything else, even when the
+state was damaged or lost. It then draws a new `installation_id` that names the
+one it replaces whenever that one could be read, and leaves the new
+installation unenrolled and without keys. Keys set aside still authenticate as
+the agent they were certified for until its certificate expires or is revoked,
+so revoke it when the replaced installation was enrolled, and delete
+`replaced/` once nothing in it is needed. Records belong to the installation
+that admitted them, so a spool kept in the state directory is set aside with
+that installation rather than handed to its replacement.
+
+Packaging follows the same line: an uninstall leaves the state where it is, so
+a reinstall is the same installation, and only a purge removes the directory,
+after which the next start is a new installation.
+
+## Related guidance
+
+Continue with [agent architecture](/docs/agent/architecture), [enrollment and PKI](/docs/security/enrollment), [configuration troubleshooting](/docs/troubleshooting/agent), and [the target delivery model](/docs/agent/delivery).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md) · [Seagull-agent-v2/internal/identity/identity.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/identity/identity.go).

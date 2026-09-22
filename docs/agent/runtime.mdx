@@ -1,0 +1,44 @@
+---
+title: 'Runtime and lifecycle'
+description: 'Current runtime and lifecycle behavior, limitations, source evidence, and operational guidance.'
+---
+
+<FeatureStatus status="implemented" />
+
+This page preserves the agent maintainers' detailed explanation at the reviewed revision, checked against the owning implementation. Read the [agent overview](/docs/agent/overview) for the boundary between implemented foundations and planned delivery.
+
+## Current behavior
+
+`seagull-agent -config FILE run` starts the agent on the configuration held in
+`FILE` and keeps it running until it receives SIGINT or SIGTERM. It logs to
+stderr, and exits with 0 after a requested stop, 1 when it could not start, an
+essential component failed or the stop overran its deadline, and 2 on a usage
+error.
+
+`cmd/seagull-agent` is the composition root: it builds each component and hands
+the enabled ones to `internal/runtime`, which owns their lifecycle.
+
+- A component is a `Run(ctx)` call that returns once everything it started has
+  stopped. Building one must start no work, so a component left out of the
+  composition, such as a disabled one, never runs.
+- Every component declares a failure policy. An optional component that fails
+  is reported and the agent carries on without it; an essential one that fails,
+  or stops before it is asked to, stops the agent.
+- Stopping cancels every component and waits `resources.shutdown_timeout` for
+  them. A component still running after that is named in the log, and the
+  process exits rather than wait any longer.
+- A panic is never recovered. It ends the process, because the goroutine that
+  panicked may have left shared state inconsistent; durable state has to
+  survive that just as it survives any other crash.
+
+One component is composed: the configuration the agent holds, which reads the
+file again whenever the agent is asked to. Collection, local admission, the
+spool and delivery will each arrive as a component of its own.
+
+## Related guidance
+
+Continue with [agent architecture](/docs/agent/architecture), [enrollment and PKI](/docs/security/enrollment), [configuration troubleshooting](/docs/troubleshooting/agent), and [the target delivery model](/docs/agent/delivery).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md) · [Seagull-agent-v2/internal/runtime/runtime.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/runtime/runtime.go).
