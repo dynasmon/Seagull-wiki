@@ -1,0 +1,32 @@
+---
+title: 'Asset inventory'
+description: 'Why inventory is a separate stream and how full scans and deltas determine current asset state.'
+---
+
+<FeatureStatus status="implemented" />
+
+Inventory answers “what does this asset have?” An event answers “what was observed happening?” A package scan can carry far more observations than a login stream and requires set semantics, so V2 gives inventory its own contract, route, topic, projector, and tables.
+
+## Supported record kinds
+
+The contract models operating system, kernel, packages, services, network interfaces, users and group membership, hardware, and process inventory. Backend support for these records does not mean the V2 agent already collects them. No endpoint collector is composed in the current agent.
+
+## Full scans versus deltas
+
+A full snapshot completely enumerates one inventory kind. The newest full scan establishes what is current: an item omitted by that scan is no longer current, retaining its previous `last_seen`. An empty complete snapshot is meaningful because it says the asset has none of that kind.
+
+A delta adds or refreshes only the items it names. Omission does not retire an item and does not advance the complete-scan line. An empty delta is refused. Do not split a complete snapshot into independent snapshots: each partial set would falsely declare omitted items absent. The current contract has no scan ID or chunk-assembly protocol.
+
+## Identity and ordering
+
+The platform derives item identity. Package identity uses name, architecture, and package manager, excluding version so an upgrade replaces current state rather than creating another item. Collection must account for whether multiple installed instances fit that identity.
+
+Projection ordering uses `collected_at`; records arriving late must lose to newer observations. Item writes and the full-scan watermark together define the result. Review the projector and integration tests when reasoning about partial writes, timestamp ties, or clock regression.
+
+## Storage and assessment
+
+`asset_inventory` holds item observations and `asset_inventory_scans` tracks full enumerations. These are projections of retained inventory records. Future vulnerability matching must distinguish stale or unassessable assets from clean ones. The [advisory pipeline](/docs/vulnerability-management/overview) supplies intelligence but currently performs no asset matching.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/docs/decisions/0027-inventory-is-a-record-kind-of-its-own.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0027-inventory-is-a-record-kind-of-its-own.md) · [Seagull-backend-v2/internal/inventorystore/projector.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/inventorystore/projector.go) · [Seagull-backend-v2/tests/integration/inventorystore_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/integration/inventorystore_test.go) · [Seagull-contracts/proto/seagull/inventory/v1/inventory.proto](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/proto/seagull/inventory/v1/inventory.proto).
