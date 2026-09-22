@@ -1,0 +1,32 @@
+---
+title: 'State, replay, and partition ownership'
+description: 'How stateful detection remains bounded and responds to restart, rebalance, and changing ownership.'
+---
+
+A consumer group assigns partitions, not arbitrary rule groups. This distinction determines which stateful rules a deployment can answer.
+
+## State identity and limits
+
+A detection window is keyed by tenant, rule, revision, and group. Observations preserve event IDs and event times; replaying an already-folded event does not count it again. Tenant is always part of the key and cannot be removed by rule configuration. Group values are hashed to bound key size.
+
+Three limits bound memory: the maximum window, observations per key, and number of keys. A full observation window retains a bounded suffix and reports saturation, so its count is a floor. A threshold above the observation limit is refused. At the key ceiling, new keys are refused rather than evicting old ones. Late observations outside the current window are refused; there is no unbounded historical accumulation.
+
+## Partition affinity
+
+The raw-event topic is keyed by agent ID. A rule whose `group_by` includes the agent keeps all its state on one partition owner and can operate across replicas. An estate-wide group without the agent can span partitions. Such a rule requires `SEAGULL_DETECTION_STATE_SOLE_READER=true` and actual ownership of the entire stream. Losing that ownership stops the engine.
+
+This is a deployment constraint, not a hint. Activating an unsupported ruleset fails as a whole and leaves the last executable ruleset running. Adding an engine replica can invalidate a sole-reader deployment.
+
+## Restart and rebalance
+
+On assignment, the consumer seeks back far enough to rebuild the rules' required event-time window, widened by configured clock skew. A consumer already further behind is not moved forward past unprocessed work. Stateless rules require no state rewind. The window is reconstructed by reading broker records, not by recovering a Redis checkpoint.
+
+Re-evaluation can republish detections under deterministic names. Durable consumers must still be replay-safe. The [integration recovery suite](/docs/testing/strategy) exercises process loss, reassignment, scale-up, scale-down, and sole-reader refusal.
+
+## Operational implications
+
+Retain enough broker history for the configured recovery window and allowable skew. Measure restart catch-up cost before widening windows. Watch partition movement, state rebuild records, key pressure, and refused activations. No published benchmark establishes a universal supported fleet size.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/docs/decisions/0018-detection-state-is-a-bounded-window.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0018-detection-state-is-a-bounded-window.md) · [Seagull-backend-v2/docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md) · [Seagull-backend-v2/internal/broker/recovery.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/recovery.go) · [Seagull-backend-v2/internal/detectionstate/keeper.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/detectionstate/keeper.go) · [Seagull-backend-v2/tests/integration/recovery_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/integration/recovery_test.go).

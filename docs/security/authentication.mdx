@@ -1,0 +1,30 @@
+---
+title: 'Authentication and authorization'
+description: 'Control sessions, permissions, tenant checks, and the separate query authorization model.'
+---
+
+## Control API
+
+A caller first completes mTLS using the operator/caller trust domain. `POST /v1/auth/session` exchanges that authenticated connection for a short-lived session. The token proves session identity and is bound to the certificate; it does not embed immutable permission authority.
+
+Each request resolves the caller against the policy. Every registered route declares `Certificate`, `Session`, or a typed `Permits(resource, action)` requirement. A route with no valid declaration cannot register. Handler-level tenant checks additionally prevent a caller from operating on another tenant's records.
+
+Use `Authorization: Bearer` with the session token on session-protected calls while presenting the same certificate. The current session store is a bounded in-memory allowlist. Restart invalidates live sessions. Multiple replicas do not share sessions even if a signing key is configured identically; do not claim a stateless horizontally scalable session service.
+
+## Policy
+
+The policy document defines subjects, roles, permissions, and tenants. Treat the ability to write that document as authority to change access. [Generated routes](/docs/reference/generated/http-routes) expose declared permissions, while the exact policy example remains in `deploy/policy.yml`.
+
+## Query API
+
+The query API currently derives readable tenants from the organization fields of the verified caller certificate. Its scope is not a request filter and cannot be broadened by a query expression. An empty/invalid scope reads nothing.
+
+This differs from control-plane authorization. Removing a role from control policy does not automatically remove a tenant from an already-issued query certificate. The gap is documented in development notes and must be considered in operational access revocation.
+
+## Rate and capacity limits
+
+Control and query listeners have separate request budgets. Session counts are bounded per caller and globally; queries have body, page, window, row-read, and concurrency bounds. See [environment declarations](/docs/reference/generated/environment) before tuning. A permission grant is not permission to consume unlimited resources.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/control/guard.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/guard.go) · [Seagull-backend-v2/internal/control/sessions.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/sessions.go) · [Seagull-backend-v2/internal/hunt/scope.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/scope.go) · [Seagull-backend-v2/deploy/policy.yml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/policy.yml) · [Seagull-backend-v2/docs/decisions/0014-a-token-says-who-and-the-policy-says-what.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0014-a-token-says-who-and-the-policy-says-what.md).

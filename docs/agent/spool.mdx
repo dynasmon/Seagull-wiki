@@ -1,0 +1,36 @@
+---
+title: 'Durable local spool'
+description: 'Target persistence, source checkpoints, crash recovery, disk pressure, and loss accounting.'
+---
+
+<FeatureStatus status="planned" />
+
+The durable spool is planned in AG-011, with admission/delivery and pressure requirements in AG-012 and AG-013. There is no spool implementation in the current agent. The JSON settings `spool.max_bytes` and `spool.max_age` are validated reservations for that work.
+
+## Required durability boundary
+
+A collector observation must reach recoverable local storage before source progress moves beyond it. Otherwise a crash after advancing a log offset but before persisting its event permanently loses the observation. The admission result must say what was durably preserved; a memory queue cannot provide that guarantee.
+
+## Ownership and recovery
+
+Spool records belong to an installation. Explicit installation replacement sets aside the old state rather than uploading old records under a new identity. Stable event IDs and original timestamps must survive process restarts and network retries. Recovery must distinguish a partially written record, a valid record awaiting ACK, and locally acknowledged state awaiting reclamation.
+
+The plan does not establish a chosen spool database or on-disk format. Do not configure SQLite, a write-ahead log layout, or segment sizes based on this page.
+
+## Reclamation
+
+Normal deletion requires both a matched durable backend ACK and durable local acknowledgement state. A crash between receiving the ACK and recording it locally should cause replay rather than loss. Reclamation before that local persistence boundary would make restart behavior depend on volatile memory.
+
+## Finite storage and pressure
+
+Finite disk cannot preserve an unlimited outage backlog. The implementation must define queue limits, prioritization, backpressure, and observable expiry/quarantine/eviction exceptions. Explicit data loss must not be counted as delivered. Operator diagnosis should compare available disk, queue depth/age, blocked delivery, and the gateway's admissible event age.
+
+The current configuration defaults reserve 512 MiB and 72 hours. Those numbers are not measured outage guarantees. Seven-day event admission and thirty-day inventory admission are independent server defaults; increasing local retention beyond them can preserve records the gateway will reject.
+
+## Acceptance evidence still required
+
+Fault tests must interrupt writes, acknowledgements, and reclamation; exhaust disk; restart with queued data; and hold the network down long enough to reach declared bounds. See [reliability testing](/docs/testing/agent) and [delivery semantics](/docs/agent/delivery).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/internal/config/config.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/config/config.go) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).

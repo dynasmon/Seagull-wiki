@@ -1,0 +1,64 @@
+---
+title: 'Protocol compatibility'
+description: 'Current protocol compatibility behavior, limitations, source evidence, and operational guidance.'
+---
+
+<FeatureStatus status="implemented" />
+
+This page preserves the agent maintainers' detailed explanation at the reviewed revision, checked against the owning implementation. Read the [agent overview](/docs/agent/overview) for the boundary between implemented foundations and planned delivery.
+
+## Current behavior
+
+Three versions describe an agent, and none stands in for another. The release
+names a build. The protocol version, `protocol_version` on every batch, shapes
+a batch and the answer to it. The schema version, `schema_version` on every
+event and on every inventory record, shapes a record of that kind, and each
+kind moves on its own. This build speaks protocol 1, event schema 1 and
+inventory schema 1: `-version` prints them and `agent_starting` logs them.
+
+What the platform accepts is the platform's to say, and an agent hears it in
+one place: the answer to a batch. The platform's descriptor names the versions
+it supports, but it is served on the operator listener, which an agent's
+certificate cannot reach, and it names no inventory schema. So the agent
+negotiates nothing before it sends, and it advertises no capability or build
+metadata, because the contracts have no field to carry them. It reads a refusal
+with `internal/protocol` instead:
+
+- a refused protocol or schema version the agent set is an `Incompatibility`;
+- so is a refused value the agent's contracts declare, such as an event class,
+  an inventory kind or a service state: the platform was built from contracts
+  that lack it;
+- a refused value the agent left unset, or one no contracts declare, is the
+  agent's own mistake, and like every other refusal it is no incompatibility.
+
+An `Incompatibility` names the field, the value and the record the platform
+refused, with the platform's own explanation. It does not make those records
+invalid: a platform that speaks what they carry accepts them unchanged.
+
+What one side does not know follows from the same rule:
+
+- a reply field the pinned contracts do not declare is ignored and changes
+  nothing the agent concludes, so a change to what a reply means has to come
+  with a new protocol version, which an older agent sees refused;
+- no reply the agent reads carries an enum, and a contracts release that adds
+  one fails the suite until the agent decides how to read a value it does not
+  declare;
+- the agent writes only what its contracts declare, and since a platform built
+  from older contracts ignores a field it does not know instead of refusing it,
+  nothing the agent sends may depend on a field no recorded platform consumes.
+
+`tests/compatibility/testdata` holds exchanges recorded from the ingest gateway
+of a backend commit, driven in process by that commit's end-to-end harness: the
+bytes of every batch sent and of every answer. The suite fails when `go.mod`
+pins contracts no recorded platform was built with, when a recorded platform
+never durably accepted a version the agent speaks, or when a recorded refusal
+reads differently. Compatibility is claimed only with recorded platforms, and
+with no earlier release of the agent, because none exists.
+
+## Related guidance
+
+Continue with [agent architecture](/docs/agent/architecture), [enrollment and PKI](/docs/security/enrollment), [configuration troubleshooting](/docs/troubleshooting/agent), and [the target delivery model](/docs/agent/delivery).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md) · [Seagull-agent-v2/internal/protocol/protocol.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/protocol/protocol.go).

@@ -1,0 +1,34 @@
+---
+sidebar_position: 1
+title: 'What is Seagull?'
+description: 'Start with the scope, components, and maturity of the Seagull V2 security platform.'
+---
+
+Seagull is an open security operations platform evolving toward SIEM/XDR use cases. It brings endpoint observations into a durable event backbone, evaluates security rules, and preserves the resulting evidence separately from the work an operator performs on it.
+
+V2 is a re-architecture with independently built components. It is under active development: a working backend does not imply a finished endpoint product or a deployed user interface.
+
+## What you can do today
+
+Run the backend development stack; submit authenticated test telemetry; hunt events and detections; publish and activate rulesets; manage alerts and incidents; register agents and issue certificates; project inventory; and ingest distribution vulnerability advisories. The agent executable currently provides local runtime, configuration, identity, and key foundations. It does not yet collect or upload observations. The V2 frontend repository is a placeholder.
+
+## Start with your task
+
+| Your task             | Start here                                          | Then read                                     |
+| --------------------- | --------------------------------------------------- | --------------------------------------------- |
+| Evaluate V2           | [Quickstart](/docs/getting-started/quickstart)      | [Implementation status](/docs/roadmap/status) |
+| Understand the system | [Architecture](/docs/architecture/overview)         | [Data ownership](/docs/storage/ownership)     |
+| Operate a deployment  | [Deployment](/docs/deployment/topology)             | [Operations](/docs/operations/overview)       |
+| Integrate an endpoint | [Agent](/docs/agent/overview)                       | [Contracts](/docs/contracts/overview)         |
+| Review security       | [Trust boundaries](/docs/security/trust-boundaries) | [Threat model](/docs/security/threat-model)   |
+| Contribute code       | [Developer onboarding](/docs/development/overview)  | [Testing](/docs/testing/strategy)             |
+
+## Read status precisely
+
+**Implemented** means present in the reviewed source, with the stated boundaries. It is not a production certification. **In progress** means some parts exist and others remain. **Planned** identifies a documented requirement with no completed implementation. **Target architecture** describes the intended relationship between those parts. **Experimental** identifies a deliberately limited interface or workflow. **Deprecated** is reserved for explicitly superseded behavior.
+
+Each guide links to evidence. Generated references are pinned snapshots; see the [review baseline](/docs/reference/source-baseline) before comparing them with a newer checkout.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/README.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/README.md) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md) · [Seagull-frontend-v2/README.md](https://github.com/dynasmon/Seagull-frontend-v2/blob/307351e8d7f9a696786a9b05d50ac0b783db4163/README.md).

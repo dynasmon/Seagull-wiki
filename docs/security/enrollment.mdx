@@ -1,0 +1,37 @@
+---
+title: 'Enrollment and initial trust'
+description: 'The implemented operator-mediated certificate flow and the planned endpoint bootstrap lifecycle.'
+---
+
+import {
+  operatorIssuance,
+  admissionPropagation,
+} from '@site/src/diagrams/security';
+
+## Current backend issuance
+
+An operator registers an agent in a tenant they are authorized to administer. Registration starts it as pending. A CSR signed by the endpoint's private key is submitted through `POST /v1/agents/{id}/certificate`, guarded by `agents:write`. The authority verifies the requested identity and key, issues a certificate, and binds that identity to the registry. Binding makes a pending agent active. Admission then propagates to gateways through `security.agents`.
+
+<SequenceDiagram diagram={operatorIssuance} />
+
+<SequenceDiagram diagram={admissionPropagation} />
+
+The diagrams describe the implemented backend interface and required provisioning actions. The current V2 agent has a key provider and installation state but no enrollment command that completes these actions automatically.
+
+## Initial server trust
+
+An endpoint must receive its initial trust bundle through an authenticated installation or provisioning channel. Downloading a CA from the unverified server and then trusting it does not establish server identity. Never place operator credentials on an endpoint to simulate autonomous enrollment.
+
+## Planned bootstrap tokens
+
+Single-use, expiring bootstrap enrollment is part of AG-006's automated profile. No token minting, redemption endpoint, token expiry setting, or installer flag is implemented in this baseline. The absence of that workflow is explicit in ADR 25.
+
+## Verify and recover
+
+The backend `tools/devprobe -agents ... -renewals ...` workflow can demonstrate registration, issuance, renewal, and revocation with development material. It changes registry state and is intended for a disposable development environment. See [certificate operations](/docs/operations/certificates).
+
+For a suspected stolen key, revoke the agent identity and register a replacement identifier. Merely issuing a new certificate for the same identity does not invalidate the stolen credential.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/docs/decisions/0024-an-agent-is-registered-by-the-control-plane-and-refused-by-the-gateway.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0024-an-agent-is-registered-by-the-control-plane-and-refused-by-the-gateway.md) · [Seagull-backend-v2/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md) · [Seagull-backend-v2/internal/control/certificates.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/certificates.go) · [Seagull-backend-v2/tools/devprobe/main.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tools/devprobe/main.go) · [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go).

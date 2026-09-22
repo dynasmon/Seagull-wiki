@@ -1,0 +1,41 @@
+---
+title: 'Counts, windows, and sequences'
+description: 'Exact semantics for grouping, thresholds, saturation, ordered stages, and late observations.'
+---
+
+## Count rules
+
+The real count shape is:
+
+```yaml
+count:
+  at_least: 20
+  within: 1m
+  group_by:
+    - authentication.network.source.ip
+    - origin.agent_id
+```
+
+The count extends the rule's match. Tenant is always part of state identity and is not written in `group_by`. A count threshold must fit the observation ceiling, and its window must fit the deployment's configured state window. Invalid active rules are refused before execution.
+
+Past the threshold, a rule can decide once per matching event. It does not reset the window after firing. Cooldown and folding belong to the alert plane. Saturation means a bounded count is a floor rather than an exact total.
+
+## Sequence rules
+
+A rule carries `sequence` or `match`, never both. A sequence has a shared group, a bounded window, and two to eight named stages. The shipped example asks for failed SSH authentication followed by successful SSH authentication.
+
+Order is event time, not arrival order. A late-arriving event can occupy its proper place in the bounded window and complete a story. An event outside the window is refused. A completed story is decided once per window that holds it, rather than every subsequent event producing the same story again.
+
+## Confidence and clock skew
+
+Severity measures the consequence if the story occurred. Confidence reflects how strongly the source clocks establish its order. The platform computes clock spread; a rule cannot declare that a fleet's clocks agree. Analysts must inspect timing evidence rather than assuming an ordered list proves causality.
+
+## Cross-agent limitations
+
+An agent-keyed stream does not automatically colocate a source-IP group across endpoints. Multi-agent temporal groups require a verified sole-reader deployment today. Repartitioning by arbitrary rule group and shared distributed state are possible architectural directions, not implemented scaling guarantees.
+
+Distinct-cardinality rules, generic graph attack-chain scoring, and a user-facing temporal backtest facility are not established by the current count/sequence implementation.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/docs/decisions/0019-a-rule-that-counts-decides-on-a-window.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0019-a-rule-that-counts-decides-on-a-window.md) · [Seagull-backend-v2/docs/decisions/0020-a-sequence-is-decided-by-the-window-that-holds-it.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0020-a-sequence-is-decided-by-the-window-that-holds-it.md) · [Seagull-backend-v2/docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md) · [Seagull-backend-v2/internal/analysis/count.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/analysis/count.go) · [Seagull-backend-v2/internal/analysis/sequence.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/analysis/sequence.go).

@@ -1,0 +1,28 @@
+---
+title: 'Contributing'
+description: 'Make reviewable, evidence-based changes without weakening repository, security, or durability boundaries.'
+---
+
+## Before editing
+
+Read applicable `AGENTS.md`, current source, tests, accepted decisions, and relevant contracts. A historical backlog status is not a substitute for checking the composition root. Search for an existing owner before adding a new abstraction or process.
+
+Use English for source, tests, documentation, and necessary comments. Keep comments focused on non-obvious constraints rather than narrating syntax. Avoid unrelated refactors in independently released repositories.
+
+## A reviewable change
+
+Explain the concrete problem and resulting behavior. For asynchronous work, identify the durable effect, commit point, retry, crash, replay, and rebalance semantics. For security work, name the authority and residual risk. Include the checks actually run and their result; do not claim tests passed because code inspection looked convincing.
+
+Keep protocol changes in the contracts repository and update consumers explicitly. Do not commit secrets, generated local caches, `go.work`, or dependency overrides as hidden workspace coupling.
+
+## Documentation contribution
+
+State current versus planned behavior, cite precise sources, and link to the canonical explanation rather than copying it. Update the implementation matrix when a composition root gains a feature. Refresh generated references only after updating their evidence snapshots. See [documentation maintenance](/docs/development/documentation).
+
+## Security-sensitive reports
+
+The inspected repositories do not establish a dedicated published vulnerability disclosure address or policy in this documentation baseline. Do not invent one. Use an existing private maintainer channel available to you for sensitive details rather than placing credentials or exploitable deployment information in a public documentation issue.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/tests/architecture/dependencies_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/architecture/dependencies_test.go) · `Seagull-agent-v2/AGENTS.md` (local planning evidence) · [Seagull-contracts/README.md](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/README.md).

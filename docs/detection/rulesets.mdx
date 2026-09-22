@@ -1,0 +1,28 @@
+---
+title: 'Publish, activate, and roll back rulesets'
+description: 'Immutable content-addressed rulesets and distributed activation without synchronous engine mutation.'
+---
+
+## Publication and activation are different operations
+
+The control plane validates, compiles, and checks a ruleset before writing it to `security.rulesets`. A published version is immutable and named by content. A separate activation pointer identifies the desired running version. Publishing identical executable content yields the same identity.
+
+The engine starts with its configured rule tree and follows the compacted ruleset log. Once the log supplies a published active version, it takes precedence over the bootstrap tree. Losing control API availability does not remove the engine's running ruleset.
+
+## Activation is checked by each engine
+
+The control plane can validate a rule's shape while an engine still cannot execute it under that deployment's state limits or partition ownership. The engine therefore validates executable bounds on activation. A refused candidate leaves the last executable ruleset running and increments refused activation metrics.
+
+## Operator sequence
+
+Use the [route reference](/docs/reference/generated/http-routes) and [ruleset messages](/docs/reference/generated/contracts/ruleset): validate, check cases, publish, and activate. Confirm engine activation results and the running version before announcing a rollout complete.
+
+Rollback activates a previously published version. It does not rewrite old content or mutate a live evaluator over HTTP. Preserve ruleset history in the broker and document which version was running during an investigation.
+
+## Sigma interoperability
+
+`go run ./tools/sigmaimport -input path/to/sigma -output deploy/rules/imported.yml -strict` translates supported Sigma content into the same authoring format. Imported rules are drafts without cases; author and check cases before promotion. Unsupported patterns, ranges, keyword searches, distinct counts, and unsupported case semantics are refused rather than approximated. See ADR 22 for exact translation boundaries.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/control/rulesets.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/rulesets.go) · [Seagull-backend-v2/cmd/analysis-engine/rules.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/analysis-engine/rules.go) · [Seagull-backend-v2/docs/decisions/0008-a-ruleset-is-named-by-what-is-in-it.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0008-a-ruleset-is-named-by-what-is-in-it.md) · [Seagull-backend-v2/docs/decisions/0015-a-ruleset-is-published-to-a-log.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0015-a-ruleset-is-published-to-a-log.md) · [Seagull-backend-v2/docs/decisions/0022-sigma-is-translated-and-never-adopted.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0022-sigma-is-translated-and-never-adopted.md).

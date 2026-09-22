@@ -1,0 +1,42 @@
+---
+title: 'Threat model'
+description: 'Concrete abuse paths, affected boundaries, current mitigations, and remaining security work.'
+---
+
+This model covers the reviewed V2 backend, current agent foundation, and documented target endpoint pipeline. It assumes an attacker may control an endpoint or submit hostile external feed content; possession of infrastructure credentials is treated as a separate compromise. Development defaults do not establish an internet-safe production perimeter. It synthesizes the existing backend threat models and source rather than certifying a particular deployment.
+
+## Assets and authority
+
+Primary assets are telemetry integrity, tenant isolation, operator decisions, endpoint private keys, the signing authority, retained analytical evidence, ruleset integrity, and vulnerability intelligence provenance. The most consequential writers are the control process, authorized broker producers, privileged database accounts, and endpoint configuration/package administrators.
+
+## Threats and controls
+
+| Threat / affected boundary                      | Current mitigation                                                      | Residual risk and status                                                                                    |
+| ----------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Forged agent at gateway                         | Verified client chain; identity from certificate; registry admission    | Stolen authorized key can impersonate its agent; implemented authentication, no endpoint attestation        |
+| Malicious enrolled endpoint                     | Typed validation, size/age/rate bounds, stamped origin                  | Can lie within its permitted telemetry; mTLS cannot establish observation truth                             |
+| Stolen enrollment token                         | No bootstrap-token service exists                                       | Token expiry/use-count/replay controls belong to planned automated enrollment                               |
+| MITM or backend impersonation                   | Backend mTLS; validated trust bundle in agent configuration             | Initial trust provisioning must be authenticated; live agent transport remains planned                      |
+| Stolen endpoint key / cloned state              | Owner-only state and key files; explicit agent revocation               | Root or the account can copy files; hardware non-exportability and clone handling are not implemented       |
+| Telemetry replay / duplicate publication        | Stable identities, replay-aware consumers, bounded event age            | Request retries can duplicate broker records; no global exactly-once claim                                  |
+| Event loss during crash/outage                  | Broker-before-ACK; store-before-offset commit                           | Broker retention/cluster loss remain limits; endpoint spool is planned                                      |
+| Unauthorized control request                    | Certificate-bound session, per-request policy, tenant checks            | Policy/CA compromise grants authority; sessions remain local to a process                                   |
+| Query access survives policy change             | Certificate-derived tenant scope is enforced                            | Query is not yet integrated with control policy; certificate scope must be managed separately               |
+| Forged admission/ruleset/advisory broker record | Explicit ownership and topology; TLS/SCRAM support                      | Producer ACL provisioning is incomplete in supplied deployment; high-impact infrastructure trust boundary   |
+| Database compromise                             | Separate transactional and analytical workloads                         | Privileged store access can expose/alter data; complete production role/backup hardening is deployment work |
+| Malicious configuration or privileged module    | Ownership checks; atomic local config activation; dependency boundaries | In-process modules share privileges; signed central policy and a helper are planned                         |
+| Tampered update / dependency                    | Locked/pinned dependencies and existing CI gates                        | No complete signed native agent release/update channel yet                                                  |
+| Hostile advisory feed                           | Bounded fetch/parse, schema translation, platform-written provenance    | Provenance identifies bytes, not truth; compromised upstream can supply misleading intelligence             |
+| Resource exhaustion                             | Gateway capacity/rate bounds; bounded windows and session stores        | Sustained authorized input can consume allowed capacity; protection requires monitoring and sizing          |
+
+## Operational priorities
+
+Protect CA and broker producer credentials first because they can create identities or authoritative records, not merely read data. Isolate development services from untrusted networks. Review query access revocation separately from control policy. Preserve incident and alert trails in backups. Observe failure and saturation signals before tuning their ceilings upward.
+
+## Future boundaries requiring fresh analysis
+
+Enrollment token redemption, spool recovery, signed policy, native packaging, verified upgrades, privileged collection, and response execution each add an attack surface. Their plan must not be read as evidence that the required mitigation already exists. Revisit this model when those components enter the composition root.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). `Seagull-backend-v2/notes/Seagull-backend-v2-threat-model.md` (local planning evidence) · `Seagull-backend-v2/notes/Seagull-backend-v2-advisories-threat-model.md` (local planning evidence) · [Seagull-backend-v2/internal/control/guard.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/guard.go) · [Seagull-backend-v2/internal/broker/security.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/security.go) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).

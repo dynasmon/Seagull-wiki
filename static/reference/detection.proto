@@ -1,0 +1,168 @@
+syntax = "proto3";
+
+package seagull.detection.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "seagull/event/v1/event.proto";
+
+// How much the rule says a detection matters. A closed set, because a consumer
+// routes on it and a severity nobody declared is a detection nobody sees.
+enum Severity {
+  SEVERITY_UNSPECIFIED = 0;
+  SEVERITY_LOW = 1;
+  SEVERITY_MEDIUM = 2;
+  SEVERITY_HIGH = 3;
+  SEVERITY_CRITICAL = 4;
+}
+
+// Which rule decided this and at which revision — enough to find the rule and
+// read it back, and deliberately not a copy of it. A rule's prose belongs to
+// the ruleset, which is named by its own content and can be fetched.
+message Rule {
+  string id = 1;
+  uint32 revision = 2;
+  string name = 3;
+  Source source = 4;
+}
+
+// Where the rule itself came from, when this estate did not write it. Both
+// fields or neither: half a provenance is a claim nobody can follow.
+message Source {
+  string catalogue = 1;
+  string identifier = 2;
+}
+
+// Where the rule sits in ATT&CK. Optional, and all of it or none of it.
+message Technique {
+  string tactic = 1;
+  string id = 2;
+  string name = 3;
+}
+
+// One question the rule asked of the event, and what the event answered. This
+// is where a field value the platform observed is allowed to live: it is the
+// reason the detection exists, and it is carried here rather than in a log line
+// so that what an event held stays out of the platform's own output.
+message Evidence {
+  string field = 1;
+  string operator = 2;
+  bool negated = 3;
+
+  // What the event held, written the way a rule writes a literal. Empty when
+  // absent is set: the event did not carry the field at all, which is a
+  // different observation from carrying nothing.
+  string held = 4;
+  bool absent = 5;
+}
+
+// One field a counting rule groups by, and what the events it counted held in
+// it. An absent field is its own group: events carrying no source address are
+// not counted alongside every address that was named.
+message Grouping {
+  string field = 1;
+  string value = 2;
+  bool absent = 3;
+}
+
+// What a counting rule found, and nothing a rule deciding one event at a time
+// can say. It is carried because the finding is the count: a detection reading
+// "a failed password" and one reading "twenty failed passwords from one address
+// in a minute" are different pieces of work, and only this tells them apart.
+message Aggregation {
+  // What the window held when this was decided, and what the rule asked for.
+  // Both, because a count means nothing without the threshold it crossed.
+  uint32 count = 1;
+  uint32 threshold = 2;
+
+  // How far back the rule was told to look, and the oldest event still inside
+  // the window. With `event_time`, which is the newest, the two bound the
+  // activity that was counted.
+  google.protobuf.Duration window = 3;
+  google.protobuf.Timestamp first_event_time = 4;
+
+  // The window held as many events as it is allowed to, so `count` is a floor
+  // rather than a total.
+  bool saturated = 5;
+
+  repeated Grouping group = 6;
+}
+
+// One stage of a sequence, and the event that satisfied it. Named rather than
+// numbered, because a sequence is a story and a reader should not have to fetch
+// the rule to learn what its third step was.
+message Stage {
+  string name = 1;
+  string event_id = 2;
+  google.protobuf.Timestamp event_time = 3;
+}
+
+// What an ordered sequence of events came to, and nothing a rule deciding one
+// event at a time can say. A detection reading "a successful login" and one
+// reading "a successful login after twenty failures from the same address"
+// are different pieces of work, and only this tells them apart.
+message Correlation {
+  // One per stage, in the order the rule declares them, each naming the event
+  // that satisfied it. The events are also carried in `source_event_ids`; this
+  // says which of them played which part.
+  repeated Stage stages = 1;
+
+  // How far back the rule was told to look. The span the events actually
+  // covered is the difference between the first and last stage above.
+  google.protobuf.Duration window = 2;
+
+  // How much the clocks that timed this sequence disagreed, measured as the
+  // spread of `observed_time` against `ingest_time` across the events above.
+  // Ordering is decided in event time, which is the producer's clock, so a
+  // spread wider than the span means the order is not established by the data.
+  google.protobuf.Duration clock_spread = 3;
+
+  repeated Grouping group = 4;
+}
+
+// The result of analytical logic matching evidence.
+//
+// A detection is not an alert. It carries no status, no assignee and no
+// disposition: it is a statement that a rule matched an event, and what an
+// operator then does about it has a lifecycle of its own that belongs to the
+// alert. Nor is it an event — the events it was decided from are named here and
+// stored elsewhere.
+message Detection {
+  // Derived from the rule, its revision, and the events it was decided from, so
+  // that deciding the same events against the same rule twice names the same
+  // detection. A replay therefore rewrites what it already wrote instead of
+  // adding a second copy of it.
+  string detection_id = 1;
+  uint32 schema_version = 2;
+
+  Rule rule = 3;
+
+  // The set of rules the deciding process was pinned to, named by what is in
+  // it, so a detection can be traced back to exactly what decided it.
+  string ruleset_id = 4;
+
+  Severity severity = 5;
+  Technique technique = 6;
+
+  seagull.event.v1.EventClass event_class = 7;
+  seagull.event.v1.Origin origin = 8;
+  repeated string source_event_ids = 9;
+
+  // When the thing happened, taken from the events it was decided from, and
+  // when the platform decided it. The first places a detection on a timeline;
+  // the second says when this evaluation ran and is not part of its identity.
+  google.protobuf.Timestamp event_time = 10;
+  google.protobuf.Timestamp detected_time = 11;
+
+  repeated Evidence evidence = 12;
+
+  // What a counting rule counted, absent when the rule decides one event at a
+  // time. The events named above are what this detection is identified by;
+  // this is what they were counted against.
+  Aggregation aggregation = 13;
+
+  // What an ordered sequence found, absent on every other rule. The events
+  // named above are the ones that made the sequence; this says which stage each
+  // of them satisfied and how far the clocks that ordered them disagreed.
+  Correlation correlation = 14;
+}

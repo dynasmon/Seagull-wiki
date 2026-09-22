@@ -1,0 +1,30 @@
+---
+title: 'Rules or correlation are not firing'
+description: 'Symptoms, causes, diagnosis, resolution, and verification for rules or correlation are not firing.'
+---
+
+## Symptoms
+
+Queryable authentication evidence exists but no expected detection, alert, or incident appears.
+
+## Likely causes
+
+Wrong event class, canonical field/value mismatch, draft rule, failed activation, unreachable count/window bounds, cross-agent grouping without valid ownership, late observations, severity floor, or alert suppression. A detection and an alert are different results.
+
+## Diagnosis
+
+Check the engine's actual running ruleset and activation outcome, then the relevant shipped/author cases. Inspect normalization and missing-field semantics. For temporal rules inspect group values, event time, state pressure, and partition ownership. Look for the detection before diagnosing alert/incident storage.
+
+## Resolution
+
+Correct the rule or deployment within supported semantics; validate/check, publish, and activate deliberately. Add a case for the observed edge condition. Adjust alert tuning only when the analytical finding is correct and the operational workload is wrong.
+
+## Verification
+
+The same controlled event or sequence produces the expected analytical evidence. The downstream writer then creates or folds operator work as configured, preserving occurrences and history.
+
+Continue with [health and metrics](/docs/observability/health) and [failure semantics](/docs/architecture/failure-model).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/analysis/engine.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/analysis/engine.go) · [Seagull-backend-v2/cmd/analysis-engine/rules.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/analysis-engine/rules.go) · [Seagull-backend-v2/deploy/rules/authentication.yml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/rules/authentication.yml) · [Seagull-backend-v2/docs/decisions/0017-noise-is-removed-from-the-alert-and-never-from-the-detection.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0017-noise-is-removed-from-the-alert-and-never-from-the-detection.md).

@@ -1,0 +1,32 @@
+---
+title: 'Agent architecture'
+description: 'Process, package, and trust boundaries for the implemented foundation and target endpoint runtime.'
+---
+
+import { agentTarget } from '@site/src/diagrams/agent';
+
+## Current implementation
+
+`cmd/seagull-agent` reads configuration, applies logging and Go memory settings, reports privilege posture, opens private installation state and the key provider, and composes the configuration component into the runtime. It exposes local CLI commands and responds to process signals. Module supervision exists but is not connected to a real collector.
+
+The runtime owns lifecycle and knows neither contracts nor collectors. Identity owns installation state, not network addresses. PKI owns signers, not TLS connections. Configuration validates paths but leaves each owner to open the state or material it names.
+
+## Target V2 architecture
+
+<FlowDiagram diagram={agentTarget} />
+
+The whole collection-to-delivery path in this diagram is a target. The implemented identity/configuration foundations are prerequisites, not proof of a running telemetry pipeline.
+
+## In-process boundaries
+
+The target prefers one modular daemon with the smallest necessary OS privileges. Modules in a Go process share memory and privileges. Separate goroutines do not isolate a compromised collector. A privileged helper would need a justified OS boundary, authenticated local caller identity, a narrow typed interface, bounded messages, and constrained targets. None exists today.
+
+## Admission and source progress
+
+The plan requires a collector to advance its source checkpoint only after the relevant observation is durably admitted. A queue enqueue in memory cannot satisfy that receipt. Event and inventory records remain typed and distinct throughout admission and spool handling.
+
+The [agent roadmap](/docs/roadmap/agent) records the source plan and milestones. The [architecture tests](/docs/testing/strategy) protect package boundaries before the future components are introduced.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go) · [Seagull-agent-v2/tests/architecture/ownership_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/tests/architecture/ownership_test.go) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).

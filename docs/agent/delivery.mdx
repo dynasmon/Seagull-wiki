@@ -1,0 +1,36 @@
+---
+title: 'Delivery, retries, and acknowledgements'
+description: 'The target agent delivery protocol and the implemented gateway contract it must satisfy.'
+---
+
+import { deliveryAcknowledgement } from '@site/src/diagrams/agent';
+
+<FeatureStatus status="planned" />
+
+Delivery is planned. The gateway-side durability behavior and wire ACK are already implemented, and the agent's compatibility tests record that contract.
+
+## Success condition
+
+For the response to a particular request, normal delivery completes only when `accepted == true`, `durable == true`, and `received` equals the number of submitted records. The ACK does not echo the batch ID or identify accepted records individually. Transport must keep request/response association intact. Inventory counts records, not the items inside them.
+
+<SequenceDiagram diagram={deliveryAcknowledgement} />
+
+## Retry classes
+
+Transient network or broker failures require bounded retry/backoff without changing observation identity. Publication may have partly succeeded, so retry can repeat events. A schema/protocol incompatibility must be distinguishable from corrupted producer data; the implemented `internal/protocol` refusal classifier supplies this distinction.
+
+Malformed data, capacity pressure, expired certificates, revoked agent state, and a backend that does not speak the schema are different failures. An uploader that retries every refusal forever with the same delay can fill its spool without giving an operator a usable diagnosis.
+
+## Ordering and backpressure
+
+The target must define in-flight batch limits, concurrency, retry scheduling, and pressure propagation to collection. Preserve per-source progress requirements without inventing global ordering across all collectors. A separate inventory stream cannot be broken into misleading complete scans merely to fit a batch.
+
+## Security limits
+
+mTLS proves possession of a trusted private key. It does not prove the endpoint's observations are truthful or that the executable is authentic. Initial server trust must arrive through an authenticated provisioning path. There is no supported insecure-verification switch.
+
+See [gateway admission](/docs/ingestion/gateway), [spool requirements](/docs/agent/spool), and [PKI limits](/docs/security/pki).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-contracts/proto/seagull/ingest/v1/ingest.proto](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/proto/seagull/ingest/v1/ingest.proto) · [Seagull-agent-v2/internal/protocol/protocol.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/protocol/protocol.go) · [Seagull-backend-v2/internal/ingest/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/http.go).

@@ -1,0 +1,33 @@
+---
+title: 'Telemetry and collector roadmap'
+description: 'Planned endpoint observations and the contract and privilege work each collector requires.'
+---
+
+<FeatureStatus status="planned" />
+
+No real collector is implemented or enabled in the current V2 agent. The module supervisor is implemented independently of collection.
+
+| Planned collector                          | Purpose                                            | Required boundary                                             |
+| ------------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------- |
+| Authentication / security logs (AG-020)    | Observe authentication outcomes and source context | Source permissions, parsing, stable IDs, durable checkpoints  |
+| Process telemetry (AG-021)                 | Security observations about process lifecycle      | New compatible event semantics; command-line privacy          |
+| File integrity (AG-022)                    | Detect and describe relevant filesystem change     | Watch scope, exclusions, bounded hashing, overflow recovery   |
+| Network telemetry (AG-023)                 | Connection/listener metadata and optional sensors  | Explicit metadata scope, OS permissions, supported contract   |
+| Inventory (AG-024)                         | Report complete supported asset kinds              | Full-scan completeness, item identity, collection consistency |
+| Security configuration assessment (AG-025) | Evaluate supported endpoint security settings      | Versioned checks and explainable results                      |
+
+## Collector design
+
+A collector owns its goroutines, timers, descriptors, and checkpoint state and returns only after stopping them. It submits observations through local admission; it does not acquire a TLS client or endpoint key. Resource governance must bound expensive collection, concurrency, hashing, and parsing.
+
+Do not translate “network telemetry” into packet capture or payload inspection by assumption. Do not translate “process inventory” into a real-time process-event stream. Those are different capabilities with different privacy and transport requirements.
+
+## Incremental integration
+
+The first functional milestone is authentication observation through durable local admission, spool, mTLS, backend ACK, and detection. Inventory follows with a complete snapshot fitting the current contract. New telemetry classes require contract and backend support before a collector can claim interoperability.
+
+Use [collector supervision](/docs/agent/collectors) for current lifecycle behavior, [privileges](/docs/agent/privileges) for the process boundary, and [contract evolution](/docs/contracts/compatibility) before adding a new observation.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/internal/modules/modules.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/modules/modules.go) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md) · [Seagull-contracts/proto/seagull/event/v1/event.proto](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/proto/seagull/event/v1/event.proto) · [Seagull-contracts/proto/seagull/inventory/v1/inventory.proto](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/proto/seagull/inventory/v1/inventory.proto).

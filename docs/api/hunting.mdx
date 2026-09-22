@@ -1,0 +1,30 @@
+---
+title: 'Hunting and pagination'
+description: 'Scoped analytical queries, typed filtering, time ranges, opaque cursors, and resource limits.'
+---
+
+The query process reads analytical events and detections and writes no analytical state. It consumes no broker topic. Its API answers a bounded question within an authorized tenant scope.
+
+## Query shape
+
+`POST /v1/hunt/events` accepts `hunt.v1.Query` and returns `EventPage`. `POST /v1/hunt/detections` accepts the same query shape and returns `DetectionPage`. A required time range includes its start and excludes its end, allowing adjacent windows without double-counting a boundary instant.
+
+The expression tree supports declared predicates and boolean groups. Field paths come from the relevant contracts. Values are validated against field types. The language does not accept arbitrary SQL, regex, or wildcard syntax.
+
+## Tenant scope
+
+The verified caller certificate's organization entries define readable tenants. The server compiles that scope into the query separately from user predicates. A caller cannot broaden it by adding a tenant filter; an empty scope reads nothing.
+
+## Page traversal
+
+Records are returned newest first. Pass `next_cursor` unchanged as the next request's cursor. A short page does not prove completion because the store may return within its read budget. Only an empty next cursor means no further page is available for that query range.
+
+Cursor signing and request/query constraints prevent treating it as a user-composed offset. Preserve relevant query parameters and handle invalid or expired context by restarting the query, not editing the token.
+
+## Operational limits
+
+Defaults bound query window, page size, maximum rows read, execution time, body size, caller rate, and concurrent queries. Check the [query environment reference](/docs/reference/generated/environment/query-api) and [shared store settings](/docs/reference/generated/environment/shared). A slow query may require a narrower time range or better predicate selectivity rather than a larger server timeout.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-contracts/proto/seagull/hunt/v1/hunt.proto](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/proto/seagull/hunt/v1/hunt.proto) · [Seagull-backend-v2/internal/hunt/query.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/query.go) · [Seagull-backend-v2/internal/hunt/cursor.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/cursor.go) · [Seagull-backend-v2/internal/hunt/scope.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/scope.go).

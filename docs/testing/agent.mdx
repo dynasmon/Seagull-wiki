@@ -1,0 +1,34 @@
+---
+title: 'Agent reliability and security testing'
+description: 'Current local-state/compatibility tests and the future failure evidence required for durable endpoint telemetry.'
+---
+
+## Current evidence
+
+`make verify` runs formatting, vet, module graph checks, unit/architecture/compatibility suites, race detection, and a build. Identity and key-provider tests exercise permissions, damaged state, stable identifiers, locking, and interrupted persistence. Runtime/module tests cover cancellation, essential failures, restart budgets, and shutdown behavior. Configuration tests enforce strict parsing and whole-candidate activation.
+
+Recorded compatibility fixtures contain actual protobuf requests and replies from a named backend revision. The agent suite fails if its pinned contract version has no recorded platform baseline. This is narrower and more useful than assuming every protobuf-compatible backend is behaviorally compatible.
+
+## Planned delivery fault matrix
+
+When admission, spool, and transport arrive, prove:
+
+- crash before and after source checkpoint advancement;
+- interruption during record persistence and acknowledgement persistence;
+- backend publication that succeeds partly but returns no ACK;
+- network loss, certificate expiry, permanent refusal, and incompatible schema;
+- duplicate/reordered replies and mismatched received counts;
+- disk exhaustion, corrupt records, bounded expiry, and restart recovery;
+- shutdown during collection, upload, and local reclamation.
+
+The expected safety property is retained/replayed data until an explicit durable success or observable loss policy applies. “The process restarted” alone is not a recovery test.
+
+## Security and production gates
+
+Fuzz parsers and boundary decoders with bounded input. Verify that collectors cannot reach network/key packages transitively. Exercise unsafe file ownership and symlink replacement. Native packages must later prove service privileges and lifecycle, and upgrades must prove signature and rollback behavior before they can be enabled.
+
+No absent component is claimed tested. The [agent roadmap](/docs/roadmap/agent) identifies where these acceptance requirements originate.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/Makefile](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/Makefile) · [Seagull-agent-v2/tests/compatibility/gateway_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/tests/compatibility/gateway_test.go) · [Seagull-agent-v2/tests/architecture/ownership_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/tests/architecture/ownership_test.go) · [Seagull-agent-v2/internal/identity/identity_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/identity/identity_test.go) · [Seagull-agent-v2/internal/pki/keyfiles_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/pki/keyfiles_test.go).

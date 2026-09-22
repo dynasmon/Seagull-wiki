@@ -1,0 +1,41 @@
+---
+title: 'Telemetry admission'
+description: 'How the gateway authenticates, bounds, validates, stamps, and durably admits telemetry.'
+---
+
+<FeatureStatus status="implemented" />
+
+The gateway serves `POST /v1/events` and `POST /v1/inventory` over mTLS. Both routes share agent admission, per-agent rate limiting, and aggregate capacity. Inventory does not grant a second resource budget.
+
+## Request sequence
+
+1. Obtain the agent ID from the leaf certificate in the verified chain.
+2. Look up the agent in the locally replayed admission roster. Unknown agents have no tenant and are refused.
+3. Enforce the per-agent rate and reserve bounded in-flight bytes and request capacity.
+4. Require a supported Protobuf content type and read within the body limit.
+5. Decode the batch, check protocol and schema versions, stamp authoritative identity/reception, and validate every record.
+6. Publish within the configured budget. Only a successful durable publication produces an ACK.
+
+The default listener is `0.0.0.0:8443`. The default request limit is 8 MiB, event batch limit 1,000, inventory record limit 64, and aggregate held-body limit 128 MiB. These are configuration defaults rather than capacity claims.
+
+## Authoritative fields
+
+`origin.agent_id` comes from TLS, `origin.tenant_id` from the roster, and reception metadata from the gateway. Client-supplied versions of those fields are replaced. Producer event/observation timestamps remain observations and are bounded by skew/age policy; they do not become trusted clock truth.
+
+## Refusal and retry
+
+| Signal                         | Meaning                         | Response                                            |
+| ------------------------------ | ------------------------------- | --------------------------------------------------- |
+| `agent_not_registered`         | Roster has no identity          | Register and bind through control plane             |
+| `agent_not_admitted`           | Registered but not admissible   | Inspect state and operator trail                    |
+| `rate_limited`                 | Per-agent budget exceeded       | Honor retry pacing                                  |
+| `gateway_at_capacity`          | Aggregate work bound reached    | Retain data; reduce pressure                        |
+| `unsupported_protocol_version` | Unsupported protocol            | Resolve compatibility; do not discard valid records |
+| `batch_body_too_large`         | Request exceeds body ceiling    | Split within supported record semantics             |
+| `backbone_unavailable`         | No successful durability result | Retain and replay, possibly duplicating records     |
+
+See [ACK semantics](/docs/architecture/event-lifecycle), [event contracts](/docs/contracts/event-model), and [ingestion troubleshooting](/docs/troubleshooting/ingestion). Never retimestamp old observations to get them past admission.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/ingest/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/http.go) · [Seagull-backend-v2/cmd/ingest-gateway/config.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/ingest-gateway/config.go) · [Seagull-backend-v2/internal/ingest/inventory.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/inventory.go).

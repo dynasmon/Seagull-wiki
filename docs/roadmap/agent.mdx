@@ -1,0 +1,40 @@
+---
+title: 'Agent milestones and target scope'
+description: 'The architecture backlog translated into a navigable roadmap without presenting cards as implemented features.'
+---
+
+<FeatureStatus status="target" />
+
+The local architecture plan `AGENTS-BACKLOG.md` defines target behavior and explicitly says it is not proof of implementation. The documentation repository records the hash of the reviewed plan in `sources/manifest.json` but does not publish the plan. Card numbers below identify requirements, not completion.
+
+## Milestones
+
+**M0 — Independently operable foundation:** repository isolation, reproducible builds, runtime/configuration, installation identity, protected key ownership, and evidence-backed compatibility. Several of these are present; a milestone label is not a blanket completion claim.
+
+**M1 — Core endpoint-to-detection path:** authentication collection, durable local admission, recoverable spool, secure transport, matched ACK, retries, and backend-visible analytical results. No end-to-end V2 agent pipeline exists yet.
+
+**M2 — Inventory:** collect complete supported kinds and preserve full-scan semantics through the independent inventory route. The backend is ready to project records; the endpoint collector remains planned.
+
+## Work areas
+
+| Cards      | Target                                                                      | Read                                                                                       |
+| ---------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| AG-001–004 | Repository/runtime/protocol/build foundations                               | [Agent architecture](/docs/agent/architecture), [compatibility](/docs/agent/compatibility) |
+| AG-005–009 | Identity, enrollment, PKI, key storage, forgery/replay/clone considerations | [Identity](/docs/agent/identity), [enrollment](/docs/security/enrollment)                  |
+| AG-010–014 | mTLS transport, spool, ACK/idempotency, pressure, connection/heartbeat      | [Spool](/docs/agent/spool), [delivery](/docs/agent/delivery)                               |
+| AG-015–019 | Modules, typed configuration, signed policy, privileges, self-monitoring    | [Collector runtime](/docs/agent/collectors), [configuration](/docs/agent/configuration)    |
+| AG-020–026 | Security collectors and resource governance                                 | [Telemetry roadmap](/docs/agent/telemetry)                                                 |
+| AG-027–030 | Tamper resistance, secret handling, confinement, diagnostics                | [Privileges](/docs/agent/privileges), [diagnostics](/docs/agent/diagnostics)               |
+| AG-031–033 | Native lifecycle, verified updates, fleet compatibility                     | [Fleet control](/docs/agent/policy-updates)                                                |
+| AG-034–035 | Authenticated typed command channel and restricted response                 | [Fleet control](/docs/agent/policy-updates)                                                |
+| AG-036–039 | Fuzzing, recovery/chaos, performance/soak, readiness gates                  | [Agent testing](/docs/testing/agent)                                                       |
+
+## Release profiles
+
+The plan distinguishes core maturity from expanded capabilities. Optional sensors, hardware-backed keys, automated bootstrap, or response functions must satisfy their own profile requirements before being advertised. A core source build does not implicitly deliver every planned collector or fleet feature.
+
+An internal event bus, storage technology for the spool, helper process, or update transport must be chosen only when its owner and failure semantics are justified. This site does not turn those options into invented deployed services.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md) · [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go).

@@ -1,0 +1,36 @@
+---
+title: 'Implement a platform change'
+description: 'Practical workflows for contracts, backend features, rules, API routes, and future agent collectors.'
+---
+
+## Add a wire field or record
+
+Change the canonical schema, regenerate committed bindings, run contracts verification and breaking checks, and publish the required contract release through the established project process. Update consumers explicitly. Never introduce a backend-only or agent-only competing envelope to avoid a contracts change.
+
+## Add a backend capability
+
+Choose a real owner and define narrow ports for infrastructure it needs. Keep domain types independent of broker/database drivers. Wire adapters in a composition root. Add a process only when independent scaling, lifecycle, workload, or trust justifies it.
+
+For a new consumer, define source topic/group, key affinity, bounded batches, retry classification, quarantine behavior, durable side effects, offset commit, shutdown, and replay. Tests must cover a crash after effects but before commit where relevant.
+
+## Add a detection
+
+Use the supported canonical fields and the [rule authoring workflow](/docs/detection/rules). Add meaningful cases. Verify state-window and grouping constraints for counts/sequences. Imported Sigma content remains a draft until its intended behavior is tested.
+
+## Add an API operation
+
+Use the correct query/control/ingest owner. Define a contract message where needed. A control route must declare its guard and perform tenant-aware authorization. Bound input and response work; use the owner's structured refusal model. Include the route in the generated documentation snapshot after implementation.
+
+## Add an agent collector
+
+No real collector exists yet, so this workflow is the target extension seam. Implement the module lifecycle boundary, submit observations through durable admission once that component exists, and keep network/key access out of modules. Define permissions, privacy, source checkpoint semantics, cancellation, restart behavior, resource bounds, and inventory completeness if relevant.
+
+Do not declare collection complete while it only emits to memory. The full milestone must prove source progress, spool recovery, transport, matched ACK, and backend visibility.
+
+## Add a frontend feature
+
+The V2 frontend is not scaffolded. Establish its actual build, API, and authentication architecture first. Do not document legacy frontend conventions as a mandatory V2 implementation. See [frontend status](/docs/frontend/architecture).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/tests/architecture/dependencies_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/architecture/dependencies_test.go) · [Seagull-agent-v2/tests/architecture/ownership_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/tests/architecture/ownership_test.go) · [Seagull-backend-v2/internal/control/server.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/server.go) · [Seagull-contracts/Makefile](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/Makefile).

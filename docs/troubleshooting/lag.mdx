@@ -1,0 +1,30 @@
+---
+title: 'Consumer lag keeps increasing'
+description: 'Symptoms, causes, diagnosis, resolution, and verification for consumer lag keeps increasing.'
+---
+
+## Symptoms
+
+Committed lag grows, query visibility falls behind, or the engine repeatedly rebuilds state.
+
+## Likely causes
+
+Slow/unavailable stores, refused broker commits, repeated dependency retries, state recovery after rebalance, incompatible activation, or more input than measured processing capacity. Partition counts and sole-reader requirements constrain scaling.
+
+## Diagnosis
+
+Compare input rate with durable output and commit progress. Read writer/engine errors before tuning. Inspect partition-held/moved and state-rebuild metrics; check whether a new replica invalidated a sole-reader declaration. Confirm retention still covers unprocessed work.
+
+## Resolution
+
+Restore the dependency first. Adjust resource/capacity only after measuring the bottleneck. Reduce needless rebalance churn. Scale consumers only where their partition/group semantics permit it. Do not add analysis replicas blindly for cross-agent temporal rules.
+
+## Verification
+
+Committed lag declines under a representative workload, writes remain durable, state activation is executable, and no required partitions or observations are silently skipped.
+
+Continue with [health and metrics](/docs/observability/health) and [failure semantics](/docs/architecture/failure-model).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/broker/metrics.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/metrics.go) · [Seagull-backend-v2/internal/broker/recovery.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/recovery.go) · [Seagull-backend-v2/docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md).

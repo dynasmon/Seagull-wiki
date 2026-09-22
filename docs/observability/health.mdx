@@ -1,0 +1,37 @@
+---
+title: 'Health, readiness, logs, and metrics'
+description: 'Observe independent process health and follow committed work through the platform.'
+---
+
+## Operational surfaces
+
+Long-running backend services expose `/healthz`, `/readyz`, and `/metrics` through their operations listener. It defaults to `127.0.0.1:9100`; exposing it outside a process/container network requires explicit deployment configuration. A healthy process is not necessarily ready to perform its dependency-bound work.
+
+Readiness reports component outcomes, caches results for a bounded interval, and reports draining during shutdown. Do not expose unauthenticated operational details publicly to simplify scraping.
+
+## Diagnose progress, not only uptime
+
+| Boundary        | Signals to compare                                                  | Interpretation                                           |
+| --------------- | ------------------------------------------------------------------- | -------------------------------------------------------- |
+| Admission       | Accepted/rejected batches, publish duration, held bytes/requests    | Is work refused or waiting on broker durability?         |
+| Broker consumer | Committed lag, fetch/commit failures, partitions held/moved         | Is durable downstream progress keeping up?               |
+| Analysis        | Outcome/refusal counts, decision delay, evaluations/matches         | Are supported events reaching an executable ruleset?     |
+| Stateful rules  | Keys versus ceiling, observations, rebuild work, refused activation | Is the engine answering within its declared state model? |
+| Persistence     | Write duration/failures, batches, quarantines                       | Is queryable evidence progressing?                       |
+| Advisories      | Last complete sync versus attempted check, feed source age          | Is intelligence current and complete?                    |
+
+Metric families use the Seagull registry namespace and capability subsystems. Exact names and help text are in the [generated metric reference](/docs/reference/generated/metrics). Keep labels bounded; agent IDs and event IDs must not become metric labels.
+
+## Lag semantics
+
+Consumer lag is measured from committed processing position to the partition end. A fetched record is not processed merely because the client received it. Commit failures can leave durable effects ahead of recorded progress and cause replay on recovery.
+
+State rebuilding intentionally reads old records. Partition movement plus increased rebuild work during scaling can explain temporary load without indicating duplicate endpoint activity.
+
+## Agent observability
+
+Today the agent emits structured startup, privilege, core-dump, configuration, and stop diagnostics. Spool depth, upload failures, collector throughput, and heartbeat monitoring remain target signals until those components exist. See [agent diagnostics](/docs/agent/diagnostics) and avoid inventing metrics endpoints for the current executable.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/platform/ops/server.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/platform/ops/server.go) · [Seagull-backend-v2/internal/platform/health/health.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/platform/health/health.go) · [Seagull-backend-v2/internal/broker/metrics.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/metrics.go) · [Seagull-backend-v2/internal/ingest/metrics.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/metrics.go) · [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go).

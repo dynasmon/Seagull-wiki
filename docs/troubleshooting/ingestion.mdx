@@ -1,0 +1,30 @@
+---
+title: 'Events are accepted but do not appear'
+description: 'Symptoms, causes, diagnosis, resolution, and verification for events are accepted but do not appear.'
+---
+
+## Symptoms
+
+The producer received a successful HTTP exchange, but a hunt has no matching event or detection.
+
+## Likely causes
+
+The reply was not a full durable ACK; the event writer is behind; the query uses the wrong tenant/time range; the record was quarantined; or the event simply does not match a rule. Inventory uses a separate route/store.
+
+## Diagnosis
+
+Confirm ACK fields and count. Check gateway `batch_admitted`, event-writer logs and committed lag, migration status, and quarantine metrics. Compare event time with the half-open query window. Confirm the query certificate organizations include the stamped tenant.
+
+## Resolution
+
+Restore the failing broker/store boundary, resolve a permanent-record refusal, or correct the query scope/window. Preserve producer IDs and timestamps when retrying. Do not advance consumer offsets to hide a growing backlog.
+
+## Verification
+
+A known development probe event is durably acknowledged and then queryable in its intended tenant. Evaluate detection separately against the actual active ruleset.
+
+Continue with [health and metrics](/docs/observability/health) and [failure semantics](/docs/architecture/failure-model).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/ingest/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/http.go) · [Seagull-backend-v2/internal/broker/consumer.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/consumer.go) · [Seagull-backend-v2/internal/hunt/scope.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/scope.go).

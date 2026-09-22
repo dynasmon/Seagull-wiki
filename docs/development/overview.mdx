@@ -1,0 +1,37 @@
+---
+sidebar_position: 1
+title: 'Developer onboarding'
+description: 'Clone and build independent repositories, identify capability owners, and run the relevant engineering gates.'
+---
+
+## Choose the owning repository
+
+Use [repository boundaries](/docs/architecture/repositories) to decide where a change belongs. Protocol changes belong in contracts; endpoint runtime/collection belongs in agent; backend processing and control belong in backend; documentation is independent. Avoid changes in a sibling just to make a local checkout compile.
+
+Clone only the repositories you need, using the actual project GitHub remotes. Private access uses your existing authenticated Git setup. Backend and agent import published contracts rather than a relative filesystem path. The module file is authoritative for the toolchain and version.
+
+## First working loop
+
+| Repository    | Initial gate                                 | Additional evidence                                                        |
+| ------------- | -------------------------------------------- | -------------------------------------------------------------------------- |
+| Backend       | `make verify`, `make build`                  | `make test-integration`, `make test-load`, `make vulncheck` where relevant |
+| Agent         | `make verify`                                | `make vulncheck`; compatibility/failure tests for changed behavior         |
+| Contracts     | `make verify`, `make breaking`               | Consumer compatibility against released bindings                           |
+| Documentation | `docker compose run --rm docs npm run check` | Production image and browser suite                                         |
+| V2 frontend   | No build yet                                 | Establish implementation and CI before claiming support                    |
+
+## Read before changing behavior
+
+Inspect the owning package, tests, accepted ADRs, contracts, configuration, and composition root. For data-plane work, identify the durable side effect and commit point. For control-plane work, identify authentication, permission, tenant scope, and audit trail. For stateful work, identify partition ownership and recovery.
+
+Do not create a generic helper or new process before searching for an existing owner. Backend architecture tests enforce dependency direction, and agent tests inspect transitive boundaries across build tags.
+
+## Debug at the boundary
+
+Use structured logs and relevant metrics, then reproduce with the smallest meaningful test. A broker outage, refusal, store error, and state activation rejection are different failure classes. Avoid weakening TLS or changing offset commits to make a local test pass.
+
+Read [implementation workflows](/docs/development/workflows), [testing](/docs/testing/strategy), and [contribution expectations](/docs/contributing/guide) for the next step.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/Makefile](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/Makefile) · [Seagull-agent-v2/Makefile](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/Makefile) · [Seagull-contracts/Makefile](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/Makefile) · [Seagull-backend-v2/tests/architecture/dependencies_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/architecture/dependencies_test.go).

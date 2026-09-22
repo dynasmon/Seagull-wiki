@@ -1,0 +1,744 @@
+---
+title: "Backend operational reference"
+description: "Backend operational reference reproduced from the reviewed backend source."
+---
+
+:::info Source snapshot
+This is the maintainer reference at the reviewed baseline. Historical measurements are not production guarantees. Current source declarations take precedence over prose; see [configuration](/docs/configuration/overview).
+:::
+
+
+Every setting each process reads, the acknowledgement contract an agent depends
+on, the topic topology, and the shape of the telemetry store. The reasoning
+behind these choices lives in [the decision records](/docs/architecture/decisions/); this file is
+what to reach for when running the platform.
+
+## Configuration
+
+Every setting is an environment variable. An empty value counts as unset,
+because Compose renders unset variables as empty strings. Any variable can be
+read from a file instead by adding the `_FILE` suffix, which is how secrets
+reach a container without going through the environment.
+
+Startup reports every configuration problem at once and then exits:
+
+```text
+ingest-gateway: invalid configuration: SEAGULL_BACKBONE_BROKERS: is required
+SEAGULL_GATEWAY_AGENT_CA: is required
+SEAGULL_GATEWAY_TLS_CERT: is required
+SEAGULL_GATEWAY_TLS_KEY: is required
+```
+
+### Shared by every process
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_LOG_LEVEL` | `info` | `debug`, `info`, `warn` or `error` |
+| `SEAGULL_LOG_FORMAT` | `json` | `json` or `text` |
+| `SEAGULL_OPS_ADDRESS` | `127.0.0.1:9100` | where `/healthz`, `/readyz` and `/metrics` listen |
+| `SEAGULL_SHUTDOWN_TIMEOUT` | `20s` | how long a graceful stop may take |
+| `SEAGULL_READINESS_CACHE` | `5s` | how long a readiness verdict is reused |
+| `SEAGULL_READINESS_TIMEOUT` | `2s` | budget for a single readiness check |
+
+The operational listener binds to loopback unless a deployment says otherwise.
+A container that needs to be scraped sets `SEAGULL_OPS_ADDRESS` explicitly, so
+exposing metrics and readiness is always a visible decision.
+
+### ingest-gateway
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_GATEWAY_ADDRESS` | `0.0.0.0:8443` | the mutual TLS listener agents connect to |
+| `SEAGULL_GATEWAY_TLS_CERT` | required | server certificate |
+| `SEAGULL_GATEWAY_TLS_KEY` | required | server private key |
+| `SEAGULL_GATEWAY_AGENT_CA` | required | authority that agent certificates must chain to |
+| `SEAGULL_GATEWAY_MAX_BODY` | `8MiB` | ceiling on a batch body, counted as it is read |
+| `SEAGULL_GATEWAY_MAX_INFLIGHT_BYTES` | `128MiB` | request bytes held at once across every caller |
+| `SEAGULL_GATEWAY_MAX_INFLIGHT_REQUESTS` | `512` | requests held at once across every caller |
+| `SEAGULL_GATEWAY_MAX_EVENTS_PER_BATCH` | `1000` | ceiling on events in one batch |
+| `SEAGULL_GATEWAY_MAX_RECORDS_PER_BATCH` | `64` | ceiling on inventory records in one batch, alongside the contract's 20,000 items |
+| `SEAGULL_GATEWAY_PUBLISH_TIMEOUT` | `10s` | budget for making a batch durable |
+| `SEAGULL_GATEWAY_RATE_PER_SECOND` | `200` | per-agent batch budget, `0` disables it |
+| `SEAGULL_GATEWAY_RATE_BURST` | `400` | per-agent burst |
+| `SEAGULL_GATEWAY_RATE_TRACKED_AGENTS` | `10000` | how many agents the limiter remembers |
+| `SEAGULL_GATEWAY_ID` | `ingest-gateway` | recorded on every admitted event |
+| `SEAGULL_GATEWAY_START_TIMEOUT` | `30s` | how long it will spend reading the agent roster before it gives up |
+| `SEAGULL_GATEWAY_ROSTER_RECORDS` | `500` | admission records read per fetch |
+| `SEAGULL_EVENT_MAX_CLOCK_SKEW` | `5m` | how far ahead of the platform clock an event may be |
+| `SEAGULL_EVENT_MAX_AGE` | `168h` | how old an event may be and still be admitted |
+| `SEAGULL_INVENTORY_MAX_CLOCK_SKEW` | `5m` | how far ahead of the platform clock a scan may be |
+| `SEAGULL_INVENTORY_MAX_AGE` | `720h` | how old a scan may be and still be admitted |
+
+The batch ceiling is measured, not chosen. No event in a batch is published until
+every event in it has been decoded and validated, so a larger batch is a larger
+body that must be fully materialised before one byte reaches the backbone. At a
+thousand the gateway sustains 727k events/s with a p99 of 139ms; at ten thousand
+it sustains 300k with a p99 of three seconds. `make test-load` is where those
+numbers come from.
+
+The gateway serves two routes on one listener: `POST /v1/events` and
+`POST /v1/inventory`. They stand behind the same certificate, the same registry
+answer, the same rate limiter and the same capacity bound, so a collector cannot
+buy a second budget by sending inventory. A scan may be older than an event may
+be, because an asset that was offline for a fortnight sends what it saw while it
+was.
+
+### The backbone, shared by both halves of the data plane and the migrator
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_BACKBONE_BROKERS` | required | comma separated broker addresses |
+| `SEAGULL_BACKBONE_EVENTS_TOPIC` | `security.events.raw` | admitted telemetry |
+| `SEAGULL_BACKBONE_EVENTS_PARTITIONS` | `12` | how far per-agent ordering spreads |
+| `SEAGULL_BACKBONE_EVENTS_RETENTION` | `168h` | how far back a replay can reach |
+| `SEAGULL_BACKBONE_QUARANTINE_TOPIC` | `security.events.quarantine` | refused records |
+| `SEAGULL_BACKBONE_DETECTIONS_TOPIC` | `security.detections` | what the rules decided |
+| `SEAGULL_BACKBONE_DETECTIONS_QUARANTINE_TOPIC` | `security.detections.quarantine` | records the detection writer refused |
+| `SEAGULL_BACKBONE_INVENTORY_TOPIC` | `security.inventory.raw` | what an asset was observed to have |
+| `SEAGULL_BACKBONE_INVENTORY_PARTITIONS` | `6` | how far per-asset ordering spreads |
+| `SEAGULL_BACKBONE_INVENTORY_RETENTION` | `720h` | how far back the projection can be rebuilt |
+| `SEAGULL_BACKBONE_INVENTORY_QUARANTINE_TOPIC` | `security.inventory.quarantine` | records the projector refused |
+| `SEAGULL_BACKBONE_ADVISORIES_TOPIC` | `security.advisories` | every advisory the platform holds, and the freshness of each feed |
+| `SEAGULL_BACKBONE_ADVISORIES_QUARANTINE_TOPIC` | `security.advisories.quarantine` | records the advisory writer refused |
+| `SEAGULL_BACKBONE_ADVISORIES_QUARANTINE_PARTITIONS` | `1` | |
+| `SEAGULL_BACKBONE_ADVISORIES_QUARANTINE_RETENTION` | `720h` | |
+| `SEAGULL_BACKBONE_RULESETS_TOPIC` | `security.rulesets` | published rulesets and the pointer at the one to run |
+| `SEAGULL_BACKBONE_QUARANTINE_PARTITIONS` | `3` | |
+| `SEAGULL_BACKBONE_QUARANTINE_RETENTION` | `720h` | |
+| `SEAGULL_BACKBONE_REPLICAS` | `1` | replication factor of every topic |
+| `SEAGULL_BACKBONE_MIN_INSYNC_REPLICAS` | `replicas/2 + 1` | replicas that must be in sync for a write to be acknowledged |
+| `SEAGULL_BACKBONE_TLS` | `false` | encrypt the connection to the brokers |
+| `SEAGULL_BACKBONE_TLS_CA` | unset | authority the brokers must chain to; the system pool when unset |
+| `SEAGULL_BACKBONE_TLS_CERT`, `SEAGULL_BACKBONE_TLS_KEY` | unset | client certificate for mutual TLS to the brokers |
+| `SEAGULL_BACKBONE_TLS_SERVER_NAME` | unset | name the broker certificate must carry |
+| `SEAGULL_BACKBONE_SASL_MECHANISM` | `none` | `scram-sha-256` or `scram-sha-512` |
+| `SEAGULL_BACKBONE_SASL_USER`, `SEAGULL_BACKBONE_SASL_PASSWORD` | unset | credentials for that mechanism |
+
+Every process reads the same declaration: `backbone-migrator` applies it, and
+the gateway and the writer verify it before they serve.
+
+Plaintext and unauthenticated is a development posture, written down rather than
+inherited. A deployment turns encryption and authentication on together:
+authenticating without TLS is refused, because a password on a plaintext
+connection is a password given away. Acknowledging on every in-sync replica is
+only a durability statement alongside `SEAGULL_BACKBONE_MIN_INSYNC_REPLICAS`:
+with one replica in sync, acks from all of them is acks from one. Redpanda
+accepts the setting and does not report it back, so the migrator declares it on
+every run and reports drift only for settings a broker answers for.
+
+### analysis-engine
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_ANALYSIS_CONSUMER_GROUP` | `analysis-engine` | the consumer group that owns its offsets |
+| `SEAGULL_DETECTION_RULES` | `/etc/seagull/rules` | the rule tree it starts on and falls back to; it does not start without one |
+| `SEAGULL_ANALYSIS_RULESET_RECORDS` | `256` | ruleset records read per fetch |
+| `SEAGULL_ANALYSIS_BATCH_EVENTS` | `5000` | records per poll |
+| `SEAGULL_ANALYSIS_FETCH_MAX_WAIT` | `1s` | how long a poll waits before returning short |
+| `SEAGULL_ANALYSIS_START_TIMEOUT` | `30s` | budget for verifying the topology before serving |
+| `SEAGULL_DETECTION_PUBLISH_TIMEOUT` | `30s` | budget for making one batch of detections durable |
+| `SEAGULL_DETECTION_RETRY_DELAY` | `1s` | first wait after the backbone refuses a batch of detections |
+| `SEAGULL_DETECTION_RETRY_DELAY_MAX` | `30s` | ceiling that wait doubles towards |
+| `SEAGULL_DETECTION_STATE_WINDOW` | `1h` | the longest window a counting rule may ask for, and what a restart costs to rebuild |
+| `SEAGULL_DETECTION_STATE_OBSERVATIONS` | `128` | events one key holds; past it the count is a floor and says so |
+| `SEAGULL_DETECTION_STATE_KEYS` | `4096` | keys held at once; at the ceiling a new key is refused rather than an old one evicted |
+| `SEAGULL_DETECTION_STATE_SOLE_READER` | `false` | declares that this engine reads the whole stream, which is what makes a rule counting across agents answerable |
+
+State held in a process does not move with a partition, so whenever the group
+hands the engine one — at startup and at every rebalance — the engine is put back
+to the first record inside the window its running rules need and reads forward
+from there. That is what `SEAGULL_DETECTION_STATE_WINDOW` costs on a restart,
+widened by `SEAGULL_EVENT_MAX_CLOCK_SKEW` because a window is event time and the
+stream is ordered by arrival. A deployment running no stateful rule reads
+nothing back, and a reader further behind than the window keeps its position
+rather than being moved forward onto telemetry nobody has decided.
+`backbone_state_rebuild_partitions_total` and
+`backbone_state_rebuild_records_total` say how often that happened and how much
+it cost; `backbone_partitions_held` and `backbone_partitions_moved_total` say
+what the group is doing.
+
+`security.events.raw` is keyed by the agent. A rule whose `group_by` includes
+the agent is exact at any number of replicas; one that groups across agents is
+exact only where a single reader holds the whole stream, which is what
+`SEAGULL_DETECTION_STATE_SOLE_READER` declares. The claim is checked against the
+assignment on every rebalance, and a reader that loses the stream it claimed
+stops rather than reporting a share of what such a rule was written to find. See
+[ADR 23](/docs/architecture/decisions/state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back).
+
+The rule tree is the bootstrap, not the source of truth. The engine runs it
+until `security.rulesets` names a published ruleset to run, and from then on the
+log wins — which is what lets an engine keep detecting when no control plane is
+reachable. ADR 15.
+
+A rule may count what it matches, which turns the same match into a threshold:
+
+```yaml
+count:
+  at_least: 20                # at least 2, and never more than one key holds
+  within: 1m                  # event time, never the clock
+  group_by:                   # what makes two matching events the same thing
+    - authentication.network.source.ip
+    - origin.agent_id
+```
+
+The tenant is always part of the grouping and is never written; grouping by the
+class, the tenant or the event identifier is refused. A count above what
+`SEAGULL_DETECTION_STATE_OBSERVATIONS` holds, or a window longer than
+`SEAGULL_DETECTION_STATE_WINDOW`, stops the process at startup rather than
+running a rule that could never fire, and the same check runs again on every
+ruleset the log names active: a published ruleset this deployment cannot answer
+is refused whole and counted as
+`ruleset_activations_total{outcome="refused"}`, leaving the last one it could
+answer running. Rules that do not run are not held to it, so a translated Sigma
+catalogue of drafts still ships. Past its threshold a rule decides once per
+matching event and never more — nothing resets when a rule fires — so folding
+those into one piece of work is the alerting document's job.
+`detection_state_observations_total` says what became of every event a counting
+rule matched, and `detection_state_keys` against `detection_state_key_ceiling`
+is the headroom. See
+[ADR 19](/docs/architecture/decisions/a-rule-that-counts-decides-on-a-window).
+
+A rule may instead order what it matches, which turns a set of matches into a
+story. A rule carries a `sequence` or a `match` and never both, because the
+stages are what it matches with:
+
+```yaml
+sequence:
+  within: 5m                  # event time, never the clock
+  group_by:                   # what makes two events part of the same story
+    - authentication.network.source.ip
+    - origin.agent_id
+  stages:                     # between 2 and 8, satisfied in this order
+    - name: a failed password
+      match:
+        field: authentication.outcome
+        equals: failure
+    - name: one that was accepted
+      match:
+        field: authentication.outcome
+        equals: success
+```
+
+The window is bounded by `SEAGULL_DETECTION_STATE_WINDOW` and a story of more
+stages than `SEAGULL_DETECTION_STATE_OBSERVATIONS` holds stops the process at
+startup, exactly as an unreachable threshold does. Ordering is event time, so an
+event that arrives after a later stage still lands where it happened and still
+completes the story, and one older than the window is refused rather than folded
+into a window reaching further back than the rule asked for. A story is decided
+once per window that holds it rather than once per event that keeps it true.
+`detection_sequences_unordered_total` counts the stories whose events were timed
+by clocks disagreeing by more than the story itself lasted; the detection carries
+that spread, so an analyst can see the order was not established by the data. See
+[ADR 20](/docs/architecture/decisions/a-sequence-is-decided-by-the-window-that-holds-it).
+
+### event-writer
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_WRITER_CONSUMER_GROUP` | `event-writer` | the consumer group that owns the offsets |
+| `SEAGULL_WRITER_BATCH_EVENTS` | `5000` | records per poll, and per store batch |
+| `SEAGULL_WRITER_FETCH_MAX_WAIT` | `1s` | how long a poll waits before returning short |
+| `SEAGULL_WRITER_RETRY_DELAY` | `1s` | first delay before a batch is retried |
+| `SEAGULL_WRITER_RETRY_DELAY_MAX` | `30s` | ceiling the delay backs off to |
+
+### event-writer and store-migrator
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_EVENT_STORE_ADDRESS` | required | the store's native protocol address, `clickhouse:9000` |
+| `SEAGULL_EVENT_STORE_DATABASE` | `seagull` | the database holding `security_events` |
+| `SEAGULL_EVENT_STORE_USER` | `seagull` | |
+| `SEAGULL_EVENT_STORE_PASSWORD` | empty | read from `..._FILE` in a deployment |
+| `SEAGULL_EVENT_STORE_TIMEOUT` | `30s` | budget for one write attempt, and to dial |
+
+The connection to the store carries no TLS, deliberately: the gateway already
+reaches Redpanda in the clear on the same internal network, and securing one leg
+of the data plane and not the other would describe a boundary that is not there.
+
+### detection-writer
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_DETECTION_WRITER_CONSUMER_GROUP` | `detection-writer` | the consumer group that owns the offsets |
+| `SEAGULL_DETECTION_WRITER_BATCH_DETECTIONS` | `500` | records per poll, and per store batch |
+| `SEAGULL_DETECTION_WRITER_FETCH_MAX_WAIT` | `1s` | how long a poll waits before returning short |
+| `SEAGULL_DETECTION_WRITER_RETRY_DELAY` | `1s` | first delay before a batch is retried |
+| `SEAGULL_DETECTION_WRITER_RETRY_DELAY_MAX` | `30s` | ceiling the delay backs off to |
+| `SEAGULL_DETECTION_STORE_ADDRESS` | required | the store's native protocol address, `clickhouse:9000` |
+| `SEAGULL_DETECTION_STORE_DATABASE` | `seagull` | the database holding `security_detections` |
+| `SEAGULL_DETECTION_STORE_USER` | `seagull` | |
+| `SEAGULL_DETECTION_STORE_PASSWORD` | empty | read from `..._FILE` in a deployment |
+| `SEAGULL_DETECTION_STORE_TIMEOUT` | `30s` | budget for one write attempt, and to dial |
+
+A batch is smaller than the event writer's because detections are rarer than the
+telemetry they are made from, and waiting to fill five thousand of them would
+keep the first one out of the store for longer than anyone would accept. The
+store settings are the writer's own and point at the same server by default: two
+processes choosing the same adapter is not the same as sharing one.
+
+### inventory-projector
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_INVENTORY_PROJECTOR_CONSUMER_GROUP` | `inventory-projector` | the consumer group that owns the offsets |
+| `SEAGULL_INVENTORY_PROJECTOR_BATCH_RECORDS` | `64` | records per poll, and per store batch |
+| `SEAGULL_INVENTORY_PROJECTOR_FETCH_MAX_WAIT` | `1s` | how long a poll waits before returning short |
+| `SEAGULL_INVENTORY_PROJECTOR_RETRY_DELAY` | `1s` | first delay before a batch is retried |
+| `SEAGULL_INVENTORY_PROJECTOR_RETRY_DELAY_MAX` | `30s` | ceiling the delay backs off to |
+| `SEAGULL_INVENTORY_STORE_ADDRESS` | required | the store's native protocol address, `clickhouse:9000` |
+| `SEAGULL_INVENTORY_STORE_DATABASE` | `seagull` | the database holding `asset_inventory` |
+| `SEAGULL_INVENTORY_STORE_USER` | `seagull` | |
+| `SEAGULL_INVENTORY_STORE_PASSWORD` | empty | read from `..._FILE` in a deployment |
+| `SEAGULL_INVENTORY_STORE_TIMEOUT` | `30s` | budget for one write attempt, and to dial |
+
+A batch is counted in records and not in items, and it is small because each
+record is a whole scan: sixty-four of them can be half a million packages. A
+record is folded whole or refused whole — one item the store cannot hold takes
+its scan with it, because a scan whose items never landed would retire
+everything the record was about to confirm.
+
+### advisory-importer
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_ADVISORY_FEEDS` | required | the distributions whose advisories are read: any of `Debian`, `Ubuntu`, `Alpine`, `Rocky Linux`, `AlmaLinux` |
+| `SEAGULL_ADVISORY_OSV_EXPORT` | `https://osv-vulnerabilities.storage.googleapis.com` | OSV's export, or a mirror laid out the same way; https only |
+| `SEAGULL_ADVISORY_OSV_CA` | unset | the authority a mirror is signed by; the system pool when unset |
+| `SEAGULL_ADVISORY_SYNC_INTERVAL` | `1h` | how often a feed is asked what changed |
+| `SEAGULL_ADVISORY_SYNC_RETRY_DELAY` | `1m` | first delay before a feed that did not complete is asked again, backing off to the interval |
+| `SEAGULL_ADVISORY_FETCH_ATTEMPTS` | `3` | times one request to an unreachable or busy origin is made before the attempt stops |
+| `SEAGULL_ADVISORY_FETCH_BACKOFF` | `1s` | first delay between those requests |
+| `SEAGULL_ADVISORY_FETCH_TIMEOUT` | `30s` | budget for one request |
+| `SEAGULL_ADVISORY_FETCH_CONCURRENCY` | `8` | records fetched at once, across every feed |
+| `SEAGULL_ADVISORY_PUBLISH_BATCH` | `64` | advisories published to the backbone at once |
+| `SEAGULL_ADVISORY_MAX_INDEX_BYTES` | `64MiB` | ceiling on one feed's index |
+| `SEAGULL_ADVISORY_MAX_RECORD_BYTES` | `4MiB` | ceiling on one record as the feed serves it |
+| `SEAGULL_ADVISORY_REPLAY_RECORDS` | `1000` | records read at once when the log is read back at startup |
+| `SEAGULL_ADVISORY_START_TIMEOUT` | `30s` | budget for verifying the topic before anything else |
+
+The one process that reaches the internet, and it holds no store: what a feed
+says reaches the platform as a validated advisory on `security.advisories` and by
+no other way. It reads the whole topic back before it asks a feed anything, so it
+knows what it holds without a disk, then asks each feed's index what changed with
+`If-None-Match` and fetches only the records listed as newer than what it holds.
+An origin that cannot be reached is asked again a few times and then the attempt
+stops, publishing what it read and saying what it still owes; the platform's copy
+of that feed stays exactly as fresh as it was. A record that is not an advisory is
+refused alone, counted, and asked for again only once the feed changes it.
+
+Every feed is followed on its own. The first read of one is its whole index —
+Alpine's 4,657 records take a few minutes and Debian's, fourteen times as many,
+close to forty at the default concurrency — which is why no feed is followed
+unless a deployment names it.
+
+### advisory-writer
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_ADVISORY_WRITER_CONSUMER_GROUP` | `advisory-writer` | the consumer group that owns the offsets |
+| `SEAGULL_ADVISORY_WRITER_BATCH_RECORDS` | `512` | records per poll, and per store batch |
+| `SEAGULL_ADVISORY_WRITER_FETCH_MAX_WAIT` | `1s` | how long a poll waits before returning short |
+| `SEAGULL_ADVISORY_WRITER_RETRY_DELAY` | `1s` | first delay before a batch is retried |
+| `SEAGULL_ADVISORY_WRITER_RETRY_DELAY_MAX` | `30s` | ceiling the delay backs off to |
+| `SEAGULL_ADVISORY_STORE_ADDRESS` | required | the store's native protocol address, `clickhouse:9000` |
+| `SEAGULL_ADVISORY_STORE_DATABASE` | `seagull` | the database holding `vulnerability_advisories` |
+| `SEAGULL_ADVISORY_STORE_USER` | `seagull` | |
+| `SEAGULL_ADVISORY_STORE_PASSWORD` | empty | read from `..._FILE` in a deployment |
+| `SEAGULL_ADVISORY_STORE_TIMEOUT` | `30s` | budget for one write attempt, and to dial |
+
+An advisory is stored whole or refused whole: a version whose packages never
+landed would read as affecting nothing, which is the one wrong answer a matcher
+cannot tell from a right one.
+
+### alert-writer
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_ALERT_WRITER_CONSUMER_GROUP` | `alert-writer` | the consumer group that owns the offsets |
+| `SEAGULL_ALERT_WRITER_BATCH_DETECTIONS` | `500` | records per poll, and per store batch |
+| `SEAGULL_ALERT_WRITER_FETCH_MAX_WAIT` | `1s` | how long a poll waits before returning short |
+| `SEAGULL_ALERT_WRITER_RETRY_DELAY` | `1s` | first delay before a batch is retried |
+| `SEAGULL_ALERT_WRITER_RETRY_DELAY_MAX` | `30s` | ceiling the delay backs off to |
+| `SEAGULL_ALERT_SEVERITY_FLOOR` | `medium` | how much a detection has to matter before it becomes somebody's work |
+| `SEAGULL_ALERTING_DOCUMENT` | empty | how alerts fold and which never become work; the built-in fold is used when unset |
+
+It reads `security.detections` in a group of its own, beside `detection-writer`
+and never through it: a relational store nobody can reach stops alerts being
+opened and does not stop detections being stored. A detection below the floor is
+still stored, still queryable and still part of a hunt; it just does not become
+work. It quarantines nothing — `detection-writer` already writes exactly the
+records this cannot use to the detection quarantine, verbatim — and instead
+steps over them, counted by reason in `alertstore_skipped_total`.
+
+The alerting document says what an alert is keyed by, how long one absorbs what
+shares its key, how long a closed one silences what follows it, and which
+detections never become work at all. Without one the built-in fold applies:
+`[rule, agent]` over fifteen minutes, and no cooldown, because a cooldown is the
+only one of the three that can keep an operator from hearing about activity they
+have not decided about.
+
+```yaml
+schema_version: 1
+
+defaults:
+  key: [rule, agent]     # a key must always name the rule
+  window: 15m            # how long an open alert absorbs what shares its key
+  cooldown: 0s           # how long a closed one silences what follows it
+
+rules:
+  - id: ssh.failed_password_from_outside
+    key: [rule, agent, "evidence:authentication.source.ip"]
+    window: 1h
+    cooldown: 30m
+
+suppressions:
+  - rule: ssh.failed_password_from_outside
+    when:
+      agent: [scanner-01]
+    reason: our own credentialed scanner   # required
+    until: 2026-12-31T00:00:00Z            # optional, and worth writing
+```
+
+A key is a list of parts: `rule`, `agent`, `class`, `severity`, or
+`evidence:<contract field path>`. The tenant is always in the key and is never
+written. The same vocabulary is the suppression selector. Every window is
+measured in **event time**, so replaying a batch decides what it decided the
+first time. `alertstore_alerts_total` counts what became of every detection —
+`raised`, `folded`, `repeated`, `cooled_down` — and `alertstore_suppressed_total`
+is labelled by rule and by the reason written down. See
+[ADR 17](/docs/architecture/decisions/noise-is-removed-from-the-alert-and-never-from-the-detection).
+
+### alert-writer, control-api and control-migrator
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_ALERT_STORE_ADDRESS` | required | PostgreSQL address, `postgres:5432` |
+| `SEAGULL_ALERT_STORE_DATABASE` | `seagull` | the database holding alerts, incidents and agents with their trails |
+| `SEAGULL_ALERT_STORE_USER` | `seagull` | |
+| `SEAGULL_ALERT_STORE_PASSWORD` | empty | read from `..._FILE` in a deployment |
+| `SEAGULL_ALERT_STORE_SSLMODE` | `prefer` | `disable` only on a network you already trust |
+| `SEAGULL_ALERT_STORE_MAX_CONNECTIONS` | `8` | connections one process will hold |
+| `SEAGULL_ALERT_STORE_TIMEOUT` | `30s` | budget for one statement |
+| `SEAGULL_ALERT_STORE_CONNECT_TIMEOUT` | `10s` | budget to dial |
+
+`control-migrator` applies the schema and exits, as `store-migrator` does for
+ClickHouse. The variables keep the `SEAGULL_ALERT_STORE_` prefix they were named
+under; the store now holds three kinds of record and the migrator is named for
+the plane rather than for one of them. Both processes that read the store verify the schema before they
+serve and refuse to run against one behind what they ship. The writer only ever
+inserts and the control plane only ever updates, which is what keeps a replayed
+detection away from somebody's triage.
+
+### control-api
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_CONTROL_API_ADDRESS` | `127.0.0.1:8445` | the API listener |
+| `SEAGULL_CONTROL_API_TLS_CERT` | required | server certificate |
+| `SEAGULL_CONTROL_API_TLS_KEY` | required | server private key |
+| `SEAGULL_CONTROL_API_CALLER_CA` | required | authority that issues caller certificates |
+| `SEAGULL_CONTROL_API_POLICY` | required | the policy document to pin to |
+| `SEAGULL_CONTROL_API_SESSION_KEY` | empty | key sessions are signed with; drawn at random when unset |
+| `SEAGULL_CONTROL_API_SESSION_LIFETIME` | `15m` | how long a session lasts |
+| `SEAGULL_CONTROL_API_SESSIONS_PER_CALLER` | `8` | sessions one subject may hold at once |
+| `SEAGULL_CONTROL_API_SESSIONS_MAX` | `4096` | sessions the process will hold |
+| `SEAGULL_CONTROL_API_RATE_PER_SECOND` | `20` | per-caller request budget |
+| `SEAGULL_CONTROL_API_RATE_BURST` | `40` | burst above that budget |
+| `SEAGULL_CONTROL_API_START_TIMEOUT` | `30s` | how long it will spend reading the ruleset log before it gives up |
+| `SEAGULL_CONTROL_API_RULESET_RECORDS` | `256` | ruleset records read per fetch |
+| `SEAGULL_CONTROL_API_ANNOUNCE_INTERVAL` | `30s` | how often it republishes agent decisions the backbone has not taken |
+| `SEAGULL_CONTROL_API_ANNOUNCE_BATCH` | `100` | outstanding decisions carried per sweep |
+| `SEAGULL_CONTROL_API_LIVENESS_HORIZON` | `720h` | how far back it looks for when an agent was last heard from |
+| `SEAGULL_CONTROL_TELEMETRY_STORE_ADDRESS` | required | ClickHouse address, read only, for that one question |
+| `SEAGULL_CONTROL_TELEMETRY_STORE_DATABASE` | `seagull` | |
+| `SEAGULL_CONTROL_TELEMETRY_STORE_USER` | `seagull` | |
+| `SEAGULL_CONTROL_TELEMETRY_STORE_PASSWORD` | empty | read from `..._FILE` in a deployment |
+
+The control plane authenticates a caller by certificate, so it has no plaintext
+mode and no mode without a caller authority: without one there is nobody to be
+authorised as. An unset session key is drawn at random, which means sessions stop
+being spendable when the process stops.
+
+It also reads `SEAGULL_BACKBONE_BROKERS` and the ruleset topic, and reads that
+topic whole before it serves: a control plane that had seen half the log would
+report an estate nobody has. It holds the only mutating connection to the
+relational store and takes the `SEAGULL_ALERT_STORE_*` settings above.
+
+It writes the agent topic rather than reading it: what it decided about an agent
+is published there for the gateway, and a decision the backbone did not take is
+carried again on the next sweep. Its connection to the telemetry store answers
+one question — when an agent was last heard from — and writes nothing.
+
+### query-api
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `SEAGULL_QUERY_API_ADDRESS` | `127.0.0.1:8444` | the query listener |
+| `SEAGULL_QUERY_API_TLS_CERT` | required | server certificate |
+| `SEAGULL_QUERY_API_TLS_KEY` | required | server private key |
+| `SEAGULL_QUERY_API_CALLER_CA` | required | the authority that signs a caller's certificate |
+| `SEAGULL_QUERY_API_WINDOW` | `720h` | the widest stretch of time a query may ask about |
+| `SEAGULL_QUERY_API_PAGE` | `50` | records in a page when the caller asks for no limit |
+| `SEAGULL_QUERY_API_PAGE_MAX` | `500` | ceiling on the page a caller may ask for |
+| `SEAGULL_QUERY_API_READ_BUDGET` | `15s` | how long one read may run in the store |
+| `SEAGULL_QUERY_API_MAX_ROWS_READ` | `50000000` | how much of the store one read may examine |
+| `SEAGULL_QUERY_API_CURSOR_KEY` | generated | signs a page token; set it when more than one replica serves one address |
+| `SEAGULL_QUERY_API_MAX_BODY` | `256KiB` | ceiling on a query body |
+| `SEAGULL_QUERY_STORE_ADDRESS` | required | ClickHouse address, read only |
+
+There is no plaintext mode and no mode without a caller authority: the scope a
+query is answered within comes from the caller's certificate, so without one
+there is nobody to be authorised as. The write timeout has to outlast the read
+budget or a query is cut off after the store has already paid for it, and the
+process refuses to start when it does not.
+
+## The acknowledgement contract
+
+An agent may drop its local copy of a batch only when the gateway answers `200`
+with `accepted`, `durable` and a `received` count equal to what it sent. Every
+other answer means the agent keeps the batch and retries:
+
+| Status | Meaning for the agent |
+|---|---|
+| `200` | the backbone owns the batch; drop the local copy |
+| `400` | the payload is not a valid batch; do not retry unchanged |
+| `403` | the platform takes nothing from this connection: no usable agent identity, no registration placing the agent in a tenant (`agent_not_registered`), or a registration it stopped honouring (`agent_not_admitted`); keep the batch |
+| `413` | the body is above the gateway ceiling; send smaller batches |
+| `415` | the batch was not sent as protobuf |
+| `422` | an event failed admission; the answer names the index and the field |
+| `426` | the protocol version is not supported by this gateway |
+| `429` | the agent is above its budget; back off |
+| `503` | the batch was not made durable; retry |
+
+Delivery is at least once. Duplicate suppression belongs to the consumers,
+keyed on `event_id`, which the producer derives deterministically. The gateway
+holds no deduplication state, which is what keeps it stateless and horizontally
+scalable.
+
+## Event time
+
+Three timestamps are distinct and never collapsed:
+
+- `time.event_time` — when it happened on the endpoint, written by the producer.
+- `time.observed_time` — when the collector saw it, written by the producer.
+- `reception.ingest_time` — when the platform accepted it, written by the gateway.
+
+The gateway replaces the whole `reception` message and the identity fields in
+`origin`, so a producer cannot choose its own identity, tenant, or place in the
+platform's timeline. `origin.agent_id` is the common name of the verified client
+certificate and `origin.tenant_id` is the tenant the registry recorded that agent
+in, read from the admission record on `security.agents` rather than from the
+gateway's configuration; an agent with no registration is refused with `403`
+before its body is read.
+
+## The backbone topology
+
+Ten topics, declared once in `internal/broker` and applied by
+`backbone-migrator`:
+
+| Topic | Partitions | Retention | Why |
+|---|---|---|---|
+| `security.events.raw` | 12 | 7 days | admitted telemetry, keyed by agent |
+| `security.events.quarantine` | 3 | 30 days | refused records, kept longer because they are the ones still waiting to be read |
+| `security.detections` | 6 | 30 days | what the rules decided, keyed by the agent it is about; narrower than the stream it is made from and kept as long as a refused record, for the same reason |
+| `security.detections.quarantine` | 3 | 30 days | records the detection writer could not store; one quarantine per stream, because a refused record's partition and offset only mean something alongside the topic they came from |
+| `security.inventory.raw` | 6 | 30 days | what an asset was observed to have, keyed by the asset so its scans are read in the order they were written, which is what decides whether an item is still installed; kept long enough that the projection can be rebuilt by replaying it |
+| `security.inventory.quarantine` | 3 | 30 days | records the inventory projector could not store, for the same reason the other two quarantines are apart |
+| `security.rulesets` | 1 | compacted, kept | every published ruleset under its own content id, plus one `active` key naming the one to run; one partition because a version and the record activating it are only meaningful in the order they were written |
+| `security.agents` | 1 | compacted, kept | the last thing the control plane decided about each agent, keyed by the agent; one partition because the last record about an agent has to be the last one every gateway sees |
+| `security.advisories` | 1 | compacted, kept | the newest version of every advisory the platform holds, keyed by its source and id, and the newest attempt to follow each feed, keyed by the feed; one partition so the advisories an attempt published are read before the record accounting for them |
+| `security.advisories.quarantine` | 1 | 30 days | records the advisory writer could not store |
+
+**Partitions and replication are refused, never converged.** Records are keyed
+by `agent_id`, so growing the partition count moves an agent to a different
+partition and silently ends the per-agent ordering that stateful detection will
+depend on. The migrator reports the divergence and stops; changing the shape of
+a live topic stays an operator's decision.
+
+**Retention, cleanup and compression do converge.** They describe how long the
+backbone keeps what it already ordered, so a run brings them back to the
+declaration and reports what it changed.
+
+**Startup verifies rather than assumes.** Readiness reaches the brokers, not the
+topics, so a gateway whose topic is missing starts, reports itself healthy, and
+then fails every batch an agent sends. A topic with the wrong shape is worse:
+one partition instead of twelve works perfectly and only collapses the per-agent
+ordering. The gateway and the writer describe their topics first and refuse to
+serve when one is missing or reshaped:
+
+```bash
+docker compose -f deploy/compose.yaml run --rm backbone-migrator
+```
+
+Retention drift is logged as `backbone_topology_drift` and does not stop a
+process: refusing to admit telemetry over a setting the process cannot fix would
+trade the stream for the window.
+
+## The telemetry store
+
+One table, `security_events`, holding one row per admitted event, projected from
+the contract by `internal/eventstore`. A field exists there because the contract
+carries it, and a test walks the protobuf descriptor to make sure the contract
+cannot grow a field the store quietly stops keeping.
+
+No column is `Nullable`: absence is the zero value, which is exactly what proto3
+means by an unset field. Enums are stored under their own name with the
+contract's prefix removed and lowercased, so a value added to the contract needs
+no migration. A new event class does need one, which is the friction intended.
+
+**Duplicates.** Delivery is at least once, so a crash between the write and the
+commit replays a batch. The table is a `ReplacingMergeTree` ordered by
+`(tenant_id, event_time, event_id)`, so the replay collapses back to one row —
+but that happens **on merge**, not on insert. A query that must not see a
+duplicate has to ask for it:
+
+```sql
+SELECT count() FROM security_events FINAL WHERE tenant_id = 'acme';
+```
+
+**Retention.** `TTL event_time + INTERVAL 365 DAY`. A security store without
+retention fills disks; changing the window is a later migration.
+
+**Schema changes** are versioned SQL embedded in the binary and applied by
+`store-migrator`, never at process startup. `event-writer` verifies at startup
+that every migration it ships is applied, and refuses to run otherwise:
+
+```bash
+docker compose -f deploy/compose.yaml run --rm store-migrator
+```
+
+**Scaling** is horizontal. One `event-writer` is a single sequential loop —
+poll, write, commit — with no worker pool and no buffering, because at 5000-row
+batches there is nothing for concurrency to win. More throughput means more
+instances of the process, and the topic's partitions divide between them.
+
+**Quarantine.** A refused record is published to `security.events.quarantine` as
+the bytes that arrived, with `quarantine-reason`, `quarantine-detail`,
+`source-partition` and `source-offset` as record headers. It is replayable by
+construction, and wrapping an unparseable payload in a second schema — which
+would itself have to parse — is avoided. Payloads are never logged: a refused
+record can carry an attacker's input, and the position is enough to fetch it.
+
+## The inventory projection
+
+Two tables hold what an asset currently has, projected from the contract by
+`internal/inventorystore` and written by `inventory-projector`. The same rule
+holds as for telemetry: a field exists there because the contract carries it, and
+a test walks the protobuf descriptor so the contract cannot grow a field the
+store quietly stops keeping. Items are walked into rather than treated as a leaf,
+because the projection is one row per item.
+
+- **`asset_inventory`** — one row per `(tenant_id, agent_id, kind, item_id)`,
+  carrying the item's own fields and `last_seen`. The identity is derived by the
+  platform as a digest over the kind and the length of every identifying part,
+  never read off the wire, so a replay lands on the row it wrote the first time.
+- **`asset_inventory_scans`** — one row per `(tenant_id, agent_id, kind)`, holding
+  the `scanned_at` of the newest full enumeration.
+
+**What is current.** The items of a kind on an asset are those whose `last_seen`
+is at or after that asset's `scanned_at` for that kind:
+
+```sql
+SELECT item.package_name, item.package_version
+FROM asset_inventory AS item FINAL
+INNER JOIN (
+    SELECT tenant_id, agent_id, kind, max(scanned_at) AS scanned_at
+    FROM asset_inventory_scans
+    WHERE tenant_id = 'acme'
+    GROUP BY tenant_id, agent_id, kind
+) AS scan
+ON item.tenant_id = scan.tenant_id AND item.agent_id = scan.agent_id AND item.kind = scan.kind
+WHERE item.tenant_id = 'acme' AND item.last_seen >= scan.scanned_at;
+```
+
+A snapshot moves that line and a delta never does, so a delta refreshes what it
+names without retiring what it omits. An empty snapshot moves it too, which is
+how a collector says the asset has none of that kind left. **Nothing is deleted
+and nothing is tombstoned**: an item that went away leaves the row saying when it
+was last seen, and it is out of the answer because the line moved past it. Read
+the other way round, the same line is the staleness of the answer.
+
+**Out of order.** Both tables are `ReplacingMergeTree` versioned by the
+collector's clock — `last_seen` and `scanned_at` — so a record that reaches the
+store late loses to the newer one it arrived behind rather than overwriting it.
+As with telemetry, that collapse happens on merge, so a query that must not see a
+replaced row asks for `FINAL`.
+
+**No `PARTITION BY`.** A `ReplacingMergeTree` collapses rows of one key only
+within a partition, and every candidate to partition by here is a time that moves
+as the item is observed again, so partitioning would leave one installed package
+as a row per month that no merge ever reconciles. The tables are bounded by
+`TTL last_seen + INTERVAL 365 DAY` instead, which drops an item nobody has seen
+for a year.
+
+**Quarantine.** `security.inventory.quarantine`, on the same terms as the other
+two. A record is folded whole or refused whole: one item the store cannot hold
+takes its scan with it, because a scan whose items never landed would retire
+everything the record was about to confirm.
+
+## The vulnerability intelligence store
+
+Three tables hold what the platform has read about vulnerabilities, projected
+from the contract by `internal/advisorystore` and written by `advisory-writer`.
+As for telemetry, a field exists there because the contract carries it, and a
+test walks the descriptor so the contract cannot grow a field the store quietly
+stops keeping.
+
+- **`vulnerability_advisories`** — one row per version of an advisory, keyed by
+  `(source, advisory_id, modified, normalization)`: the modification time the
+  source gave it and the rules the platform read it with. It carries the names,
+  the prose, the severities as their authors wrote them and the whole
+  provenance.
+- **`vulnerability_affected`** — one row per package a version affects, ordered
+  by `(ecosystem, package, …)`, which is how a matcher asks. Ranges and their
+  events are parallel arrays; `event_ranges` says which range each event belongs
+  to, in the order the source wrote them.
+- **`vulnerability_feed_syncs`** — one row per attempt to follow a feed.
+
+**What affects a package.** The entries of the newest version of each advisory,
+read with the newest rules that version was stored under, leaving out one whose
+newest version withdrew it. The newest version is found among the advisories, so
+a version that stopped naming the package takes it out of the answer:
+
+```sql
+SELECT entry.advisory_id, entry.event_kinds, entry.event_versions
+FROM vulnerability_affected AS entry FINAL
+INNER JOIN (
+    SELECT source, advisory_id, max((modified, normalization)) AS newest
+    FROM vulnerability_advisories
+    WHERE (source, advisory_id) IN (
+        SELECT source, advisory_id FROM vulnerability_affected
+        WHERE ecosystem = 'Debian:12' AND package = 'openssl')
+    GROUP BY source, advisory_id
+) AS version
+ON entry.source = version.source AND entry.advisory_id = version.advisory_id
+WHERE entry.ecosystem = 'Debian:12' AND entry.package = 'openssl'
+  AND (entry.modified, entry.normalization) = version.newest
+  AND entry.withdrawn = toDateTime64(0, 3, 'UTC');
+```
+
+**How fresh a feed is.** Its newest attempt says when it was asked and what came
+of it, `synced_at` when the platform last held everything it listed, and
+`newest_listed` the newest change the feed itself lists. An attempt that failed
+carries `synced_at` forward, so the answer never looks fresher than it is:
+
+```sql
+SELECT argMax(outcome, checked_at), argMax(synced_at, checked_at), argMax(newest_listed, checked_at)
+FROM vulnerability_feed_syncs
+WHERE source = 'osv' AND feed = 'Debian';
+```
+
+**Nothing is deleted.** A version of an advisory is never removed, and a
+withdrawal is a newer version carrying `withdrawn`; the engine only collapses a
+version written twice, which is what a replay does. Neither advisory table has a
+`PARTITION BY` or a `TTL`: intelligence is kept for as long as the platform runs,
+because a finding made from a version of it has to stay explicable after the
+source has moved on. The sync attempts expire after a year.
+
+**Quarantine.** `security.advisories.quarantine`, on the same terms as the other
+three. The payload is never logged: it is what a feed on the internet wrote, and
+the position is enough to fetch it.
+
+## Source evidence
+
+Generated from [`docs/configuration.md`](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/configuration.md) at `fa3bf69`. Refresh the checked-in snapshot before regenerating; a normal build does not access another repository.

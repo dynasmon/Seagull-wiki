@@ -1,0 +1,32 @@
+---
+title: 'Operate certificates and agent admission'
+description: 'Development validation, compromised credentials, admission propagation, and staged trust rotation.'
+---
+
+## Development lifecycle test
+
+The backend's real probe can register an identity, request a signed certificate, renew it, and revoke it:
+
+```bash
+go run ./tools/devprobe -agents https://127.0.0.1:8445 -renewals https://127.0.0.1:8446
+```
+
+This changes control-plane state. Use the disposable development trust domain and read the probe before adapting the sequence to an estate. It is not a production fleet enrollment command.
+
+## Routine checks
+
+Confirm certificate validity, issuer, intended identity, server name, and correct trust domain. Agent keys belong on endpoints; CA signing keys belong to the authorized control process. Verify registration tenant and state independently of successful TLS: a valid certificate for an unregistered or disabled identity still cannot admit telemetry.
+
+## Compromise handling
+
+Revoke the agent through an authorized control operation and preserve the audit trail. Check that the new admission revision reaches the gateway. Revoked and decommissioned identities are terminal; recovery uses a newly authorized identifier. Do not simply renew or replace a certificate and assume the stolen key stopped working.
+
+An issuance timeout can leave control effects whose status must be inspected rather than blindly repeated. Preserve request context and certificate history; never expose private key bytes in logs or tickets.
+
+## Trust rotation
+
+Follow the [PKI ordering](/docs/security/pki): widen trust, distribute it through authenticated paths, switch the signer, then retire the old authority after compatible credentials are established. Current backend mechanisms support this ordering, but the V2 agent does not yet automate enrollment/renewal or fleet distribution. A manual or external provisioning workflow must make each step verifiable.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/tools/devprobe/main.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tools/devprobe/main.go) · [Seagull-backend-v2/internal/control/certificates.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/certificates.go) · [Seagull-backend-v2/internal/control/renewal.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/renewal.go) · [Seagull-backend-v2/docs/decisions/0024-an-agent-is-registered-by-the-control-plane-and-refused-by-the-gateway.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0024-an-agent-is-registered-by-the-control-plane-and-refused-by-the-gateway.md) · [Seagull-backend-v2/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md).

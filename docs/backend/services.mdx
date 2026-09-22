@@ -1,0 +1,44 @@
+---
+sidebar_position: 1
+title: 'Backend service responsibilities'
+description: 'An ownership map of every executable and its persistence and communication boundaries.'
+---
+
+<FeatureStatus status="implemented" />
+
+Each executable is a composition root with its own lifecycle. Operational isolation does not require every package to become a network service.
+
+| Executable            | Inputs                                           | Durable result / output                                | Boundary                                       |
+| --------------------- | ------------------------------------------------ | ------------------------------------------------------ | ---------------------------------------------- |
+| `ingest-gateway`      | Agent mTLS batches; admission log                | Event or inventory topic; ACK                          | No analytical store or detection               |
+| `analysis-engine`     | Raw events; ruleset log                          | Detection topic                                        | No administrative CRUD                         |
+| `event-writer`        | Raw events                                       | ClickHouse events; quarantine                          | Projection only                                |
+| `detection-writer`    | Detections                                       | ClickHouse detections; quarantine                      | Preserves analytical results                   |
+| `alert-writer`        | Detections                                       | PostgreSQL alerts, incidents, occurrences              | Creates work; does not apply user triage       |
+| `inventory-projector` | Inventory records                                | ClickHouse items and scan watermarks                   | Separate from event storage                    |
+| `advisory-importer`   | OSV distribution exports; prior log state        | Advisories and feed freshness                          | Internet access, no asset matching or database |
+| `advisory-writer`     | Advisory records                                 | ClickHouse advisory versions and feed attempts         | No internet access needed                      |
+| `control-api`         | Caller mTLS/session requests; agent renewal mTLS | Registry, certificates, triage; ruleset/admission logs | Two listeners, one authorization owner         |
+| `query-api`           | Caller mTLS hunt requests                        | Scoped analytical read responses                       | No topic consumer or analytical writes         |
+| `backbone-migrator`   | Declared topology                                | Topics and configuration                               | One-shot, exits                                |
+| `store-migrator`      | Analytical migrations                            | ClickHouse schema                                      | One-shot, exits                                |
+| `control-migrator`    | Control migrations                               | PostgreSQL schema                                      | One-shot, exits                                |
+
+## Runtime and configuration
+
+Long-running processes use the common platform runtime for logs, health, readiness, metrics, and shutdown. Migrators have a separate one-shot role. Services verify the dependencies they need; they do not independently mutate schemas while starting to serve.
+
+Configuration is typed and collected at composition boundaries. See the generated [environment index](/docs/reference/generated/environment) for every extracted declaration, including settings missing from older prose references.
+
+## Follow a subsystem
+
+- [Ingestion](/docs/ingestion/gateway) explains admission and backpressure.
+- [Streaming](/docs/event-pipeline/streaming) explains topology and commit semantics.
+- [Detection](/docs/detection/overview) explains normalization and rule execution.
+- [Inventory](/docs/inventory/overview) and [advisory ingestion](/docs/vulnerability-management/overview) explain their independent streams.
+- [Storage](/docs/storage/ownership) explains canonical state and derived projections.
+- [API architecture](/docs/api/overview) separates query and administrative interfaces.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml) · [Seagull-backend-v2/README.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/README.md).

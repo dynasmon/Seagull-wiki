@@ -1,0 +1,46 @@
+---
+title: 'Build and run the agent foundation'
+description: 'The supported source-build workflow for the current Linux agent executable.'
+---
+
+This installs no collector, spool, uploader, or service package. It lets a developer exercise the implemented runtime and local identity foundation. Native packages and service-manager integration remain planned.
+
+## Build independently
+
+From the agent checkout:
+
+```bash
+make build
+dist/seagull-agent -version
+make verify
+```
+
+The agent declares Go 1.26.0 and toolchain `go1.26.8`. The only shared Seagull dependency is published contracts `v0.14.0`; no sibling checkout is required. Linux is the supported baseline.
+
+## Provide configuration
+
+Create a JSON file with an absolute private state-directory path, HTTPS ingest/renewal URLs, and an absolute path to an authenticated PEM trust bundle. The [configuration page](/docs/agent/configuration) supplies the canonical example, defaults, and permission rules.
+
+The file and its parent directory must be writable only by root or the agent account. The trust bundle follows the same ownership rule. Do not run an example from a shared writable temporary directory and then weaken permission checks to make it pass.
+
+```bash
+dist/seagull-agent -config /etc/seagull-agent/config.json config check
+dist/seagull-agent -config /etc/seagull-agent/config.json config print
+dist/seagull-agent -config /etc/seagull-agent/config.json run
+```
+
+These commands assume you have provisioned that file and its referenced bundle; the paths are deployment examples, not a supplied installer. A dedicated unprivileged account is sufficient for current implemented behavior.
+
+## Validate and stop
+
+Inspect `agent_starting`, `agent_privileges`, and `agent_core_dumps`. A first start creates installation identity; later starts preserve it. SIGINT or SIGTERM requests an orderly stop. SIGHUP reloads a valid configuration while keeping the old one on refusal.
+
+A successful start does not prove network connectivity: no delivery component runs yet. Do not use the absence of uploaded events as evidence of TLS failure in this build.
+
+## Upgrade and removal
+
+No supported package-manager upgrade/uninstall command exists. Preserve the installation directory when replacing a development binary. Explicit `installation replace` sets old state aside and creates a new identity; it is not a routine upgrade step. See [identity recovery](/docs/troubleshooting/agent) before using it.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/Makefile](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/Makefile) · [Seagull-agent-v2/go.mod](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/go.mod) · [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).

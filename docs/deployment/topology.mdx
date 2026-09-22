@@ -1,0 +1,38 @@
+---
+title: 'Deployment topology and networking'
+description: 'Current single-node development wiring, external listeners, internal stores, and planned production scaling.'
+---
+
+import { developmentTopology } from '@site/src/diagrams/deployment';
+
+## Supplied topology
+
+`deploy/compose.yaml` is a single-node development environment. It declares the dependencies, one-shot migrations, persistent volumes, and independently runnable backend processes. It does not include a working V2 frontend or deployed V2 endpoint agent.
+
+<FlowDiagram diagram={developmentTopology} />
+
+## Listener defaults
+
+| Surface          | Process default             | Compose host override                   |
+| ---------------- | --------------------------- | --------------------------------------- |
+| Agent ingest     | `0.0.0.0:8443`              | `SEAGULL_GATEWAY_PUBLISH`               |
+| Query            | `127.0.0.1:8444`            | `SEAGULL_QUERY_API_PUBLISH`             |
+| Operator control | `127.0.0.1:8445`            | `SEAGULL_CONTROL_API_PUBLISH`           |
+| Agent renewal    | `127.0.0.1:8446`            | `SEAGULL_CONTROL_API_RENEWAL_PUBLISH`   |
+| Operations       | `127.0.0.1:9100` by default | Explicit per-process deployment binding |
+
+Compose sets container listener addresses as needed. A code default is not always the address published by the example deployment. Do not expose analytical databases or unauthenticated operations listeners merely to make a health command convenient.
+
+## Network boundaries
+
+The internal backbone network carries broker/database communication. The advisory importer joins a separate network with outbound feed access. The agent and operator trust domains use distinct CA material and listeners even where the control process terminates both.
+
+Use TLS passthrough for the product gateway if placing it behind a proxy; HTTP identity headers are not an accepted substitute. In contrast, the independent documentation container can use normal HTTP behind any TLS reverse proxy.
+
+## Scaling boundary
+
+Writer consumer groups can divide partitions. Analysis replication is constrained by rule grouping and state ownership. Control sessions are process-local. Production database replication, failover orchestration, load balancers, and fleet rollout are deployment design work, not present Compose features.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml) · [Seagull-backend-v2/cmd/ingest-gateway/config.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/ingest-gateway/config.go) · [Seagull-backend-v2/cmd/query-api/config.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/query-api/config.go) · [Seagull-backend-v2/cmd/control-api/config.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/control-api/config.go).

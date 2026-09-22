@@ -1,0 +1,30 @@
+---
+title: 'Agent will not start or reload'
+description: 'Symptoms, causes, diagnosis, resolution, and verification for agent will not start or reload.'
+---
+
+## Symptoms
+
+`agent_not_started` or `configuration_not_reloaded` appears; the process exits or keeps its previous settings.
+
+## Likely causes
+
+Unsafe file ownership, writable parent directories, invalid JSON, duplicate/unknown settings, missing trust bundle, locked state, damaged installation metadata, or a missing/mismatched key. Every module name and enabled updates are unsupported today.
+
+## Diagnosis
+
+Run `seagull-agent -config FILE config check` using the same account and paths as the service. Read the named field and `recovery` message. Inspect ownership without printing key bytes. Distinguish first-time empty state from a nonempty damaged directory.
+
+## Resolution
+
+Correct the configuration or permissions at the owning path. Stop another instance holding the state lock. Restore this installation from a trusted backup when appropriate. Use `installation replace` only for an intentional new installation; it sets old state aside, and exposed credentials must be revoked.
+
+## Verification
+
+Configuration check succeeds; a valid reload produces `configuration_reloaded`; a restart preserves the expected installation ID. Startup alone does not prove telemetry delivery.
+
+Continue with [health and metrics](/docs/observability/health) and [failure semantics](/docs/architecture/failure-model).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go) · [Seagull-agent-v2/internal/config/config.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/config/config.go) · [Seagull-agent-v2/internal/identity/identity.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/identity/identity.go).

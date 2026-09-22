@@ -1,0 +1,26 @@
+---
+sidebar_position: 1
+title: 'Troubleshooting by symptom'
+description: 'Find the failing boundary before changing certificates, retention, resource limits, or detection semantics.'
+---
+
+Start by recording the component revision, relevant configuration names, time range, structured refusal code, and last known successful boundary. Keep private keys, session tokens, and sensitive raw observations out of shared reports.
+
+| Symptom                                                 | Guide                                                    |
+| ------------------------------------------------------- | -------------------------------------------------------- |
+| Agent fails to start or reload configuration            | [Agent foundation](/docs/troubleshooting/agent)          |
+| Agent cannot enroll or certificate fails                | [Enrollment and TLS](/docs/troubleshooting/certificates) |
+| Accepted events do not appear                           | [Ingestion and storage](/docs/troubleshooting/ingestion) |
+| Consumer lag keeps growing                              | [Lag and state recovery](/docs/troubleshooting/lag)      |
+| Rules do not fire or incidents do not appear            | [Detection](/docs/troubleshooting/detection)             |
+| Events or detections look duplicated                    | [Duplicates](/docs/troubleshooting/duplicates)           |
+| API unavailable, forbidden, or session lost             | [API and migration](/docs/troubleshooting/api)           |
+| Spool grows, collector missing, frontend cannot connect | [Unimplemented paths](/docs/troubleshooting/planned)     |
+
+A successful TLS handshake, durable ACK, committed writer position, query result, detection, and alert are different milestones. Use [the event lifecycle](/docs/architecture/event-lifecycle) to decide which one stopped advancing.
+
+Do not disable verification, retimestamp records, skip offsets, delete state, or widen security limits before understanding the cause. The existing [observability surfaces](/docs/observability/health) are designed to make those boundaries visible.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/ingest/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/http.go) · [Seagull-backend-v2/internal/broker/consumer.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/consumer.go) · [Seagull-agent-v2/cmd/seagull-agent/main.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/cmd/seagull-agent/main.go).

@@ -1,0 +1,88 @@
+---
+title: 'Key storage and providers'
+description: 'Current key storage and providers behavior, limitations, source evidence, and operational guidance.'
+---
+
+<FeatureStatus status="implemented" />
+
+This page preserves the agent maintainers' detailed explanation at the reviewed revision, checked against the owning implementation. Read the [agent overview](/docs/agent/overview) for the boundary between implemented foundations and planned delivery.
+
+## Current behavior
+
+The agent proves which agent it is with a private key it draws itself, and the
+key stays where it was drawn. `internal/pki` holds that line: a `KeyProvider`
+creates keys and opens them by identifier, and each `Key` it hands out is a
+`crypto.Signer` with an identifier and nothing more. A certificate request and
+a TLS client handshake need no more than that, so no caller receives a private
+key, and a provider that never exports its keys fits the same boundary without
+an export to fall back on.
+
+Every key is ECDSA on P-256. At the recorded backend commit, the platform signs
+requests for P-256, P-384, P-521, Ed25519 and RSA keys of at least 2048 bits,
+and its ingest and renewal listeners accept only TLS 1.3, which every
+implementation must support with ECDSA on P-256. P-256 is also a curve that
+TPM 2.0, PKCS #11 tokens, Windows CNG and the Apple Secure Enclave hold, so
+keeping keys in one of them would change nothing the platform receives.
+
+A key's `key_id` is the SHA-256 digest, in lower-case hexadecimal, of its
+DER-encoded SubjectPublicKeyInfo: the bytes a certificate request and a
+certificate for the key carry, so a credential generation names exactly one
+key.
+
+The only provider keeps keys in files, under `keys/` in the state directory:
+
+- each key is an unencrypted PKCS #8 PEM file named `<key_id>.pem`, created
+  0600 in a 0700 directory, and the directory or a key in it is refused when it
+  does not belong to the account the agent runs as or is open to its group or
+  to others;
+- a new key is written to a temporary file that is synced and then linked under
+  its name, which never replaces an existing file, before the directory is
+  synced; `Create` returns the key only then, and opening the directory
+  discards whatever an interrupted write left behind;
+- a key opens only from a regular file holding one unencrypted PKCS #8 ECDSA
+  P-256 key, the one its name identifies, so a key that is truncated,
+  re-encoded, swapped for another or replaced by a symbolic link is damaged,
+  and it is left as it was.
+
+At start, the agent opens `keys/` and, once the installation is enrolled, the
+key of its active credential generation. When `keys/` or a key in it is
+reachable by another account, or that key is missing or damaged, the agent logs
+`agent_not_started` with a `recovery` and does not start, as for damaged
+installation state. A key another account could read has to be treated as
+exposed: revoke the certificate issued for it and replace the installation.
+`agent_starting` names the provider in `key_provider` and says in
+`key_exportable` whether a key can be read out of it; no log line carries a key.
+
+The files keep a key from other accounts, and from nothing else:
+
+- root, the account the agent runs as, anything that can act as that account
+  and whoever copies the state directory, such as a backup or a disk image, can
+  read a key, so `key_exportable` is `true` and a copied key is an identity to
+  revoke;
+- a key is not encrypted at rest, since the secret to decrypt it would have to
+  sit on the same disk, within reach of whoever can read the key;
+- the agent does not claim to erase a key's copies from memory, which Go does
+  not guarantee.
+
+Protected providers were weighed against Linux, the platform the agent is built
+and tested for:
+
+- a TPM 2.0 is the one that fits: it signs with a key wrapped by its own storage
+  key and never exports it. It is not implemented yet, because no supported
+  deployment requires it and many hosts, virtual machines and containers have no
+  TPM to use;
+- PKCS #11 needs a hardware token on every endpoint and cgo in the build;
+- CNG, DPAPI, the Keychain and the Secure Enclave belong to Windows and macOS,
+  which the agent does not support yet.
+
+Providers never fall back to one another: when a protected provider is added,
+a host where it is unavailable will not have its keys quietly kept in files
+instead.
+
+## Related guidance
+
+Continue with [agent architecture](/docs/agent/architecture), [enrollment and PKI](/docs/security/enrollment), [configuration troubleshooting](/docs/troubleshooting/agent), and [the target delivery model](/docs/agent/delivery).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md) · [Seagull-agent-v2/internal/pki/keyfiles.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/pki/keyfiles.go).

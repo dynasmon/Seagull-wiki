@@ -1,0 +1,220 @@
+.home {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px 56px;
+}
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 330px;
+  gap: 72px;
+  align-items: center;
+  padding: 64px 0 48px;
+}
+.hero h1 {
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+  margin: 16px 0 22px;
+}
+.hero h1 span {
+  color: var(--ifm-color-primary);
+}
+.lead {
+  max-width: 650px;
+  font-size: 1.07rem;
+  color: var(--sg-muted);
+  line-height: 1.75;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+.release {
+  border: 1px solid var(--sg-border);
+  border-top: 3px solid var(--ifm-color-primary);
+  border-radius: 5px;
+  padding: 26px;
+  background: var(--sg-surface);
+}
+.release h2 {
+  font-size: 1.13rem;
+  margin: 22px 0 12px;
+}
+.release p:not(:first-child) {
+  color: var(--sg-muted);
+  font-size: 0.9rem;
+}
+.release a {
+  font-size: 0.87rem;
+  font-weight: 600;
+}
+.releaseMeta {
+  border-top: 1px solid var(--sg-border);
+  margin-top: 24px;
+  padding-top: 16px;
+  font-size: 0.75rem;
+  color: var(--sg-muted);
+}
+.sectionHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: baseline;
+  margin-bottom: 22px;
+}
+.sectionHeading h2 {
+  font-size: 1.17rem;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.sectionHeading a,
+.sectionHeading > span {
+  font-size: 0.8rem;
+}
+.sectionHeading > span {
+  color: var(--sg-muted);
+}
+.flowSection {
+  border-block: 1px solid var(--sg-border);
+  padding: 28px 0 24px;
+  margin-bottom: 38px;
+}
+.flow {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  margin-bottom: 15px;
+}
+.flow li {
+  position: relative;
+  background: var(--sg-surface);
+  border: 1px solid var(--sg-border);
+  border-radius: 4px;
+  padding: 17px 15px;
+}
+.flow li:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -21px;
+  top: 27px;
+  color: var(--sg-muted);
+}
+.flow strong {
+  display: block;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.83rem;
+}
+.flow span {
+  display: block;
+  color: var(--sg-muted);
+  font-size: 0.72rem;
+  margin-top: 6px;
+}
+.flowCaption {
+  font-size: 0.78rem;
+  color: var(--sg-muted);
+  margin: 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.card {
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--sg-border);
+  border-radius: 5px;
+  padding: 23px;
+  transition: border-color 140ms ease;
+}
+.card:hover {
+  text-decoration: none;
+  color: var(--ifm-font-color-base);
+  border-color: var(--ifm-color-primary);
+}
+.number {
+  font-family: var(--ifm-font-family-monospace);
+  color: var(--sg-muted);
+  font-size: 0.72rem;
+}
+.card h3 {
+  font-size: 1.05rem;
+  margin: 12px 0;
+}
+.card p {
+  font-size: 0.875rem;
+  color: var(--sg-muted);
+  line-height: 1.65;
+  min-height: 65px;
+}
+.cardAction {
+  font-size: 0.8rem;
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+.reference {
+  margin-top: 42px;
+  padding-top: 30px;
+  border-top: 1px solid var(--sg-border);
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+}
+.reference h2 {
+  font-size: 1.2rem;
+}
+.reference > div:last-child {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 32px;
+  font-size: 0.85rem;
+}
+@media (max-width: 996px) {
+  .hero {
+    gap: 32px;
+    grid-template-columns: 1fr 285px;
+  }
+  .flow {
+    grid-template-columns: 1fr 1fr;
+  }
+  .flow li:nth-child(2)::after {
+    content: '';
+  }
+}
+@media (max-width: 650px) {
+  .home {
+    padding: 0 20px 32px;
+  }
+  .hero {
+    display: block;
+    padding-top: 36px;
+  }
+  .release {
+    margin-top: 28px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .card p {
+    min-height: 0;
+  }
+  .sectionHeading {
+    display: block;
+  }
+  .sectionHeading h2 {
+    margin-bottom: 8px;
+  }
+  .reference {
+    display: block;
+  }
+  .flow strong {
+    font-size: 0.75rem;
+  }
+  .flow span {
+    font-size: 0.7rem;
+  }
+}

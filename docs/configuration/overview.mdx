@@ -1,0 +1,30 @@
+---
+title: 'Configuration guide'
+description: 'Typed backend environment settings, file-based secrets, agent JSON, and generated reference conventions.'
+---
+
+Seagull has separate configuration owners. Backend processes read typed environment variables; the agent reads one strict JSON file; rules, alert tuning, and authorization policy use their own validated documents. The documentation website has only public build/server configuration.
+
+## Backend settings
+
+Startup parses and validates configuration at composition boundaries and reports all detected problems before exiting. Empty environment values count as unset. Any supported variable can read from a file using its `_FILE` variant; do not supply secrets in checked-in examples.
+
+The [generated environment index](/docs/reference/generated/environment) extracts declarations from code, including type, required/default form, and bounds. Defaults written as Go expressions preserve the actual source definition. `Duration(name, default, minimum, maximum)` and equivalent typed calls show validation limits. Shared settings must be read alongside each executable's declarations.
+
+The [maintainer operational reference](/docs/reference/generated/operational) adds purpose, topology, ACK details, and retention explanations. It is a reviewed snapshot of prose and can lag source; code declarations take precedence where they disagree.
+
+## Document configuration
+
+`deploy/rules` supplies bootstrap detection content. `deploy/alerting.yml` controls alert-plane tuning. `deploy/policy.yml` declares operator authorization. Changes to these documents are changes to security decisions, not just presentation settings.
+
+## Agent configuration
+
+The agent uses `-config FILE` and ignores environment configuration. Unknown keys, duplicate keys, null values, oversized input, unsupported formats, and unsafe ownership are refused. See [the complete agent reference](/docs/agent/configuration), including which reserved settings do not yet have active consumers.
+
+## Documentation configuration
+
+`DOCS_URL` is the public canonical origin and `DOCS_BASE_URL` the slash-delimited deployment prefix. They are build-time public values. `DOCS_PORT` selects the development host port, and optional `WATCH_POLL=true` enables slower polling for filesystems where native notifications fail. No application secret is required by the docs.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/platform/config/parser.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/platform/config/parser.go) · [Seagull-backend-v2/docs/configuration.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/configuration.md) · [Seagull-agent-v2/internal/config/config.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/config/config.go).

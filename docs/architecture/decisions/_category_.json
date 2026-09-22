@@ -1,0 +1,12 @@
+{
+  "label": "Decision records",
+  "position": 20,
+  "collapsible": true,
+  "collapsed": true,
+  "link": {
+    "type": "generated-index",
+    "title": "Architecture decision records",
+    "description": "Backend decision records reproduced from the reviewed revision. They explain why a boundary exists; current source takes precedence over historical statements.",
+    "slug": "/architecture/decisions"
+  }
+}

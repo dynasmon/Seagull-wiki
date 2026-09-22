@@ -1,0 +1,91 @@
+import { defineFlow } from '@site/src/components/FlowDiagram/layout';
+
+export const developmentTopology = defineFlow({
+  title:
+    'Development Compose topology: published listeners and the internal network',
+  caption:
+    'Each arrow points from the side that opens the connection. Only the gateway, query API, and control API publish ports.',
+  grid: {
+    columns: [150, 128, 128, 150, 128],
+    rows: 5,
+    rowHeight: 58,
+    rowGap: 38,
+    columnGap: 24,
+    margin: { x: 24, y: 34 },
+  },
+  nodes: {
+    client: {
+      label: 'Authenticated client',
+      detail: 'or development probe',
+      kind: 'actor',
+      col: 0,
+      row: 0,
+    },
+    operator: {
+      label: 'Operator tools',
+      kind: 'actor',
+      col: 1,
+      cols: 2,
+      row: 0,
+    },
+    agent: {
+      label: 'Agent credential',
+      detail: 'or development probe',
+      kind: 'actor',
+      col: 3,
+      row: 0,
+    },
+    osv: { label: 'OSV feeds', kind: 'actor', col: 4, row: 0 },
+    gateway: { label: 'ingest-gateway', kind: 'process', col: 0, row: 1 },
+    query: { label: 'query-api', kind: 'process', col: 1, row: 1 },
+    control: { label: 'control-api', kind: 'process', col: 2, row: 1 },
+    importer: { label: 'advisory-importer', kind: 'process', col: 4, row: 1 },
+    clickhouse: { label: 'ClickHouse', kind: 'store', col: 1, row: 2 },
+    postgres: { label: 'PostgreSQL', kind: 'store', col: 2, row: 2 },
+    writers: {
+      label: 'Analysis and writers',
+      kind: 'process',
+      col: 1,
+      cols: 2,
+      row: 3,
+    },
+    redpanda: { label: 'Redpanda', kind: 'topic', col: 0, cols: 5, row: 4 },
+  },
+  edges: [
+    { from: 'client', to: 'gateway', label: '8443' },
+    { from: 'operator', to: 'query', label: '8444' },
+    { from: 'operator', to: 'control', label: '8445' },
+    { from: 'agent', to: 'control', label: '8446' },
+    { from: 'importer', to: 'osv', label: 'HTTPS' },
+    { from: 'gateway', to: 'redpanda' },
+    { from: 'query', to: 'clickhouse' },
+    { from: 'control', to: 'postgres' },
+    {
+      from: 'control',
+      to: 'redpanda',
+      exit: 'right',
+      enter: 'top',
+      enterCol: 3,
+    },
+    { from: 'importer', to: 'redpanda' },
+    { from: 'writers', to: 'redpanda' },
+    { from: 'writers', to: 'clickhouse', exitCol: 1 },
+    { from: 'writers', to: 'postgres', exitCol: 2 },
+  ],
+  groups: [
+    {
+      label: 'Internal backbone network',
+      tone: 'neutral',
+      cols: [0, 4],
+      rows: [2, 4],
+      labelPosition: 'bottom-left',
+    },
+  ],
+  legend: {
+    actor: 'Client or external service',
+    process: 'Backend process',
+    topic: 'Broker',
+    store: 'Database',
+    data: 'Connection to a listener',
+  },
+});

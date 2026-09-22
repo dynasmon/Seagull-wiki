@@ -1,0 +1,33 @@
+---
+title: 'Data ownership and persistence'
+description: 'Canonical records, analytical projections, transactional state, retention, and recovery implications.'
+---
+
+| Dataset                              | Owner / source                                            | Persistence                                 | Consumers                                 | Recovery implication                                       |
+| ------------------------------------ | --------------------------------------------------------- | ------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------- |
+| Admitted events                      | Gateway; typed producer observation with stamped identity | Raw broker topic, then `security_events`    | Analysis, event writer, query API         | Replay only within retained broker history                 |
+| Detections                           | Analysis engine and immutable ruleset                     | Detection topic, then `security_detections` | Detection writer, alert writer, query API | Deterministic identity supports repeated delivery          |
+| Alerts / occurrences                 | Alert writer creates; control API triages                 | PostgreSQL                                  | Control API                               | Replay cannot reconstruct operator decisions               |
+| Incidents / trails                   | Correlation detection creates; control API triages        | PostgreSQL                                  | Control API                               | Preserve story evidence and operational history            |
+| Agent registry / certificate history | Control plane                                             | PostgreSQL, replicated admission log        | Gateway roster and control API            | Roster is a projection; registry owns decisions            |
+| Ruleset versions / active pointer    | Control publication                                       | Compacted broker log                        | Analysis and control registry             | Bootstrap files are not a substitute for published history |
+| Inventory items / scans              | Gateway records; inventory projector                      | Inventory topic; ClickHouse                 | Inventory consumers and future matching   | Full-scan semantics determine currentness                  |
+| Advisory versions / feed attempts    | Importer-stamped upstream intelligence                    | Compacted topic; ClickHouse                 | Future matching, operators                | Failed/absent feed data does not mean withdrawal           |
+| Agent installation / keys            | Endpoint installation                                     | Private local directory                     | Agent foundation                          | Losing keys requires deliberate identity recovery          |
+| Sessions                             | Control process                                           | Bounded in-memory allowlist                 | That process's guard                      | Restart invalidates sessions; replicas do not share them   |
+
+## Why these stores exist
+
+ClickHouse serves high-volume analytical evidence and projection workloads. PostgreSQL owns mutable transactional control state and append-only trails. Redpanda owns durable asynchronous handoff and retained replay. Agent local persistence protects installation identity today; a durable telemetry spool is planned.
+
+Redis, Elasticsearch/OpenSearch, and object storage are not part of the current V2 deployment. Legacy technology choices are not inherited requirements.
+
+## Retention and replication
+
+Broker retention and analytical TTLs serve different purposes. Raw events default to a seven-day replay window. The analytical schemas define their own retention, including the detection evidence retention documented in ADR 17. Inventory and advisory schemas preserve different histories; read the [migration reference](/docs/reference/generated/storage) rather than applying one global retention policy.
+
+The development deployment uses local volumes and one broker replica. Database replication, off-host backups, retention sizing, and tested restores are production responsibilities without a complete supplied HA topology.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml) · [Seagull-backend-v2/internal/clickhouse/schema/0001_security_events.sql](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/clickhouse/schema/0001_security_events.sql) · [Seagull-backend-v2/internal/postgres/schema/0004_agents.sql](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/postgres/schema/0004_agents.sql) · [Seagull-backend-v2/docs/decisions/0012-storage-is-owned-per-workload.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0012-storage-is-owned-per-workload.md) · [Seagull-backend-v2/docs/decisions/0017-noise-is-removed-from-the-alert-and-never-from-the-detection.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0017-noise-is-removed-from-the-alert-and-never-from-the-detection.md) · [Seagull-backend-v2/docs/decisions/0027-inventory-is-a-record-kind-of-its-own.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0027-inventory-is-a-record-kind-of-its-own.md) · [Seagull-backend-v2/docs/decisions/0028-vulnerability-intelligence-is-read-from-its-source.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0028-vulnerability-intelligence-is-read-from-its-source.md).

@@ -1,0 +1,248 @@
+.figure {
+  --sg-diagram-dim: 0.16;
+}
+.scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  background:
+    linear-gradient(to right, var(--sg-diagram-surface) 40%, transparent) left /
+      28px 100% no-repeat local,
+    linear-gradient(to left, var(--sg-diagram-surface) 40%, transparent) right /
+      28px 100% no-repeat local,
+    radial-gradient(
+        farthest-side at 0 50%,
+        var(--sg-diagram-scroll-shadow),
+        transparent
+      )
+      left / 12px 100% no-repeat scroll,
+    radial-gradient(
+        farthest-side at 100% 50%,
+        var(--sg-diagram-scroll-shadow),
+        transparent
+      )
+      right / 12px 100% no-repeat scroll;
+}
+.frame {
+  container-type: inline-size;
+  margin-inline: auto;
+}
+.canvas {
+  --u: calc(100cqw / var(--w));
+  position: relative;
+  width: 100%;
+  color: var(--sg-diagram-ink);
+  font-family: var(--ifm-font-family-base);
+  -webkit-tap-highlight-color: transparent;
+}
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.group {
+  fill: var(--sg-diagram-group-fill);
+  stroke: var(--sg-diagram-group-stroke);
+  stroke-width: 1;
+  stroke-dasharray: 5 4;
+}
+.group[data-tone='endpoint'],
+.groupLabel[data-tone='endpoint'] {
+  --sg-diagram-group-fill: var(--sg-diagram-endpoint-fill);
+  --sg-diagram-group-stroke: var(--sg-diagram-endpoint-stroke);
+  --sg-diagram-group-ink: var(--sg-diagram-endpoint-ink);
+}
+.group[data-tone='operator'],
+.groupLabel[data-tone='operator'] {
+  --sg-diagram-group-fill: var(--sg-diagram-operator-fill);
+  --sg-diagram-group-stroke: var(--sg-diagram-operator-stroke);
+  --sg-diagram-group-ink: var(--sg-diagram-operator-ink);
+}
+.group[data-tone='backend'],
+.groupLabel[data-tone='backend'] {
+  --sg-diagram-group-fill: var(--sg-diagram-backend-fill);
+  --sg-diagram-group-stroke: var(--sg-diagram-backend-stroke);
+  --sg-diagram-group-ink: var(--sg-diagram-backend-ink);
+}
+.groupLabel {
+  position: absolute;
+  color: var(--sg-diagram-group-ink);
+  font-size: calc(10.5 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.shape path {
+  fill: var(--sg-diagram-kind-fill);
+  stroke: var(--sg-diagram-kind-stroke);
+  stroke-width: 1.4;
+}
+.shape .rim {
+  fill: none;
+}
+.process {
+  --sg-diagram-kind-fill: var(--sg-diagram-process-fill);
+  --sg-diagram-kind-stroke: var(--sg-diagram-process-stroke);
+  --sg-diagram-kind-ink: var(--sg-diagram-process-ink);
+}
+.topic {
+  --sg-diagram-kind-fill: var(--sg-diagram-topic-fill);
+  --sg-diagram-kind-stroke: var(--sg-diagram-topic-stroke);
+  --sg-diagram-kind-ink: var(--sg-diagram-topic-ink);
+}
+.store {
+  --sg-diagram-kind-fill: var(--sg-diagram-store-fill);
+  --sg-diagram-kind-stroke: var(--sg-diagram-store-stroke);
+  --sg-diagram-kind-ink: var(--sg-diagram-store-ink);
+}
+.actor {
+  --sg-diagram-kind-fill: var(--sg-diagram-actor-fill);
+  --sg-diagram-kind-stroke: var(--sg-diagram-actor-stroke);
+  --sg-diagram-kind-ink: var(--sg-diagram-actor-ink);
+}
+.shape.planned path {
+  fill: var(--sg-diagram-planned-fill);
+  stroke-dasharray: 5 3.5;
+}
+.edge {
+  color: var(--sg-diagram-line);
+}
+.line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.arrow {
+  fill: currentColor;
+}
+.edge-control {
+  color: var(--sg-diagram-control);
+}
+.edge-control .line {
+  stroke-dasharray: 6 4;
+  stroke-linecap: butt;
+}
+.edge-ack {
+  color: var(--sg-diagram-ack);
+}
+.edge-ack .line {
+  stroke-dasharray: 0.5 4.5;
+  stroke-width: 2;
+}
+.node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(2 * var(--u));
+  text-align: center;
+  line-height: 1.22;
+}
+.node-process {
+  --sg-diagram-kind-ink: var(--sg-diagram-process-ink);
+}
+.node-topic {
+  --sg-diagram-kind-ink: var(--sg-diagram-topic-ink);
+}
+.node-store {
+  --sg-diagram-kind-ink: var(--sg-diagram-store-ink);
+}
+.node-actor {
+  --sg-diagram-kind-ink: var(--sg-diagram-actor-ink);
+}
+.nodeLabel {
+  color: var(--sg-diagram-kind-ink);
+  font-size: calc(13 * var(--u));
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+.nodeDetail {
+  color: var(--sg-diagram-muted);
+  font-size: calc(10.75 * var(--u));
+  line-height: 1.25;
+}
+.node.planned .nodeLabel {
+  font-weight: 550;
+}
+.edgeLabel {
+  position: absolute;
+  width: max-content;
+  max-width: calc(170 * var(--u));
+  padding: calc(1 * var(--u)) calc(5 * var(--u));
+  border-radius: calc(4 * var(--u));
+  background: var(--sg-diagram-surface);
+  color: var(--sg-diagram-muted);
+  font-size: calc(11 * var(--u));
+  line-height: 1.25;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.edgeLabel[data-side='above'] {
+  transform: translate(-50%, calc(-100% - 2 * var(--u)));
+}
+.edgeLabel[data-side='below'] {
+  transform: translate(-50%, calc(2 * var(--u)));
+}
+.edgeLabel[data-side='left'] {
+  text-align: right;
+  transform: translate(calc(-100% - 3 * var(--u)), -50%);
+}
+.edgeLabel[data-side='right'] {
+  text-align: left;
+  transform: translate(calc(3 * var(--u)), -50%);
+}
+.edge,
+.shape,
+.node,
+.edgeLabel {
+  transition: opacity 140ms ease;
+}
+.canvas[data-focus] .edge:not([data-related]),
+.canvas[data-focus] .edgeLabel:not([data-related]) {
+  opacity: var(--sg-diagram-dim);
+}
+.canvas[data-focus] .shape:not([data-related]),
+.canvas[data-focus] .node:not([data-related]) {
+  opacity: 0.4;
+}
+.canvas[data-focus] .edge[data-related] .line {
+  stroke-width: 2.1;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 14px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--sg-diagram-divider);
+  color: var(--sg-diagram-muted);
+  font-size: 0.74rem;
+  line-height: 1.4;
+  list-style: none;
+}
+.figure .legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+}
+.figure .legend .hint {
+  margin-left: auto;
+  font-style: italic;
+  opacity: 0.85;
+}
+.legend svg {
+  flex: none;
+  width: 28px;
+  height: 14px;
+  overflow: visible;
+}
+.legend .shape path {
+  stroke-width: 1.2;
+}

@@ -1,0 +1,32 @@
+---
+title: 'Architectural principles'
+description: 'The invariants behind Seagull durability, independent processes, bounded state, and explicit trust.'
+---
+
+## Durability precedes acknowledgement
+
+An ingest ACK means the broker accepted the batch under its configured replication policy. It does not mean detection or indexing completed. Writers commit consumer progress only after durable side effects or durable quarantine. These two boundaries make retries visible and recovery possible.
+
+## Ownership precedes technology
+
+Events are immutable observations. Detections describe analytical decisions. Alerts and incidents carry operator lifecycle. Inventory is a set projection; an advisory is intelligence about software rather than an asset finding. The storage and process model follows those meanings.
+
+## Asynchrony separates failure domains
+
+The gateway does not wait on analytical queries or synchronous detection. Writers, analysis, inventory, and advisory ingestion have separate work and consumer groups. A package is not automatically a service: certificate signing stays inside the control process because that process already owns issuance authorization.
+
+## Replay is a correctness case
+
+At-least-once transport allows duplicates. Consumers use deliberate identities and idempotent effects; they do not claim global exactly-once behavior. Stateful detection rebuilds bounded event-time windows on partition assignment. Rules whose grouping cannot be answered by the assigned partitions are refused.
+
+## Bounds are part of security
+
+Bodies, in-flight bytes, sessions, parsing, windows, observations, and keys have finite limits. At the state-key ceiling, the engine refuses new keys rather than letting attacker-controlled grouping values evict existing security state. A finite spool in the target agent cannot promise unlimited offline retention.
+
+## Trust is explicit
+
+A verified certificate supplies agent identity. Registry state supplies its tenant and admission status. Payload fields cannot grant either. Keys, policy writers, broker producers, and database roles each occupy a trust boundary with residual risks described in the [threat model](/docs/security/threat-model).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/docs/decisions/0001-durable-before-acknowledged.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0001-durable-before-acknowledged.md) · [Seagull-backend-v2/docs/decisions/0012-storage-is-owned-per-workload.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0012-storage-is-owned-per-workload.md) · [Seagull-backend-v2/docs/decisions/0018-detection-state-is-a-bounded-window.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0018-detection-state-is-a-bounded-window.md) · [Seagull-backend-v2/docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0023-state-is-owned-by-the-partition-and-rebuilt-by-reading-it-back.md) · [Seagull-backend-v2/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md) · [Seagull-backend-v2/docs/decisions/0026-an-agent-sends-into-the-tenant-it-was-registered-in.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0026-an-agent-sends-into-the-tenant-it-was-registered-in.md).

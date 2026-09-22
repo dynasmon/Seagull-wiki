@@ -1,0 +1,5 @@
+.identifier {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.95em;
+  letter-spacing: -0.01em;
+}
