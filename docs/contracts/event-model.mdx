@@ -1,0 +1,36 @@
+---
+title: 'Event model and normalization'
+description: 'Identifiers, three timestamps, authoritative origin, typed bodies, and derived analytical form.'
+---
+
+## Envelope
+
+A canonical event has a producer-assigned event ID, schema version, origin, time information, reception metadata, class, and a typed body. There is no generic arbitrary payload map. The current event body is authentication; inventory uses its own record model.
+
+| Time                    | Owner    | Meaning                                      |
+| ----------------------- | -------- | -------------------------------------------- |
+| `time.event_time`       | Producer | When the endpoint says the activity occurred |
+| `time.observed_time`    | Producer | When collection observed it                  |
+| `reception.ingest_time` | Gateway  | When the platform admitted it                |
+
+These timestamps answer different questions. Replacing event time with retry time hides backlog and changes detection windows. Ingest time cannot prove the endpoint's clock was accurate.
+
+## Identity and metadata
+
+Producer origin includes host and collector context. The gateway replaces agent and tenant identity using TLS and the registry. Reception identifies the receiving gateway and batch. Fields chosen by a producer remain observations unless explicitly assigned by the platform.
+
+The broker key is the stamped agent ID. It gives partition affinity but not a global time order across endpoints. Stable event IDs support downstream replay behavior.
+
+## Normalization
+
+Analysis prepares a canonical working representation for rules, including deliberate comparison conventions. Raw evidence is preserved independently. Rule fields directly address contract paths such as `authentication.outcome` or `authentication.network.source.ip`; the compiler rejects fields absent from the contract.
+
+Missing values do not silently become a meaningful zero value for matching. Review the rule's use of negation and its tests. A typed contract also does not make every string truthful: an authenticated compromised endpoint can still report fabricated observations.
+
+## Follow the record
+
+Use the [field reference](/docs/reference/generated/contracts/event) for exact names and enums, [ingestion](/docs/ingestion/gateway) for bounds/stamping, and [event lifecycle](/docs/architecture/event-lifecycle) for durability. Derived detections and mutable alerts remain separate records.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-contracts/proto/seagull/event/v1/event.proto](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/proto/seagull/event/v1/event.proto) · [Seagull-backend-v2/internal/analysis/normalize.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/analysis/normalize.go) · [Seagull-backend-v2/docs/decisions/0003-the-contract-is-the-event-model.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0003-the-contract-is-the-event-model.md) · [Seagull-backend-v2/docs/decisions/0005-the-canonical-form-is-for-analysis.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0005-the-canonical-form-is-for-analysis.md) · [Seagull-backend-v2/docs/decisions/0006-a-rule-addresses-the-contract.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0006-a-rule-addresses-the-contract.md) · [Seagull-backend-v2/docs/decisions/0009-an-absent-field-answers-no-question.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0009-an-absent-field-answers-no-question.md).

@@ -1,0 +1,38 @@
+---
+sidebar_position: 1
+title: 'Shared contracts'
+description: 'Canonical wire schemas, independent releases, generated bindings, and ownership.'
+---
+
+`Seagull-contracts` owns messages exchanged among independently released platform components. The agent does not import backend implementation to learn a protocol; both consume a published contract release.
+
+## Contract families
+
+| Family                                                             | Meaning                                        |
+| ------------------------------------------------------------------ | ---------------------------------------------- |
+| [Event](/docs/reference/generated/contracts/event)                 | Typed security observation                     |
+| [Ingest](/docs/reference/generated/contracts/ingest)               | Event batch, durable ACK, and refusal          |
+| [Platform](/docs/reference/generated/contracts/platform)           | Descriptor and version/capability declarations |
+| [Detection](/docs/reference/generated/contracts/detection)         | Evidence-bearing analytical result             |
+| [Hunt](/docs/reference/generated/contracts/hunt)                   | Bounded query and result pages                 |
+| [Control](/docs/reference/generated/contracts/control)             | Sessions, permissions, and caller grants       |
+| [Ruleset](/docs/reference/generated/contracts/ruleset)             | Typed rules, versions, publication, activation |
+| [Alert](/docs/reference/generated/contracts/alert)                 | Operator work and occurrence evidence          |
+| [Incident](/docs/reference/generated/contracts/incident)           | Correlation story with operational lifecycle   |
+| [Agent](/docs/reference/generated/contracts/agent)                 | Registry, admission, and certificate lifecycle |
+| [Inventory](/docs/reference/generated/contracts/inventory)         | Asset scans and typed items                    |
+| [Vulnerability](/docs/reference/generated/contracts/vulnerability) | Advisory intelligence and feed provenance      |
+
+## Generation and ownership
+
+Canonical `.proto` definitions live under `proto/seagull/.../v1`. Generated Go bindings are committed so consumers need no generator to build. CI regenerates and fails on differences. Documentation extracts references from a pinned source snapshot; it does not own a second protocol definition.
+
+Both backend and agent currently pin `v0.14.0`. The introductory contracts README's old `go get ...@v0.1.0` example is not the current integration baseline. Use each consumer's `go.mod` and [recorded compatibility](/docs/agent/compatibility).
+
+## Boundaries of a schema
+
+A declared inventory message does not prove an endpoint collector exists. A platform descriptor does not imply the agent currently fetches it. Wire structure, handler support, runtime composition, and release compatibility must be evaluated together.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-contracts/README.md](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/README.md) · [Seagull-contracts/Makefile](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/Makefile) · [Seagull-backend-v2/go.mod](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/go.mod) · [Seagull-agent-v2/go.mod](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/go.mod).

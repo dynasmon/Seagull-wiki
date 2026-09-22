@@ -1,0 +1,36 @@
+---
+title: 'Versioning and compatibility'
+description: 'How wire changes evolve and why schema, protocol, software, and configuration versions differ.'
+---
+
+## Independent version axes
+
+Software release, contract module release, wire protocol version, event schema version, inventory schema version, and agent configuration format are distinct. The current agent declares wire protocol 1 and event/inventory schema 1; that does not make the application a “version 1” product.
+
+The agent pins a published contract release and interprets backend refusals against the values it intentionally sent. A rejected schema or declared enum can signal incompatibility; an unset required value or unknown enum constructed by a bug is not automatically an incompatible server.
+
+## Additive contract changes
+
+The contracts policy adds fields rather than renumbering, renaming, or removing them. Buf checks compatibility against the branch baseline. Incompatible shape changes use a new `vN` package so independently deployed consumers can migrate deliberately.
+
+```bash
+make lint
+make generate
+make check
+make breaking
+make verify
+```
+
+Run in `Seagull-contracts`. `make verify` covers lint, module verification, generation consistency, and build; `make breaking` is a separate compatibility gate. Commit regenerated Go bindings alongside schema changes.
+
+## Behavioral compatibility
+
+Unknown protobuf fields may be ignored. That is not permission to change response meaning silently. A new interpretation that an older client cannot safely make requires an explicit protocol transition. The agent's recorded backend exchanges constrain claims to actual tested platforms; they do not establish compatibility with every version bearing a similar schema.
+
+## Capability negotiation
+
+The backend descriptor and version declarations exist. The agent currently has version constants and refusal classification, not a live descriptor negotiation loop. Future collectors and control features must negotiate only capabilities actually supported by both sides. Do not create a competing agent-local envelope or handshake schema.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-contracts/Makefile](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/Makefile) · [Seagull-contracts/buf.yaml](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/buf.yaml) · [Seagull-agent-v2/internal/protocol/protocol.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/protocol/protocol.go) · [Seagull-agent-v2/tests/compatibility/gateway_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/tests/compatibility/gateway_test.go).
