@@ -1,0 +1,37 @@
+---
+title: 'Event lifecycle and ACKs'
+description: 'Follow an event from its producer through broker durability, analysis, persistence, and triage.'
+---
+
+import {
+  durableAdmission,
+  downstreamEffects,
+} from '@site/src/diagrams/architecture';
+
+## Before the request
+
+The producer assigns a stable `event_id`, records event and observation time, and constructs the typed event body. The future agent must preserve that identity and those timestamps across retries. Today, the backend development probe exercises this contract; there is no functioning V2 agent delivery loop.
+
+## Durable admission
+
+<SequenceDiagram diagram={durableAdmission} />
+
+Validation is whole-batch, but broker publication is not an atomic batch transaction. Some records can become durable before publication returns an error. Retrying the entire request is correct and can repeat those records. An idempotent Kafka producer does not eliminate duplicates from a separately retried HTTP request.
+
+## What the ACK proves
+
+`BatchAck` has `accepted`, `durable`, and `received`. It contains neither an echoed `batch_id` nor per-record acceptances. The producer must correlate the reply to its request and require all three conditions. Inventory ACK counts are counts of records, not items.
+
+The gateway's all-in-sync-replicas acknowledgement is only as resilient as the replication and minimum-in-sync configuration. The development topology has one replica. It provides a broker durability boundary, not replicated high availability.
+
+## Downstream effects
+
+<SequenceDiagram diagram={downstreamEffects} />
+
+The event writer projects the observation into ClickHouse. Analysis independently normalizes a working representation and evaluates a pinned ruleset. Detections enter a second topic. The detection writer preserves analytical evidence; the alert writer creates operator work above the configured floor and applies alert-plane folding and suppression.
+
+An event can be acknowledged before any of these effects is queryable. Trace [consumer lag](/docs/observability/health) and writer progress before treating a query delay as lost ingestion. [Duplicates](/docs/troubleshooting/duplicates) must be investigated at the relevant layer rather than suppressed indiscriminately.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/ingest/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/http.go) · [Seagull-backend-v2/internal/broker/publisher.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/publisher.go) · [Seagull-backend-v2/internal/broker/consumer.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/consumer.go) · [Seagull-contracts/proto/seagull/ingest/v1/ingest.proto](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/proto/seagull/ingest/v1/ingest.proto).

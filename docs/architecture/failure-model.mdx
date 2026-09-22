@@ -1,0 +1,29 @@
+---
+title: 'Failure and consistency model'
+description: 'Where Seagull retries, where it fails closed, and which states are eventually visible.'
+---
+
+| Failure boundary                 | Current behavior                                                | Operator implication                                              |
+| -------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Gateway → broker                 | No durable ACK on failure; request may have partially published | Keep producer data and tolerate duplicates                        |
+| Consumer → store                 | Retry transient failures; progress follows completed delivery   | Growing lag can represent protected work                          |
+| Poison record                    | Writer-specific quarantine with source position and reason      | Monitor quarantine; it is preserved failure evidence              |
+| Control registry → admission log | Registry keeps unannounced changes for retry                    | Admission changes propagate asynchronously                        |
+| Ruleset activation → engine      | Incompatible activation is refused; last executable set remains | Published or active in the log is not proof every engine switched |
+| Engine partition reassignment    | Rewind and rebuild bounded state                                | Catch-up load accompanies restart and scaling                     |
+| Control process restart          | In-memory sessions disappear                                    | Callers must establish new sessions                               |
+| Agent damaged installation state | Startup refuses rather than silently inventing identity         | Repair or explicitly replace the installation                     |
+
+## Consistency is workload-specific
+
+An ACK gives a broker durability result, while query visibility depends on asynchronous writers. PostgreSQL stores mutable control records and their trails. Rulesets and admission rosters replicate through compacted topics. Gateways can temporarily hold an earlier roster revision while a newer control decision propagates.
+
+Inventory currentness is determined by the newest full scan for a kind. Item projection and scan-watermark persistence must be understood together; an ADR is not proof that every multi-write operation is atomic. The integration tests and actual projector code define the supported recovery behavior.
+
+## Failure is observable, not equivalent to loss
+
+An unavailable broker, saturated capacity, or failed write should surface as a refusal, retry, lag, or failure metric. A record committed beyond retention cannot be reconstructed from the broker. Quarantine and storage retention likewise bound recovery. Backups and retention are therefore part of the [operational recovery plan](/docs/operations/recovery).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/broker/consumer.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/consumer.go) · [Seagull-backend-v2/internal/control/admissions.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/admissions.go) · [Seagull-backend-v2/internal/control/sessions.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/sessions.go) · [Seagull-agent-v2/internal/identity/identity.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/identity/identity.go) · [Seagull-backend-v2/docs/decisions/0027-inventory-is-a-record-kind-of-its-own.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0027-inventory-is-a-record-kind-of-its-own.md).

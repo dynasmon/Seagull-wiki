@@ -1,0 +1,33 @@
+---
+title: 'Performance and scaling'
+description: 'Measured backend baselines, practical bottlenecks, and safe interpretation of scalability claims.'
+---
+
+## What has been measured
+
+The backend includes a documented ingest benchmark and load harness. Its recorded environment is an AMD Ryzen 7 5700X, Linux, Go 1.25.13, and a local Docker Redpanda. The figures characterize that revision and setup; they are not a supported production events-per-second commitment.
+
+```bash
+make bench
+make test-load
+```
+
+Run these in the backend checkout. The load target starts a broker and can consume substantial local resources. The benchmark target isolates in-process hot paths. Preserve hardware, revision, batch size, concurrency, and broker configuration with every comparison.
+
+## Known constraints
+
+Decode and validation allocate work before publication because the gateway must overwrite identity and validate the entire batch. Increasing batch size can reduce throughput and worsen tail latency. The default event count is 1,000, with independent body and aggregate in-flight limits.
+
+Consumer scaling is bounded by topic partitions and processing ownership. More consumers than partitions do not create more independent ownership. Stateful detection also limits grouping, window width, observations per key, and total keys. Widening a window increases recovery work after restart.
+
+## Measure the bottleneck before tuning
+
+Distinguish gateway admission time, broker publication, consumer lag, analysis delay, store write time, and query read cost. A faster HTTP ACK does not prove more detections are available. Retention must cover realistic outage and recovery duration, including catch-up load.
+
+Agent fleet capacity, collector footprint, spool disk behavior, and update rollout performance have not been established because those components are unfinished. The agent's Go memory target is not a kernel-enforced resident-memory limit.
+
+The [historical performance reference](/docs/reference/generated/performance) preserves the measured context and numbers. Re-run it before making deployment decisions against a newer source revision.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). `Seagull-backend-v2/notes/performance-baseline.md` (local planning evidence) · [Seagull-backend-v2/tests/load/ingest_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/load/ingest_test.go) · [Seagull-backend-v2/cmd/ingest-gateway/config.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/ingest-gateway/config.go) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).

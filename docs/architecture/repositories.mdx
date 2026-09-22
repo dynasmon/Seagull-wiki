@@ -1,0 +1,34 @@
+---
+title: 'Repository and package boundaries'
+description: 'Ownership, build independence, and dependency direction across the Seagull repositories.'
+---
+
+import { repositoryDependencies } from '@site/src/diagrams/architecture';
+
+A workspace is a convenient checkout layout. It is not a shared build tree.
+
+| Repository            | Owns                                                                       | Boundary                                        |
+| --------------------- | -------------------------------------------------------------------------- | ----------------------------------------------- |
+| `Seagull-contracts`   | Protobuf schemas and committed Go bindings                                 | No component implementation                     |
+| `Seagull-backend-v2`  | Admission, analysis, persistence, queries, administration                  | Imports published contracts, never agent code   |
+| `Seagull-agent-v2`    | Endpoint runtime, installation state, keys; future collection and delivery | Imports published contracts, never backend code |
+| `Seagull-frontend-v2` | Reserved V2 product interface                                              | README and license only in this baseline        |
+| `Seagull-wiki`        | Guides, evidence snapshots, generated reference, static website            | Independently installable and deployable        |
+
+## Dependency direction
+
+<FlowDiagram diagram={repositoryDependencies} />
+
+The dashed lines are a maintenance workflow, not runtime or build dependencies. A cloned documentation repository builds without access to the product repositories.
+
+Backend executables under `cmd/` select adapters and compose capabilities. Capability-owned ports express the infrastructure a capability needs. Domain packages do not import database drivers or the broker client. `internal/platform` holds product-independent configuration, logging, health, TLS, and lifecycle machinery.
+
+The agent composition root alone imports its runtime. Collectors may not transitively reach HTTP, RPC, TLS, or key providers. Configuration does not open installation state or keys. Architecture tests enforce these boundaries across build tags, so OS-specific files cannot bypass them.
+
+## Independent releases
+
+Both agent and backend currently pin contracts `v0.14.0`. This does not require simultaneous application releases. Contract compatibility and behavior must be verified with the exact release each component uses. Agent `make` gates set `GOWORK=off`; a local `go.work` is an optional development aid, not a release dependency.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/tests/architecture/dependencies_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/architecture/dependencies_test.go) · [Seagull-agent-v2/tests/architecture/boundaries_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/tests/architecture/boundaries_test.go) · [Seagull-agent-v2/tests/architecture/ownership_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/tests/architecture/ownership_test.go) · [Seagull-agent-v2/Makefile](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/Makefile) · [Seagull-backend-v2/go.mod](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/go.mod).
