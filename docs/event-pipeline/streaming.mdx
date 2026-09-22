@@ -1,0 +1,42 @@
+---
+title: 'Streaming and topic topology'
+description: 'Broker topics, consumer groups, ordering, replay, quarantine, and replication semantics.'
+---
+
+Seagull uses Redpanda through a Kafka-compatible client. The broker provides durable asynchronous transport; each consumer owns the meaning of completed processing.
+
+## Streams and keys
+
+| Topic                    | Producer                       | Consumers                          | Key / purpose                                        |
+| ------------------------ | ------------------------------ | ---------------------------------- | ---------------------------------------------------- |
+| `security.events.raw`    | Gateway                        | Event writer, analysis engine      | Agent identity; ordering within an agent's partition |
+| `security.inventory.raw` | Gateway                        | Inventory projector                | Asset identity; independent scan stream              |
+| `security.detections`    | Analysis engine                | Detection writer, alert writer     | Analytical decisions                                 |
+| `security.rulesets`      | Control API                    | Analysis engine, control registry  | Compacted versions and activation pointer            |
+| `security.agents`        | Control API                    | Gateway roster                     | Compacted agent admission revisions                  |
+| `security.advisories`    | Advisory importer              | Advisory writer, importer recovery | Compacted advisory and feed state                    |
+| Quarantine topics        | Corresponding writer/projector | Operator recovery workflows        | Permanently refused record plus position and reason  |
+
+Raw events default to 12 partitions and 168 hours of retention; inventory defaults to 6 partitions and 720 hours. Use the [configuration reference](/docs/reference/generated/environment/shared) and the topology declaration for the exact settings of each stream. Do not infer a quarantine retention from its source topic.
+
+## Transport and processing guarantees
+
+Producers wait for all in-sync replicas and use an idempotent client. Consumers disable auto-commit and block rebalance while a polled batch is in flight. Delivery completes before commit; a crash between those moments replays completed work. New consumer groups begin at the earliest retained position.
+
+A Kafka offset does not establish end-to-end exactly-once delivery. Producer retry, request retry, state reconstruction, and store deduplication are separate mechanisms. See [event lifecycle](/docs/architecture/event-lifecycle).
+
+## Backpressure and quarantine
+
+Transient outages trigger bounded backoff while the affected consumer makes no durable progress. Permanent record failures can be quarantined rather than indefinitely blocking a partition. Successful quarantine is itself a durable effect before advancing offsets. A quarantine is not a successful security decision: monitor and investigate it.
+
+## Ordering and scaling
+
+Ordering belongs to a partition. Increasing partitions changes the mapping of future keys and is not a harmless throughput knob for stateful processing. Consumer-group rebalancing requires [window reconstruction](/docs/architecture/state-correctness). Different consumer groups independently track their positions; advancing an event writer says nothing about analysis progress.
+
+## Production trust
+
+Development broker communication is plaintext and unauthenticated. TLS and SCRAM configuration exists; authentication without TLS is refused. Producer ACLs are an operational security requirement because writers to admission, ruleset, and advisory topics can influence platform authority or analytical conclusions. The example deployment is not a provisioned ACL policy.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/broker/topics.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/topics.go) · [Seagull-backend-v2/internal/broker/consumer.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/consumer.go) · [Seagull-backend-v2/internal/broker/publisher.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/broker/publisher.go) · [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml).

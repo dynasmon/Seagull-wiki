@@ -1,0 +1,26 @@
+---
+title: 'Schema and topology migrations'
+description: 'Dedicated migration ownership and safe startup ordering for stores and broker topology.'
+---
+
+Seagull applies schema changes through one-shot executables. Runtime processes verify dependencies and refuse incompatible state; they do not compete to migrate the same store at startup.
+
+## Three owners
+
+`backbone-migrator` declares topics, partition topology, retention, and replication settings. `store-migrator` applies the ClickHouse schema. `control-migrator` applies PostgreSQL changes for alerts, incidents, agents, and certificates. Compose orders dependent processes after successful migration.
+
+## Inspect before upgrading
+
+Read every migration between the running and proposed revisions, including later alterations to an existing table. Initial `CREATE TABLE` statements do not describe the final schema. Understand ClickHouse ordering and partition keys, TTLs, and deduplication behavior before changing query or write paths.
+
+Use the [generated migration reference](/docs/reference/generated/storage) to find the exact SQL. Preserve the schema-tracking state with backups. A migration that can run twice syntactically is not necessarily safe after partial execution; the migrator and integration tests define that behavior.
+
+## Failure diagnosis
+
+If a service reports an unmigrated or incompatible store, inspect the corresponding migrator's exit status and logs first. Verify credentials, database ownership, and connectivity. Do not bypass the runtime's check or allow every replica to apply ad hoc SQL as a workaround.
+
+Downgrading a binary does not roll a schema back. No general automated downgrade or tested production restore recipe is supplied by this workspace. Plan and rehearse the [recovery procedure](/docs/operations/recovery) for your deployment before applying irreversible data changes.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/clickhouse/migrate.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/clickhouse/migrate.go) · [Seagull-backend-v2/internal/postgres/migrate.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/postgres/migrate.go) · [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml).
