@@ -1,0 +1,28 @@
+---
+title: 'CI, artifacts, and release boundaries'
+description: 'What the current pipelines build and verify, and what they do not automate.'
+---
+
+## Backend
+
+The GitHub Actions workflow verifies source, dependencies, tests, race behavior, vulnerabilities, and component image builds. The Go toolchain is pinned consistently with the module and Docker builder. Each executable receives a separate image. Build metadata identifies version and revision; the runtime is non-root scratch.
+
+## Agent
+
+The independent agent workflow runs source verification and reachable vulnerability analysis. Its build is from that checkout alone, with a published contracts module. It prints binary identity after building. The current workflow does not publish native packages, signed fleet artifacts, or an automatic update channel.
+
+## Contracts
+
+Contract CI checks lint, generated bindings, compilation, and backward compatibility. The baseline is a remote-tracking main reference so branch state does not silently change the comparison. Releases use version tags; generated bindings are committed.
+
+## Documentation
+
+The docs pipeline is read-only with respect to repository permissions and does not deploy automatically. It deterministically installs from `package-lock.json`, runs `npm run check`, builds the multi-stage image, starts the unprivileged read-only runtime, and runs Chromium checks. Deployment can publish the `build/` directory or the static image through the organization's chosen infrastructure.
+
+## Release and rollback limits
+
+A successful CI build is not authorization to deploy or evidence that a production migration is reversible. Keep image/source revision, contracts version, ruleset version, and schema state together in release records. Roll back rules by activating a previous immutable ruleset. Treat database downgrade, CA rollback, and endpoint state format changes as separate recovery problems.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/.github/workflows/ci.yml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/.github/workflows/ci.yml) · [Seagull-agent-v2/.github/workflows/ci.yml](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/.github/workflows/ci.yml) · [Seagull-contracts/.github/workflows/ci.yml](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/.github/workflows/ci.yml) · [Seagull-backend-v2/deploy/Dockerfile](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/Dockerfile).
