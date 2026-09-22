@@ -1,0 +1,38 @@
+---
+sidebar_position: 1
+title: 'API architecture and conventions'
+description: 'Protobuf HTTP surfaces, trust domains, error models, and generated route/message references.'
+---
+
+The current Seagull V2 API is HTTP with binary Protocol Buffer messages. It is not a JSON REST API or a gRPC service. No OpenAPI specification exists in this baseline; the site generates route and schema references directly from registered routes and canonical contracts.
+
+## Separate surfaces
+
+| Surface | Intended caller             | Authentication / scope                                     |
+| ------- | --------------------------- | ---------------------------------------------------------- |
+| Ingest  | Telemetry producer          | Agent mTLS plus admission roster                           |
+| Query   | Analyst tooling             | Caller mTLS; certificate organization supplies tenants     |
+| Control | Authorized operator tooling | Caller mTLS; session and per-request policy where declared |
+| Renewal | Existing agent identity     | Agent mTLS; registry admissibility                         |
+
+Paths use `/v1`, independently of application release numbering. Normal responses use `application/x-protobuf`; ingestion also accepts `application/protobuf`. Encode and decode using the published generated bindings, not ad hoc JSON.
+
+## Requests and examples
+
+The backend development probe is the executable reference client and includes real request/response construction. Use the [quickstart](/docs/getting-started/quickstart) to exercise it. Raw `curl` with a JSON object cannot replace a protobuf-encoded body.
+
+[HTTP routes](/docs/reference/generated/http-routes) list methods and declared guards. [Contract reference](/docs/contracts/overview) describes exact messages. Control session, ruleset, agent, alert, and incident handlers provide operation-specific inputs; route existence alone does not establish a generic CRUD convention.
+
+## Errors
+
+Ingest errors carry `Rejection` with code, detail, field, and record index. Query errors carry `hunt.v1.Refusal`; control errors carry `control.v1.Refusal`. HTTP status and structured code must be considered together. Retryable capacity/dependency failures differ from permission or schema refusal.
+
+Control responses are `Cache-Control: no-store`. Tokens and grants must not be persisted by intermediary caches. External failure details do not expose raw database errors; operators diagnose them from logs.
+
+## Pagination and bounds
+
+Hunting uses a required half-open time range, typed predicates, a bounded limit, and opaque cursor. Control list/search operations use their own messages and filtering rules. There is no universal `page=2` query parameter or shared error envelope for every surface. See [hunting](/docs/api/hunting).
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/ingest/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/http.go) · [Seagull-backend-v2/internal/control/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/http.go) · [Seagull-backend-v2/internal/hunt/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/http.go) · [Seagull-backend-v2/tools/devprobe/main.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tools/devprobe/main.go).

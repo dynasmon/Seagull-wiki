@@ -1,0 +1,30 @@
+---
+title: 'Frontend architecture and design system'
+description: 'The current V2 frontend boundary, legacy visual reference, and integration decisions still to be implemented.'
+---
+
+<FeatureStatus status="planned" /> V2 application implementation.
+
+The inspected `Seagull-frontend-v2` repository contains a README and license. It has no React source, package manifest, routes, EUI configuration, API layer, cache, authentication flow, dashboard, or visualization implementation to describe as current V2 behavior.
+
+## Existing Seagull visual language
+
+The legacy frontend under the separate `seagull/frontend` tree supplies an established design reference: React 18, TypeScript, EUI with Borealis, a sky-blue accent, slate surfaces, explicit light/dark palettes, restrained navigation, severity colors, and compact operational interfaces. This documentation site reuses that visual direction while using Docusaurus for document navigation.
+
+Legacy implementation details are not a V2 frontend specification. Its React Router, feature directories, custom charts, and API workflows cannot be assumed compatible with V2 protobuf HTTP and certificate-bound operator access.
+
+## V2 integration boundaries
+
+A V2 interface must distinguish analytical reads from administrative actions. Query API authorization currently derives scope from the caller certificate, while the control API uses certificate-bound sessions and policy. A browser session integration, protobuf client generation strategy, gateway/BFF choice, cache ownership, and certificate handling need explicit product decisions. None is silently invented here.
+
+Views should preserve the difference between events, detections, alerts, incidents, inventory, and advisory intelligence. In particular, an advisory is not an asset vulnerability finding, and a registered agent is not proof of live endpoint connectivity.
+
+## Contributing next steps
+
+Start by reviewing [API architecture](/docs/api/overview), [authorization](/docs/security/authentication), and [implementation status](/docs/roadmap/status). Establish a tested API client and an authenticated operator workflow before presenting mock screens as connected product features.
+
+Documentation components remain small: EUI supplies status presentation and theme context; Docusaurus owns navigation, search, MDX, TOC, and code rendering. The docs do not pull in the legacy application's charting, graph, globe, or dashboard dependencies.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-frontend-v2/README.md](https://github.com/dynasmon/Seagull-frontend-v2/blob/307351e8d7f9a696786a9b05d50ac0b783db4163/README.md) · [Seagull-backend-v2/internal/hunt/scope.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/scope.go) · [Seagull-backend-v2/internal/control/guard.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/guard.go).
