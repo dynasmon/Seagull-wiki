@@ -1,0 +1,32 @@
+---
+title: 'Trust and network boundaries'
+description: 'Who authenticates each connection and which authority determines agent identity, tenant, and permissions.'
+---
+
+import { trustBoundaries } from '@site/src/diagrams/security';
+
+<FlowDiagram diagram={trustBoundaries} />
+
+## Endpoint identity and tenancy
+
+The certificate common name identifies the agent after chain verification. The registry binds the agent to its tenant; a client request cannot select a tenant. Registry admission records cross the broker, so producer permissions on that topic are part of tenant security.
+
+## Operator and query authority
+
+The control listener accepts the caller CA and resolves policy permissions per request. Session tokens are bound to the presenting certificate. The query listener also uses caller certificates but currently extracts tenant scope from certificate organizations. It does not inherit control-plane policy revocations or session semantics automatically.
+
+## Control process and CA key
+
+The control process holds the agent signing authority and the registry. This is intentional: it already owns issuance authorization. Its second listener handles agent renewal under the agent trust domain. An attacker who compromises this process can influence certificate issuance and control state; splitting listeners does not isolate process memory.
+
+## Infrastructure and internet access
+
+The Compose `backbone` network is internal. The advisory importer also joins the feeds network to reach OSV. Database and broker access must be restricted according to process ownership. The example's plaintext backend links are explicitly development settings.
+
+## Reverse proxy rule
+
+The product gateway must receive and verify the agent TLS certificate. Ordinary HTTP TLS termination that replaces it with a forwarded identity header violates the current identity model. A TCP passthrough topology can preserve it. The documentation website is separate static HTTP content and may safely sit behind normal TLS termination.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/deploy/compose.yaml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/compose.yaml) · [Seagull-backend-v2/internal/agentidentity/identity.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/agentidentity/identity.go) · [Seagull-backend-v2/internal/hunt/scope.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/scope.go) · [Seagull-backend-v2/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0025-the-platform-signs-the-identity-it-binds.md) · [Seagull-backend-v2/docs/decisions/0026-an-agent-sends-into-the-tenant-it-was-registered-in.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0026-an-agent-sends-into-the-tenant-it-was-registered-in.md).

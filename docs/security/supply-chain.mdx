@@ -1,0 +1,26 @@
+---
+title: 'Supply chain and secure releases'
+description: 'Existing repository verification and the gap between CI checks and authenticated fleet updates.'
+---
+
+## Current build checks
+
+Backend CI verifies formatting, static analysis, the module graph, unit/architecture/end-to-end tests, race detection, reachable dependency vulnerabilities, and component images. Agent CI independently verifies its pinned module graph, architecture and recorded compatibility suites, race behavior, executable build identity, and reachable vulnerabilities. Contracts CI regenerates bindings and checks backward compatibility.
+
+These checks improve source and build integrity. They do not establish a signed artifact provenance chain, an authenticated package repository, or a verified remote update path by themselves.
+
+## Agent release target
+
+The architecture plan calls for reproducible trusted builds, native installation, cryptographically verified updates, and compatibility-aware fleet rollout. A release profile must demonstrate the required gates. Current build identity and `go version -m` output describe how a binary was built; they are not remote attestation of the binary actually running.
+
+Protect signing credentials outside source and images. Avoid shared endpoint bootstrap secrets. Treat dependencies, CI credentials, artifact storage, and update trust roots as separate owners. No existing remote-update command should be inferred from this guidance.
+
+## Documentation pipeline
+
+The docs lock npm dependencies and build static output into an independent unprivileged server image. No Node build tooling is required at runtime. Documentation CI checks types, lint, generated references, formatting, links, the production build, Docker image, and browser behavior. Public website configuration carries no secrets.
+
+Dependency audit findings must be evaluated at both build time and browser runtime; removing Node from the server image does not remove JavaScript shipped to browsers. See the documentation repository's validation report for the actual audit baseline and measured asset budget.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/.github/workflows/ci.yml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/.github/workflows/ci.yml) · [Seagull-agent-v2/.github/workflows/ci.yml](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/.github/workflows/ci.yml) · [Seagull-contracts/.github/workflows/ci.yml](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/.github/workflows/ci.yml) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).

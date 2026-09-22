@@ -1,0 +1,33 @@
+---
+sidebar_position: 1
+title: 'Security architecture'
+description: 'An evidence-based map of identity, tenant authority, authorization, secrets, and residual risk.'
+---
+
+Seagull's trust model separates endpoint credentials, operator credentials, broker authority, and persistence. Authentication at one boundary does not grant unrestricted authority at another.
+
+## Implemented controls
+
+The gateway verifies client certificates and derives agent identity from the verified leaf. The registry's replicated admission record determines tenant and admissibility. The control API requires caller certificates and certificate-bound sessions with per-request policy decisions. Query scope currently derives separately from certificate organizations. Backend listeners use the shared TLS implementation; private endpoint keys are held by a local signer provider.
+
+Bodies, concurrent work, sessions, and detection state are bounded. Backend refusal responses avoid exposing raw driver failures, while operator logs preserve failure context. Agent diagnostics bound repeated untrusted text and avoid printing private keys.
+
+## Limits that matter
+
+mTLS proves key possession, not endpoint integrity. A stolen authorized key remains usable until a relevant admission decision propagates or its certificate expires. Replacing a certificate does not revoke the previous one. Broker producer access can forge the records downstream components trust. Development broker/database defaults are not a production perimeter.
+
+There is no current bootstrap-token service, live V2 agent renewal loop, signed remote policy, verified remote updater, or arbitrary response execution. These must remain visibly planned.
+
+## Read by boundary
+
+- [Trust boundaries](/docs/security/trust-boundaries) identifies authority on each connection.
+- [Enrollment](/docs/security/enrollment) separates operator-mediated issuance from future bootstrap.
+- [PKI and mTLS](/docs/security/pki) describes renewal, overlap, and revocation limits.
+- [Authentication and authorization](/docs/security/authentication) distinguishes control and query behavior.
+- [Secrets](/docs/security/secrets) covers storage and delivery of sensitive material.
+- [Threat model](/docs/security/threat-model) connects concrete abuse paths to controls and gaps.
+- [Security invariants](/docs/security/invariants) lists implemented and target rules.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/agentidentity/identity.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/agentidentity/identity.go) · [Seagull-backend-v2/internal/control/guard.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/guard.go) · [Seagull-backend-v2/internal/hunt/scope.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/hunt/scope.go) · [Seagull-agent-v2/internal/secrets/secrets.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/internal/secrets/secrets.go).

@@ -1,0 +1,29 @@
+---
+title: 'Security invariants'
+description: 'Current guarantees and target requirements, with their actual implementation boundaries.'
+---
+
+| Invariant                                | Status and exact scope                                                                  |
+| ---------------------------------------- | --------------------------------------------------------------------------------------- |
+| Payload identity is not authentication   | Implemented in gateway: verified certificate ID replaces producer identity              |
+| Tenant belongs to the registry           | Implemented: unknown agents are refused; roster determines tenant                       |
+| No ACK before required broker durability | Implemented gateway behavior; depends on broker replication policy                      |
+| No implicit permission on control routes | Implemented route registration and guard                                                |
+| Agent/backend code is not shared         | Implemented architecture tests; only published contracts cross the boundary             |
+| Private keys originate at endpoints      | Implemented agent key provider; full enrollment workflow remains planned                |
+| No shared global agent credential        | Architectural requirement; current key provider creates distinct keys                   |
+| Endpoint key is not sent to the server   | Signer/CSR boundary; does not claim files are non-exportable                            |
+| Runtime resources are finite             | Implemented bounds where components exist; spool/delivery bounds await those components |
+| Durable source progress                  | Target: collection checkpoints must follow durable local admission                      |
+| No arbitrary remote shell                | Target invariant; no response channel is implemented                                    |
+| Verified updates                         | Planned; updates are disabled today                                                     |
+
+## Invariants are narrower than slogans
+
+“Authenticated endpoint” means possession of a trusted credential, not a trustworthy operating system. “Durable” names a specific persisted boundary, not unlimited retention or immunity to cluster loss. “Revoked” is an agent state distributed to gateways, not an instantaneous global invalidation of all existing TLS connections.
+
+Use architecture and failure tests to keep these claims executable. When a new implementation introduces a second identity source, a new protocol representation, or an early acknowledgement, it must be reviewed against the existing owner and contract before being treated as an optimization.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/tests/architecture/dependencies_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/architecture/dependencies_test.go) · [Seagull-agent-v2/tests/architecture/boundaries_test.go](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/tests/architecture/boundaries_test.go) · [Seagull-backend-v2/internal/ingest/http.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/ingest/http.go) · [Seagull-agent-v2/README.md](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/README.md).
