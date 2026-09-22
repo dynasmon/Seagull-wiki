@@ -160,7 +160,7 @@ export const repositoryDependencies = defineFlow({
   title: 'Dependency direction between the Seagull repositories',
   grid: {
     columns: [190, 190, 190],
-    rows: 3,
+    rows: 2,
     rowHeight: 56,
     rowGap: 44,
     columnGap: 44,
@@ -187,42 +187,14 @@ export const repositoryDependencies = defineFlow({
       col: 2,
       row: 1,
     },
-    docs: {
-      label: 'Documentation',
-      detail: 'Seagull-wiki',
-      kind: 'process',
-      col: 1,
-      row: 2,
-    },
   },
   edges: [
     { from: 'backend', to: 'contracts', exit: 'top', enter: 'left' },
     { from: 'agent', to: 'contracts', exit: 'top', enter: 'right' },
-    {
-      from: 'docs',
-      to: 'contracts',
-      kind: 'control',
-      label: 'reviewed snapshots',
-    },
-    {
-      from: 'docs',
-      to: 'backend',
-      kind: 'control',
-      exit: 'left',
-      enter: 'bottom',
-    },
-    {
-      from: 'docs',
-      to: 'agent',
-      kind: 'control',
-      exit: 'right',
-      enter: 'bottom',
-    },
   ],
   legend: {
     process: 'Repository',
     data: 'Imports the published module',
-    control: 'Reviewed source snapshot, not a build dependency',
   },
 });
 

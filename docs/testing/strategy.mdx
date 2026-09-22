@@ -30,10 +30,6 @@ Agent tests cover local state durability/permissions, runtime/module lifecycle, 
 
 The complete endpoint-to-backend chaos suite, collector performance/soak evidence, native package tests, signed update rollback tests, and full production readiness gate remain planned. There is no comprehensive fleet benchmark or turnkey production HA validation.
 
-## Documentation checks
-
-The documentation repository checks types, code lint, metadata/fences/headings, generated references, formatting, and Docusaurus links/MDX through a production build. Browser checks cover real routes, theme persistence, diagrams, search, and mobile navigation. Source drift checking is an optional workspace maintenance gate; it is not a build-time dependency on sibling repositories.
-
 ## Source evidence
 
 Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/Makefile](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/Makefile) · [Seagull-backend-v2/tests/integration/recovery_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/integration/recovery_test.go) · [Seagull-agent-v2/Makefile](https://github.com/dynasmon/Seagull-agent-v2/blob/36efb578b40a058d3a92637f9cf08d9026431289/Makefile) · [Seagull-contracts/Makefile](https://github.com/dynasmon/Seagull-contracts/blob/d2090c560f54ee80990d1188c0d8fd0408a1e1d5/Makefile).

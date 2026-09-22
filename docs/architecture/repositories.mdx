@@ -13,13 +13,10 @@ A workspace is a convenient checkout layout. It is not a shared build tree.
 | `Seagull-backend-v2`  | Admission, analysis, persistence, queries, administration                  | Imports published contracts, never agent code   |
 | `Seagull-agent-v2`    | Endpoint runtime, installation state, keys; future collection and delivery | Imports published contracts, never backend code |
 | `Seagull-frontend-v2` | Reserved V2 product interface                                              | README and license only in this baseline        |
-| `Seagull-wiki`        | Guides, evidence snapshots, generated reference, static website            | Independently installable and deployable        |
 
 ## Dependency direction
 
 <FlowDiagram diagram={repositoryDependencies} />
-
-The dashed lines are a maintenance workflow, not runtime or build dependencies. A cloned documentation repository builds without access to the product repositories.
 
 Backend executables under `cmd/` select adapters and compose capabilities. Capability-owned ports express the infrastructure a capability needs. Domain packages do not import database drivers or the broker client. `internal/platform` holds product-independent configuration, logging, health, TLS, and lifecycle machinery.
 

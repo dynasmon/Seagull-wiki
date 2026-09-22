@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 title: 'Source baseline and evidence'
-description: 'Exact reviewed revisions, local planning sources, provenance rules, and freshness checks.'
+description: 'Exact reviewed revisions, local planning sources, and provenance rules.'
 ---
 
 The guides describe these exact local Git revisions, reviewed on **20 September 2026**. Local availability does not imply that a commit or release is publicly accessible.
@@ -17,12 +17,8 @@ The guides describe these exact local Git revisions, reviewed on **20 September 
 
 Current source and tests take precedence over historical notes. Compose and typed configuration establish wiring/defaults. Canonical contracts establish wire shape. ADRs explain decisions but retain historical statements. Roadmap cards establish target requirements, not implemented runtime behavior.
 
-The documentation implementation lives independently in the `Seagull-wiki` repository, which holds no product source. The V2 frontend has no application source. The separately inspected legacy frontend supplies visual context only.
+The V2 frontend has no application source. The separately inspected legacy frontend supplies visual context only.
 
 ## Local planning evidence
 
-The parent workspace's `AGENTS-BACKLOG.md` and `AGENTS.md`, and backend `notes/` documents, are local architectural evidence. Some are intentionally not tracked upstream. The docs therefore do not create broken GitHub links for them or expose local credentials. `sources/manifest.json` records every reviewed input hash. Of these local documents, the repository keeps only the backend performance baseline, which a generated reference reproduces; Git ignores the other snapshots.
-
-## Reproducibility and freshness
-
-`npm run references:check` detects drift between checked-in snapshots and generated references. `npm run sources:check` additionally compares the local product workspace against its recorded file inventory. A new release requires reviewing actual source changes, updating the matrix, and regenerating references. Neither a snapshot timestamp nor a badge automatically stays current.
+The parent workspace's `AGENTS-BACKLOG.md` and `AGENTS.md`, and backend `notes/` documents, are local architectural evidence. Some are intentionally not tracked upstream. The docs therefore do not create broken GitHub links for them or expose local credentials.
