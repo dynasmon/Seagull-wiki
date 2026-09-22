@@ -1,0 +1,26 @@
+---
+title: 'Backend package architecture'
+description: 'Capability owners, adapters, and the common process skeleton.'
+---
+
+## Domain and capability owners
+
+`event`, `inventory`, and `vulnerability` validate typed observations and intelligence. `detection` compiles and evaluates rules. `detectionstate` defines bounded temporal state. `alert`, `incident`, `agent`, `authz`, and `pki` express their respective identities, transitions, authorization decisions, and certificate requirements.
+
+`ingest` owns admission; `analysis` coordinates normalization, routing, evaluation, and durable output. `eventstore`, `detectionstore`, `alertstore`, `inventorystore`, and `advisorystore` own their projection workflows and required ports. `advisoryfeed` owns feed synchronization. `control` and `hunt` expose different HTTP capabilities.
+
+## Infrastructure adapters
+
+`broker` implements Kafka-compatible producers, consumers, compacted logs, topology verification, and recovery. `clickhouse` owns analytical schemas, migrations, writes, and query compilation. `postgres` owns transactional control persistence. `osv` translates upstream advisory exports. `rulefile`, `alertfile`, and `policyfile` read authoring/configuration formats. `sigma` translates supported external rules into the same domain language.
+
+These adapters do not redefine the shared wire event. Generated contract messages remain authoritative. Rule YAML is an authoring representation and is compiled into typed rules before execution.
+
+## Process skeleton
+
+`internal/platform` provides build information, typed configuration, logging, metrics, health, readiness, HTTP/TLS primitives, rate limiting, service composition, and shutdown. A process receives dependencies at startup and exposes its own operational signals. Domain packages must not acquire Prometheus, broker, database, or HTTP dependencies merely for convenience.
+
+The [coverage map](/docs/reference/coverage) accounts for each discovered package. The executable dependency tests are the final authority when adding or moving a package; a folder name alone does not establish a valid boundary.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/tests/architecture/dependencies_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/tests/architecture/dependencies_test.go) · [Seagull-backend-v2/cmd/analysis-engine/main.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/analysis-engine/main.go) · [Seagull-backend-v2/internal/platform/service/service.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/platform/service/service.go).
