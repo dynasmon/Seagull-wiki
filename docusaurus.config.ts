@@ -87,7 +87,7 @@ const config: Config = {
           to: '/docs/introduction/overview',
         },
         { label: 'Security model', to: '/docs/security/overview' },
-        { label: 'Contribute', to: '/docs/development/documentation' },
+        { label: 'Contribute', to: '/docs/contributing/guide' },
         {
           label: 'Source & license',
           href: 'https://github.com/dynasmon/Seagull-backend-v2/blob/main/LICENSE',
