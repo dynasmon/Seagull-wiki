@@ -1,0 +1,40 @@
+---
+title: 'Author and test rules'
+description: 'Use the actual rule format, account for field semantics, and validate shipped detection content.'
+---
+
+The YAML authoring format is compiled into typed domain rules. The analysis runtime does not interpret arbitrary YAML at evaluation time. A file starts with `schema_version: 1` and contains a `rules` sequence.
+
+## Learn from shipped rules
+
+The shipped authentication file contains three executable examples:
+
+| Rule                                   | Meaning                                                        | Important limit                                            |
+| -------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| `ssh.failed_password_from_outside`     | Failed SSH password outside selected address prefixes          | No network-range operator; `172.16.0.0/12` is not excluded |
+| `ssh.repeated_failed_password`         | Twenty failures from one address against one agent in a minute | Group includes agent; count is event-time                  |
+| `ssh.password_guessing_that_succeeded` | Failure then success inside five minutes                       | Correlation confidence depends on source clocks            |
+
+The complete, unmodified [shipped rules reference](/docs/reference/generated/rules) preserves their cases, metadata, and limitations. Use it as the format example rather than copying an invented rule skeleton.
+
+## Authoring workflow
+
+1. Choose an existing event class and contract field. Inspect normalization before deciding comparison values.
+2. Define rule identity/revision and guidance an analyst can act on.
+3. Add positive, negative, and known-false-positive cases next to the rule.
+4. Validate and check through the control plane before publication.
+5. Publish an immutable ruleset, then activate it deliberately.
+
+In a backend checkout, `make test` includes the shipped-rule gate in `cmd/analysis-engine/rules_test.go`. A rule with no cases or a failed case is not acceptable as shipped active content.
+
+## What cases prove
+
+A case describes what one event should match, its severity, and expected evidence. Count-rule cases establish which events count; sequence-rule cases establish which events participate. They do not express an entire temporal stream. Aggregation and sequence execution are tested in `internal/analysis` and integration recovery suites. Do not mistake per-event cases for a full backtesting system.
+
+## Rule quality and versioning
+
+Ruleset identity is content-derived. Rule changes should express a deliberate revision; cases are validation evidence and do not by themselves rename the executable ruleset. Preserve rationale for noisy or intentionally broad predicates. Use [alert-plane suppression](/docs/correlation/alerts) for workload tuning rather than removing analytical evidence.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/deploy/rules/authentication.yml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/rules/authentication.yml) · [Seagull-backend-v2/cmd/analysis-engine/rules_test.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/cmd/analysis-engine/rules_test.go) · [Seagull-backend-v2/docs/decisions/0007-a-rule-file-is-not-the-rule.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0007-a-rule-file-is-not-the-rule.md) · [Seagull-backend-v2/docs/decisions/0010-a-rule-carries-the-cases-it-was-written-for.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0010-a-rule-carries-the-cases-it-was-written-for.md).

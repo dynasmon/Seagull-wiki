@@ -1,0 +1,35 @@
+---
+sidebar_position: 1
+title: 'Detection engine'
+description: 'From canonical authentication events to typed, evidence-bearing detection results.'
+---
+
+import { detectionPipeline } from '@site/src/diagrams/detection';
+
+<FeatureStatus status="implemented" />
+
+The analysis engine consumes raw telemetry independently of the event writer. It routes, normalizes, and evaluates against one pinned ruleset, then publishes detections durably before committing its input position.
+
+## Current event scope
+
+The current canonical security-event body supports authentication. Inventory has a separate contract and does not pass through event detection. Planned process, FIM, and network telemetry need compatible typed contracts and producers before detection can claim support for them.
+
+Normalization prepares a working representation for comparison; it does not rewrite the raw event stored as evidence. Canonical field names come from the contract rather than a separate dictionary. The compiler rejects fields not defined by the schema.
+
+## Rule forms
+
+A rule carries identity and revision, event class, status, severity, ATT&CK metadata, false-positive guidance, provenance, and typed expressions. It may match one event, count matching events inside a grouped window, or describe an ordered sequence. These forms share validation and compilation.
+
+Missing fields answer no comparison. They are not substituted with a zero value. Negation can therefore have consequences: the shipped external-source SSH rule matches an event without a source IP because no private-prefix predicate matches. Its tests make that choice visible.
+
+## Detection output
+
+A detection names its rule and evidence. Count results include aggregation context; sequence results identify stages and clock spread. Detections are not mutated when an operator resolves an alert. Noise reduction happens at the [alert plane](/docs/correlation/alerts), preserving the underlying analytical output.
+
+<FlowDiagram diagram={detectionPipeline} />
+
+Read [rule authoring](/docs/detection/rules), [temporal semantics](/docs/detection/temporal), and [ruleset publication](/docs/detection/rulesets) before changing detection content.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/internal/analysis/engine.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/analysis/engine.go) · [Seagull-backend-v2/internal/analysis/normalize.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/analysis/normalize.go) · [Seagull-backend-v2/internal/detection/compile.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/detection/compile.go) · [Seagull-backend-v2/deploy/rules/authentication.yml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/rules/authentication.yml).

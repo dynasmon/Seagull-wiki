@@ -1,0 +1,26 @@
+---
+title: 'Alerts and noise reduction'
+description: 'How analytical detections become operator work without changing the evidence.'
+---
+
+A detection is an analytical result. An alert is the work an operator owns because of that result. Their separate stores and contracts prevent a triage action from rewriting what the engine found.
+
+## Creation and folding
+
+The alert writer consumes detections and applies the severity floor, defaulting to `medium`. A single-event finding can become an alert. Declared folding keys group detections representing the same work; occurrence records preserve every detection the alert includes. Suppression and folding reduce operational noise without removing detections from the evidence stream.
+
+Replaying a detection finds an existing identity instead of opening independent work. The writer does not perform operator lifecycle transitions. Read the shipped `deploy/alerting.yml` before changing suppression or time windows; these are explicit configuration semantics.
+
+## Triage lifecycle
+
+Alerts distinguish open, acknowledged, investigation, resolved, and false-positive states. Resolved means the finding was valid and addressed; false positive communicates that the finding itself was wrong. Assignment and transitions require control-plane authorization and preserve a trail with actor and reason.
+
+## Recovery and audit
+
+Analytical detections can be rebuilt from retained input under the appropriate ruleset, but operator decisions cannot be reconstructed merely by replaying detections. PostgreSQL backup protects the mutable operational history. Monitor both detection progress and alert-writer progress when a valid detection produces no visible work.
+
+[Incidents](/docs/correlation/incidents) represent multi-event correlation stories and have a separate lifecycle. They are not a renamed row in the alerts table.
+
+## Source evidence
+
+Reviewed against the [source baseline](/docs/reference/source-baseline). [Seagull-backend-v2/docs/decisions/0011-a-detection-is-not-an-alert.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0011-a-detection-is-not-an-alert.md) · [Seagull-backend-v2/docs/decisions/0016-an-alert-is-a-detection-somebody-owns.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0016-an-alert-is-a-detection-somebody-owns.md) · [Seagull-backend-v2/docs/decisions/0017-noise-is-removed-from-the-alert-and-never-from-the-detection.md](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/docs/decisions/0017-noise-is-removed-from-the-alert-and-never-from-the-detection.md) · [Seagull-backend-v2/deploy/alerting.yml](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/deploy/alerting.yml) · [Seagull-backend-v2/internal/control/alerts.go](https://github.com/dynasmon/Seagull-backend-v2/blob/fa3bf69023db0168832346c50bd353ca4188b87a/internal/control/alerts.go).
