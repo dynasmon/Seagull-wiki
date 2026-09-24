@@ -23,3 +23,6 @@ Thumbs.db
 sources/workspace/
 sources/Seagull-backend-v2/notes/*
 !sources/Seagull-backend-v2/notes/performance-baseline.md
+.agents/
+.claude/skills/humanizer
+skills-lock.json
