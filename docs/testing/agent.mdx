@@ -7,7 +7,7 @@ description: 'Current local-state/compatibility tests and the future failure evi
 
 `make verify` runs formatting, vet, module graph checks, unit/architecture/compatibility suites, race detection, and a build. Identity and key-provider tests exercise permissions, damaged state, stable identifiers, locking, and interrupted persistence. Runtime/module tests cover cancellation, essential failures, restart budgets, and shutdown behavior. Configuration tests enforce strict parsing and whole-candidate activation.
 
-Recorded compatibility fixtures contain actual protobuf requests and replies from a named backend revision. The agent suite fails if its pinned contract version has no recorded platform baseline. This is narrower and more useful than assuming every protobuf-compatible backend is behaviorally compatible.
+Recorded compatibility fixtures contain actual protobuf requests and replies from a named backend revision. The agent suite fails if its pinned contract version has no recorded platform baseline. Compatibility is therefore claimed only with recorded platforms, not with every protobuf-compatible backend.
 
 ## Planned delivery fault matrix
 
@@ -21,13 +21,13 @@ When admission, spool, and transport arrive, prove:
 - disk exhaustion, corrupt records, bounded expiry, and restart recovery;
 - shutdown during collection, upload, and local reclamation.
 
-The expected safety property is retained/replayed data until an explicit durable success or observable loss policy applies. “The process restarted” alone is not a recovery test.
+The expected safety property is retained/replayed data until an explicit durable success or observable loss policy applies. "The process restarted" alone is not a recovery test.
 
 ## Security and production gates
 
 Fuzz parsers and boundary decoders with bounded input. Verify that collectors cannot reach network/key packages transitively. Exercise unsafe file ownership and symlink replacement. Native packages must later prove service privileges and lifecycle, and upgrades must prove signature and rollback behavior before they can be enabled.
 
-No absent component is claimed tested. The [agent roadmap](/docs/roadmap/agent) identifies where these acceptance requirements originate.
+The [agent roadmap](/docs/roadmap/agent) identifies where these acceptance requirements originate.
 
 ## Source evidence
 

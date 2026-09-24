@@ -20,7 +20,7 @@ No real collector is implemented or enabled in the current V2 agent. The module 
 
 A collector owns its goroutines, timers, descriptors, and checkpoint state and returns only after stopping them. It submits observations through local admission; it does not acquire a TLS client or endpoint key. Resource governance must bound expensive collection, concurrency, hashing, and parsing.
 
-Do not translate “network telemetry” into packet capture or payload inspection by assumption. Do not translate “process inventory” into a real-time process-event stream. Those are different capabilities with different privacy and transport requirements.
+Do not read "network telemetry" as packet capture or payload inspection, or "process inventory" as a real-time process-event stream. Those are different capabilities with different privacy and transport requirements.
 
 ## Incremental integration
 

@@ -5,7 +5,7 @@ description: 'How wire changes evolve and why schema, protocol, software, and co
 
 ## Independent version axes
 
-Software release, contract module release, wire protocol version, event schema version, inventory schema version, and agent configuration format are distinct. The current agent declares wire protocol 1 and event/inventory schema 1; that does not make the application a “version 1” product.
+Software release, contract module release, wire protocol version, event schema version, inventory schema version, and agent configuration format are distinct. The current agent declares wire protocol 1 and event/inventory schema 1; that does not make the application a "version 1" product.
 
 The agent pins a published contract release and interprets backend refusals against the values it intentionally sent. A rejected schema or declared enum can signal incompatibility; an unset required value or unknown enum constructed by a bug is not automatically an incompatible server.
 
@@ -25,7 +25,7 @@ Run in `Seagull-contracts`. `make verify` covers lint, module verification, gene
 
 ## Behavioral compatibility
 
-Unknown protobuf fields may be ignored. That is not permission to change response meaning silently. A new interpretation that an older client cannot safely make requires an explicit protocol transition. The agent's recorded backend exchanges constrain claims to actual tested platforms; they do not establish compatibility with every version bearing a similar schema.
+Unknown protobuf fields may be ignored, but that does not permit a silent change to what a response means. A new interpretation that an older client cannot safely make requires an explicit protocol transition. The agent's recorded backend exchanges limit compatibility claims to the platforms they were recorded from; they do not establish compatibility with every version bearing a similar schema.
 
 ## Capability negotiation
 

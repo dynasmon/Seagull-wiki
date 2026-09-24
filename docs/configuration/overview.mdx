@@ -9,13 +9,13 @@ Seagull has separate configuration owners. Backend processes read typed environm
 
 Startup parses and validates configuration at composition boundaries and reports all detected problems before exiting. Empty environment values count as unset. Any supported variable can read from a file using its `_FILE` variant; do not supply secrets in checked-in examples.
 
-The [generated environment index](/docs/reference/generated/environment) extracts declarations from code, including type, required/default form, and bounds. Defaults written as Go expressions preserve the actual source definition. `Duration(name, default, minimum, maximum)` and equivalent typed calls show validation limits. Shared settings must be read alongside each executable's declarations.
+The [generated environment index](/docs/reference/generated/environment) extracts declarations from code, including type, required/default form, and bounds. Defaults defined as Go expressions are shown exactly as the source writes them. `Duration(name, default, minimum, maximum)` and equivalent typed calls show validation limits. Shared settings must be read alongside each executable's declarations.
 
 The [maintainer operational reference](/docs/reference/generated/operational) adds purpose, topology, ACK details, and retention explanations. It is a reviewed snapshot of prose and can lag source; code declarations take precedence where they disagree.
 
 ## Document configuration
 
-`deploy/rules` supplies bootstrap detection content. `deploy/alerting.yml` controls alert-plane tuning. `deploy/policy.yml` declares operator authorization. Changes to these documents are changes to security decisions, not just presentation settings.
+`deploy/rules` supplies bootstrap detection content. `deploy/alerting.yml` controls alert-plane tuning. `deploy/policy.yml` declares operator authorization. A change to any of these documents changes a security decision.
 
 ## Agent configuration
 

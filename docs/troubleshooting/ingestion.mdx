@@ -1,6 +1,6 @@
 ---
 title: 'Events are accepted but do not appear'
-description: 'Symptoms, causes, diagnosis, resolution, and verification for events are accepted but do not appear.'
+description: 'Diagnose events that received a successful HTTP response but do not appear in a hunt.'
 ---
 
 ## Symptoms
@@ -21,7 +21,7 @@ Restore the failing broker/store boundary, resolve a permanent-record refusal, o
 
 ## Verification
 
-A known development probe event is durably acknowledged and then queryable in its intended tenant. Evaluate detection separately against the actual active ruleset.
+A known development probe event is durably acknowledged and then queryable in its intended tenant. Evaluate detection separately against the active ruleset.
 
 Continue with [health and metrics](/docs/observability/health) and [failure semantics](/docs/architecture/failure-model).
 

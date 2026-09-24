@@ -13,7 +13,7 @@ Endpoint keys are generated locally by the implemented P-256 filesystem provider
 
 The backend control process has a separate agent-authenticated renewal listener. It derives identity from the presented certificate and checks registry admissibility before signing. The agent repository does not yet contain a live renewal client or scheduled rotation loop.
 
-A superseded certificate remains valid until expiry or agent-level revocation. The gateway admits by agent ID, not the latest certificate fingerprint. Renewal must not be described as immediate old-key invalidation. CRL and OCSP infrastructure is not provided; agent admission state is the implemented denial mechanism.
+A superseded certificate remains valid until expiry or agent-level revocation. The gateway admits by agent ID, not the latest certificate fingerprint. Renewal therefore does not immediately invalidate the old key. CRL and OCSP infrastructure is not provided; agent admission state is the implemented denial mechanism.
 
 ## CA rotation ordering
 

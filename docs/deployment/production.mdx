@@ -3,7 +3,7 @@ title: 'Production readiness and high availability'
 description: 'Existing hardening, missing deployment guarantees, and what must be proven before production operation.'
 ---
 
-The repository demonstrates backend capabilities and offers useful hardening mechanisms, but the supplied single-node Compose stack is not a production HA reference deployment. The unfinished agent and frontend further limit complete product readiness.
+The repository demonstrates backend capabilities and provides hardening mechanisms, but the supplied single-node Compose stack is not a production HA reference deployment. The unfinished agent and frontend further limit complete product readiness.
 
 ## Implemented foundation
 
@@ -26,7 +26,7 @@ Provision encrypted/authenticated broker and database access, effective broker A
 
 A production assessment should prove the chosen deployment's failure behavior, not just a successful startup: broker quorum loss, writer outage, storage recovery, credential compromise/rotation, retention exhaustion, consumer rebalance, and rolling compatibility. [Testing documentation](/docs/testing/strategy) identifies existing evidence and gaps. [Performance guidance](/docs/architecture/performance) does not extrapolate local measurements to a fleet guarantee.
 
-Treat this page as an explicit boundary of the current product, and the [roadmap](/docs/roadmap/status) as a guide to remaining work.
+The [roadmap](/docs/roadmap/status) tracks the remaining work.
 
 ## Source evidence
 

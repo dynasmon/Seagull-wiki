@@ -15,13 +15,13 @@ Within retained history, consumers can reconstruct projections under their imple
 
 ## Current procedural limit
 
-The workspace has persistence and recovery tests, but no complete production backup scheduler, cross-store restore orchestration, HA failover runbook, or guaranteed rollback script. This documentation therefore does not invent `backup` or `restore` commands. Use supported procedures for the exact deployed store versions and rehearse a restoration into an isolated environment before relying on them.
+The workspace has persistence and recovery tests, but no complete production backup scheduler, cross-store restore orchestration, HA failover runbook, or guaranteed rollback script. Use supported procedures for the exact deployed store versions and rehearse a restoration into an isolated environment before relying on them.
 
 ## Upgrade review
 
 Record source/image revisions, contracts versions, schema migrations, ruleset identity, trust bundles, and active configuration. Review schema changes before starting new binaries; migrations are owned by dedicated executables. Verify admission, query visibility, detections, and operational state after the change.
 
-Restore testing must confirm identities and tenant bindings as well as row counts. A “healthy” service after restoring an inconsistent registry and admission log may still make an incorrect authorization decision. Preserve or reconcile authoritative control state before reopening ingestion.
+Restore testing must confirm identities and tenant bindings as well as row counts. A "healthy" service after restoring an inconsistent registry and admission log may still make an incorrect authorization decision. Preserve or reconcile authoritative control state before reopening ingestion.
 
 ## Retention planning
 
