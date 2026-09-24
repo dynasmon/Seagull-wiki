@@ -8,7 +8,7 @@ description: 'Clone and build independent repositories, identify capability owne
 
 Use [repository boundaries](/docs/architecture/repositories) to decide where a change belongs. Protocol changes belong in contracts; endpoint runtime/collection belongs in agent; backend processing and control belong in backend; documentation is independent. Avoid changes in a sibling just to make a local checkout compile.
 
-Clone only the repositories you need, using the actual project GitHub remotes. Private access uses your existing authenticated Git setup. Backend and agent import published contracts rather than a relative filesystem path. The module file is authoritative for the toolchain and version.
+Clone only the repositories you need, using the project's GitHub remotes. Private access uses your existing authenticated Git setup. Backend and agent import published contracts rather than a relative filesystem path. The module file is authoritative for the toolchain and version.
 
 ## First working loop
 

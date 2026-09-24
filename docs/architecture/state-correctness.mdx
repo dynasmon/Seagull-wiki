@@ -15,7 +15,7 @@ Three limits bound memory: the maximum window, observations per key, and number 
 
 The raw-event topic is keyed by agent ID. A rule whose `group_by` includes the agent keeps all its state on one partition owner and can operate across replicas. An estate-wide group without the agent can span partitions. Such a rule requires `SEAGULL_DETECTION_STATE_SOLE_READER=true` and actual ownership of the entire stream. Losing that ownership stops the engine.
 
-This is a deployment constraint, not a hint. Activating an unsupported ruleset fails as a whole and leaves the last executable ruleset running. Adding an engine replica can invalidate a sole-reader deployment.
+The engine enforces this deployment constraint. Activating an unsupported ruleset fails as a whole and leaves the last executable ruleset running. Adding an engine replica can invalidate a sole-reader deployment.
 
 ## Restart and rebalance
 

@@ -1,6 +1,6 @@
 ---
 title: 'Security invariants'
-description: 'Current guarantees and target requirements, with their actual implementation boundaries.'
+description: 'Current guarantees and target requirements, with their implementation boundaries.'
 ---
 
 | Invariant                                | Status and exact scope                                                                  |
@@ -20,7 +20,7 @@ description: 'Current guarantees and target requirements, with their actual impl
 
 ## Invariants are narrower than slogans
 
-“Authenticated endpoint” means possession of a trusted credential, not a trustworthy operating system. “Durable” names a specific persisted boundary, not unlimited retention or immunity to cluster loss. “Revoked” is an agent state distributed to gateways, not an instantaneous global invalidation of all existing TLS connections.
+"Authenticated endpoint" means possession of a trusted credential, not a trustworthy operating system. "Durable" names a specific persisted boundary, not unlimited retention or immunity to cluster loss. "Revoked" is an agent state distributed to gateways, not an instantaneous global invalidation of all existing TLS connections.
 
 Use architecture and failure tests to keep these claims executable. When a new implementation introduces a second identity source, a new protocol representation, or an early acknowledgement, it must be reviewed against the existing owner and contract before being treated as an optimization.
 

@@ -9,13 +9,13 @@ The inspected `Seagull-frontend-v2` repository contains a README and license. It
 
 ## Existing Seagull visual language
 
-The legacy frontend under the separate `seagull/frontend` tree supplies an established design reference: React 18, TypeScript, EUI with Borealis, a sky-blue accent, slate surfaces, explicit light/dark palettes, restrained navigation, severity colors, and compact operational interfaces. This documentation site reuses that visual direction while using Docusaurus for document navigation.
+The legacy frontend under the separate `seagull/frontend` tree supplies an established design reference: React 18, TypeScript, EUI with Borealis, a sky-blue accent, slate surfaces, explicit light/dark palettes, restrained navigation, severity colors, and compact operational interfaces.
 
 Legacy implementation details are not a V2 frontend specification. Its React Router, feature directories, custom charts, and API workflows cannot be assumed compatible with V2 protobuf HTTP and certificate-bound operator access.
 
 ## V2 integration boundaries
 
-A V2 interface must distinguish analytical reads from administrative actions. Query API authorization currently derives scope from the caller certificate, while the control API uses certificate-bound sessions and policy. A browser session integration, protobuf client generation strategy, gateway/BFF choice, cache ownership, and certificate handling need explicit product decisions. None is silently invented here.
+A V2 interface must distinguish analytical reads from administrative actions. Query API authorization currently derives scope from the caller certificate, while the control API uses certificate-bound sessions and policy. A browser session integration, protobuf client generation strategy, gateway/BFF choice, cache ownership, and certificate handling need explicit product decisions.
 
 Views should preserve the difference between events, detections, alerts, incidents, inventory, and advisory intelligence. In particular, an advisory is not an asset vulnerability finding, and a registered agent is not proof of live endpoint connectivity.
 

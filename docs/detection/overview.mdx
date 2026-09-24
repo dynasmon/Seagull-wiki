@@ -20,7 +20,7 @@ Normalization prepares a working representation for comparison; it does not rewr
 
 A rule carries identity and revision, event class, status, severity, ATT&CK metadata, false-positive guidance, provenance, and typed expressions. It may match one event, count matching events inside a grouped window, or describe an ordered sequence. These forms share validation and compilation.
 
-Missing fields answer no comparison. They are not substituted with a zero value. Negation can therefore have consequences: the shipped external-source SSH rule matches an event without a source IP because no private-prefix predicate matches. Its tests make that choice visible.
+Missing fields answer no comparison; they are not substituted with a zero value. This affects negation: the shipped external-source SSH rule matches an event without a source IP because no private-prefix predicate matches. Its tests make that choice visible.
 
 ## Detection output
 

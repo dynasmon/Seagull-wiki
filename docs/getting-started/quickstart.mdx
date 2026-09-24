@@ -1,6 +1,6 @@
 ---
 title: 'Run the development platform'
-description: 'Bring up the actual backend development stack and verify authenticated ingestion, hunting, and inventory.'
+description: 'Bring up the backend development stack and verify authenticated ingestion, hunting, and inventory.'
 ---
 
 This walkthrough exercises the current backend with its development probe. It does not install a complete production platform or turn the unfinished V2 agent into a telemetry collector.
@@ -9,7 +9,7 @@ This walkthrough exercises the current backend with its development probe. It do
 
 Use Docker Engine with the Compose plugin, GNU Make, and the Go toolchain selected by the backend module. The inspected backend declares Go 1.25.0 with toolchain `go1.25.13`. Private module access may require `GOPRIVATE=github.com/dynasmon/*` and your own Git credentials. Never put those credentials in a documentation command or image.
 
-Run all commands from a clean `Seagull-backend-v2` checkout. Existing services use TLS ports 8443–8446 in the development topology. See [networking](/docs/deployment/topology) for overrides.
+Run all commands from a clean `Seagull-backend-v2` checkout. Existing services use TLS ports 8443 to 8446 in the development topology. See [networking](/docs/deployment/topology) for overrides.
 
 ## Start
 

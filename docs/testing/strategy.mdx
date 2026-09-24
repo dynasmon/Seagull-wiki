@@ -16,7 +16,7 @@ description: 'What each existing test layer proves, how to run it, and which rea
 
 `make verify` aggregates lint, module checks, tests, and race checks; it does not include every expensive live-infrastructure or load scenario. `make test-integration` starts its own test services and uses explicit addresses from the Makefile.
 
-## Important correctness evidence
+## Correctness evidence
 
 Recovery integration tests exercise engine loss during stateful windows, rebalance, scale changes, and sole-reader violation. Writer tests distinguish transient persistence failure from permanent record quarantine. API tests exercise certificate/tenant handling and denied operations. Shipped-rule tests reject untested or unheld cases.
 

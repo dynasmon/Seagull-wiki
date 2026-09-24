@@ -1,6 +1,6 @@
 ---
 title: 'Rules or correlation are not firing'
-description: 'Symptoms, causes, diagnosis, resolution, and verification for rules or correlation are not firing.'
+description: 'Diagnose queryable authentication evidence that produces no expected detection, alert, or incident.'
 ---
 
 ## Symptoms
@@ -13,7 +13,7 @@ Wrong event class, canonical field/value mismatch, draft rule, failed activation
 
 ## Diagnosis
 
-Check the engine's actual running ruleset and activation outcome, then the relevant shipped/author cases. Inspect normalization and missing-field semantics. For temporal rules inspect group values, event time, state pressure, and partition ownership. Look for the detection before diagnosing alert/incident storage.
+Check the ruleset the engine is running and its activation outcome, then the relevant shipped/author cases. Inspect normalization and missing-field semantics. For temporal rules inspect group values, event time, state pressure, and partition ownership. Look for the detection before diagnosing alert/incident storage.
 
 ## Resolution
 

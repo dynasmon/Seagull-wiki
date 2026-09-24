@@ -27,7 +27,7 @@ Compose sets container listener addresses as needed. A code default is not alway
 
 The internal backbone network carries broker/database communication. The advisory importer joins a separate network with outbound feed access. The agent and operator trust domains use distinct CA material and listeners even where the control process terminates both.
 
-Use TLS passthrough for the product gateway if placing it behind a proxy; HTTP identity headers are not an accepted substitute. In contrast, the independent documentation container can use normal HTTP behind any TLS reverse proxy.
+Use TLS passthrough for the product gateway if placing it behind a proxy; HTTP identity headers are not an accepted substitute.
 
 ## Scaling boundary
 

@@ -1,6 +1,6 @@
 ---
 title: 'Agent milestones and target scope'
-description: 'The architecture backlog translated into a navigable roadmap without presenting cards as implemented features.'
+description: 'Agent milestones and work areas from the architecture backlog, whose cards are target requirements.'
 ---
 
 <FeatureStatus status="target" />
@@ -9,11 +9,11 @@ The local architecture plan `AGENTS-BACKLOG.md` defines target behavior and expl
 
 ## Milestones
 
-**M0 — Independently operable foundation:** repository isolation, reproducible builds, runtime/configuration, installation identity, protected key ownership, and evidence-backed compatibility. Several of these are present; a milestone label is not a blanket completion claim.
+**M0: Independently operable foundation.** Repository isolation, reproducible builds, runtime/configuration, installation identity, protected key ownership, and evidence-backed compatibility. Several of these are present; a milestone label is not a blanket completion claim.
 
-**M1 — Core endpoint-to-detection path:** authentication collection, durable local admission, recoverable spool, secure transport, matched ACK, retries, and backend-visible analytical results. No end-to-end V2 agent pipeline exists yet.
+**M1: Core endpoint-to-detection path.** Authentication collection, durable local admission, recoverable spool, secure transport, matched ACK, retries, and backend-visible analytical results. No end-to-end V2 agent pipeline exists yet.
 
-**M2 — Inventory:** collect complete supported kinds and preserve full-scan semantics through the independent inventory route. The backend is ready to project records; the endpoint collector remains planned.
+**M2: Inventory.** Collect complete supported kinds and preserve full-scan semantics through the independent inventory route. The backend is ready to project records; the endpoint collector remains planned.
 
 ## Work areas
 
@@ -33,7 +33,7 @@ The local architecture plan `AGENTS-BACKLOG.md` defines target behavior and expl
 
 The plan distinguishes core maturity from expanded capabilities. Optional sensors, hardware-backed keys, automated bootstrap, or response functions must satisfy their own profile requirements before being advertised. A core source build does not implicitly deliver every planned collector or fleet feature.
 
-An internal event bus, storage technology for the spool, helper process, or update transport must be chosen only when its owner and failure semantics are justified. This site does not turn those options into invented deployed services.
+An internal event bus, storage technology for the spool, helper process, or update transport must be chosen only when its owner and failure semantics are justified.
 
 ## Source evidence
 

@@ -7,7 +7,7 @@ description: 'Control sessions, permissions, tenant checks, and the separate que
 
 A caller first completes mTLS using the operator/caller trust domain. `POST /v1/auth/session` exchanges that authenticated connection for a short-lived session. The token proves session identity and is bound to the certificate; it does not embed immutable permission authority.
 
-Each request resolves the caller against the policy. Every registered route declares `Certificate`, `Session`, or a typed `Permits(resource, action)` requirement. A route with no valid declaration cannot register. Handler-level tenant checks additionally prevent a caller from operating on another tenant's records.
+Each request resolves the caller against the policy. Every registered route declares `Certificate`, `Session`, or a typed `Permits(resource, action)` requirement. A route with no valid declaration cannot register. Handler-level tenant checks also prevent a caller from operating on another tenant's records.
 
 Use `Authorization: Bearer` with the session token on session-protected calls while presenting the same certificate. The current session store is a bounded in-memory allowlist. Restart invalidates live sessions. Multiple replicas do not share sessions even if a signing key is configured identically; do not claim a stateless horizontally scalable session service.
 

@@ -18,7 +18,7 @@ description: 'Where Seagull retries, where it fails closed, and which states are
 
 An ACK gives a broker durability result, while query visibility depends on asynchronous writers. PostgreSQL stores mutable control records and their trails. Rulesets and admission rosters replicate through compacted topics. Gateways can temporarily hold an earlier roster revision while a newer control decision propagates.
 
-Inventory currentness is determined by the newest full scan for a kind. Item projection and scan-watermark persistence must be understood together; an ADR is not proof that every multi-write operation is atomic. The integration tests and actual projector code define the supported recovery behavior.
+Inventory currentness is determined by the newest full scan for a kind. Item projection and scan-watermark persistence must be understood together; an ADR is not proof that every multi-write operation is atomic. The integration tests and the projector code define the supported recovery behavior.
 
 ## Failure is observable, not equivalent to loss
 

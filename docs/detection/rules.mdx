@@ -1,6 +1,6 @@
 ---
 title: 'Author and test rules'
-description: 'Use the actual rule format, account for field semantics, and validate shipped detection content.'
+description: 'Write rules in the supported format, account for field semantics, and validate shipped detection content.'
 ---
 
 The YAML authoring format is compiled into typed domain rules. The analysis runtime does not interpret arbitrary YAML at evaluation time. A file starts with `schema_version: 1` and contains a `rules` sequence.
@@ -9,13 +9,13 @@ The YAML authoring format is compiled into typed domain rules. The analysis runt
 
 The shipped authentication file contains three executable examples:
 
-| Rule                                   | Meaning                                                        | Important limit                                            |
+| Rule                                   | Meaning                                                        | Limit                                                      |
 | -------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
 | `ssh.failed_password_from_outside`     | Failed SSH password outside selected address prefixes          | No network-range operator; `172.16.0.0/12` is not excluded |
 | `ssh.repeated_failed_password`         | Twenty failures from one address against one agent in a minute | Group includes agent; count is event-time                  |
 | `ssh.password_guessing_that_succeeded` | Failure then success inside five minutes                       | Correlation confidence depends on source clocks            |
 
-The complete, unmodified [shipped rules reference](/docs/reference/generated/rules) preserves their cases, metadata, and limitations. Use it as the format example rather than copying an invented rule skeleton.
+The complete, unmodified [shipped rules reference](/docs/reference/generated/rules) preserves their cases, metadata, and limitations. Use those rules as the format example.
 
 ## Authoring workflow
 

@@ -7,7 +7,7 @@ The legacy implementation is a source of product requirements and operational le
 
 ## Durability becomes an admission boundary
 
-ADR 1 records a legacy ingest path that acknowledged a Redis enqueue before the downstream workers completed their writes. V2 instead makes the broker publication durable before replying. An upstream producer can therefore distinguish “the platform owns this batch” from “a process accepted some work.” Detection and database writes still happen later.
+ADR 1 records a legacy ingest path that acknowledged a Redis enqueue before the downstream workers completed their writes. V2 instead makes the broker publication durable before replying. An upstream producer can therefore distinguish "the platform owns this batch" from "a process accepted some work." Detection and database writes still happen later.
 
 ## Identity becomes explicit
 
@@ -15,7 +15,7 @@ ADR 2 records the move from proxy-forwarded identity headers to certificate veri
 
 ## Capabilities gain separate owners
 
-Events, detections, alerts, and incidents represent different facts. Analytical evidence belongs in the data plane; mutable triage belongs in the control plane. V2 makes this distinction in contracts, stores, processes, and architecture tests. Scaling ingestion no longer requires putting every product responsibility in the same request path.
+Events, detections, alerts, and incidents are different facts. Analytical evidence belongs in the data plane; mutable triage belongs in the control plane. V2 makes this distinction in contracts, stores, processes, and architecture tests. Scaling ingestion no longer requires putting every product responsibility in the same request path.
 
 ## Migration limits
 

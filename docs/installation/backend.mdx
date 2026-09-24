@@ -27,7 +27,7 @@ Persistent broker and database volumes outlive stopped containers. `make down` i
 
 A production deployment must supply independently managed certificate authorities, private-key access controls, authenticated/encrypted broker and database connections, appropriate topic replication, per-process credentials, storage/retention sizing, and a tested recovery procedure. The repository offers configuration mechanisms for several of these, not a completed production topology.
 
-Do not derive platform requirements from the documentation site's small static-server footprint. Backend advisory imports and analytical storage have independent workload and capacity needs. Refer to [production readiness](/docs/deployment/production) and the measured [performance baseline](/docs/architecture/performance).
+Advisory imports and analytical storage each have their own workload and capacity needs. Refer to [production readiness](/docs/deployment/production) and the measured [performance baseline](/docs/architecture/performance).
 
 ## Source evidence
 
